@@ -13,7 +13,7 @@ public interface Application {
 
     static <T, R> Application create(DynamicConfiguration configuration) {
         try {
-            Class<?> undertowApplication = Class.forName("no.ssb.dc.server.UndertowApplication");
+            Class<?> undertowApplication = Class.forName("no.ssb.dc.application.UndertowApplication");
             Method method = undertowApplication.getDeclaredMethod("initializeUndertowApplication", DynamicConfiguration.class);
             return (Application) method.invoke(null, configuration);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -23,7 +23,7 @@ public interface Application {
 
     static <T, R> Application create(DynamicConfiguration configuration, Integer port) {
         try {
-            Class<?> undertowApplication = Class.forName("no.ssb.dc.server.UndertowApplication");
+            Class<?> undertowApplication = Class.forName("no.ssb.dc.application.UndertowApplication");
             Method method = undertowApplication.getDeclaredMethod("initializeUndertowApplication", DynamicConfiguration.class, Integer.class);
             return (Application) method.invoke(null, configuration, port);
         } catch (ClassNotFoundException | NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
