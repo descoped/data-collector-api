@@ -1,8 +1,9 @@
-package no.ssb.dc.api.http;
+package no.ssb.dc.api.content;
 
 import no.ssb.dc.api.CorrelationIds;
+import no.ssb.dc.api.http.Headers;
 
-public class Metadata {
+public class HttpRequestInfo {
 
     private final CorrelationIds correlationIds;
     private final String url;
@@ -10,7 +11,7 @@ public class Metadata {
     private final Headers responseHeaders;
     private final long requestDurationNanoSeconds;
 
-    public Metadata(CorrelationIds correlationIds, String url, Headers requestHeaders, Headers responseHeaders, long requestDurationNanoSeconds) {
+    public HttpRequestInfo(CorrelationIds correlationIds, String url, Headers requestHeaders, Headers responseHeaders, long requestDurationNanoSeconds) {
         this.correlationIds = correlationIds;
         this.url = url;
         this.requestHeaders = requestHeaders;

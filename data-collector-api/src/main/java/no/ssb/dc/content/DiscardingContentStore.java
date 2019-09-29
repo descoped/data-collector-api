@@ -4,8 +4,8 @@ import no.ssb.dc.api.content.ContentStore;
 import no.ssb.dc.api.content.ContentStream;
 import no.ssb.dc.api.content.ContentStreamBuffer;
 import no.ssb.dc.api.content.ContentStreamProducer;
+import no.ssb.dc.api.content.HttpRequestInfo;
 import no.ssb.dc.api.content.MetadataContent;
-import no.ssb.dc.api.http.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,13 +30,13 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void addPaginationDocument(String namespace, String contentKey, byte[] content, Metadata metadata) {
+    public void addPaginationDocument(String namespace, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
         ContentStream contentStream = new DiscardingContentStream();
         ContentStreamProducer producer = contentStream.producer(namespace + "-pages");
         ContentStreamBuffer.Builder bufferBuilder = producer.builder();
 
-        String position = metadata.getCorrelationIds().first().toString();
-        MetadataContent manifest = getMetadataContent(namespace + "-pages", position, contentKey, content, MetadataContent.ResourceType.PAGE, metadata);
+        String position = httpRequestInfo.getCorrelationIds().first().toString();
+        MetadataContent manifest = getMetadataContent(namespace + "-pages", position, contentKey, content, MetadataContent.ResourceType.PAGE, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
             LOG.trace("PAGE: {}", manifest.toJSON());
         }
@@ -48,8 +48,8 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void bufferPaginationEntryDocument(String namespace, String position, String contentKey, byte[] content, Metadata metadata) {
-        MetadataContent manifest = getMetadataContent(namespace, position, contentKey, content, MetadataContent.ResourceType.ENTRY, metadata);
+    public void bufferPaginationEntryDocument(String namespace, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
+        MetadataContent manifest = getMetadataContent(namespace, position, contentKey, content, MetadataContent.ResourceType.ENTRY, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
             System.out.printf("%n");
             LOG.trace("ENTRY: {}", manifest.toJSON());
@@ -64,8 +64,8 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void bufferDocument(String namespace, String position, String contentKey, byte[] content, Metadata metadata) {
-        MetadataContent manifest = getMetadataContent(namespace, position, contentKey, content, MetadataContent.ResourceType.DOCUMENT, metadata);
+    public void bufferDocument(String namespace, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
+        MetadataContent manifest = getMetadataContent(namespace, position, contentKey, content, MetadataContent.ResourceType.DOCUMENT, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
             LOG.trace("DOCUMENT: {}", manifest.toJSON());
         }
@@ -85,19 +85,19 @@ public class DiscardingContentStore implements ContentStore {
         }
     }
 
-    MetadataContent getMetadataContent(String namespace, String position, String contentKey, byte[] content, MetadataContent.ResourceType resourceType, Metadata metadata) {
+    MetadataContent getMetadataContent(String namespace, String position, String contentKey, byte[] content, MetadataContent.ResourceType resourceType, HttpRequestInfo httpRequestInfo) {
         return new MetadataContent.Builder()
                 .resourceType(resourceType)
-                .correlationId(metadata.getCorrelationIds())
-                .url(metadata.getUrl())
+                .correlationId(httpRequestInfo.getCorrelationIds())
+                .url(httpRequestInfo.getUrl())
                 .namespace(namespace)
                 .position(position)
                 .contentKey(contentKey)
-                .contentType(metadata.getResponseHeaders().firstValue("content-type").orElseGet(() -> "application/octet-stream"))
+                .contentType(httpRequestInfo.getResponseHeaders().firstValue("content-type").orElseGet(() -> "application/octet-stream"))
                 .contentLength(content.length)
-                .requestDurationNanoTime(metadata.getRequestDurationNanoSeconds())
-                .requestHeaders(metadata.getRequestHeaders())
-                .responseHeaders(metadata.getResponseHeaders())
+                .requestDurationNanoTime(httpRequestInfo.getRequestDurationNanoSeconds())
+                .requestHeaders(httpRequestInfo.getRequestHeaders())
+                .responseHeaders(httpRequestInfo.getResponseHeaders())
                 .build();
     }
 }
