@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import no.ssb.dc.api.builder.AbstractNodeBuilder;
 import no.ssb.dc.api.builder.AddContentBuilder;
+import no.ssb.dc.api.builder.BuilderType;
 import no.ssb.dc.api.builder.ConditionBuilder;
 import no.ssb.dc.api.builder.EvalBuilder;
 import no.ssb.dc.api.builder.ExecuteBuilder;

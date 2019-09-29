@@ -1,4 +1,4 @@
-package no.ssb.dc.api;
+package no.ssb.dc.api.el;
 
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;

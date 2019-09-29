@@ -1,5 +1,6 @@
 package no.ssb.dc.api;
 
+import no.ssb.dc.api.el.ExpressionLanguage;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
