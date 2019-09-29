@@ -1,4 +1,4 @@
-package no.ssb.dc.api.delegate;
+package no.ssb.dc.api.handler;
 
 public enum QueryType {
     ITEM_LIST,
