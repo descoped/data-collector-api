@@ -1,13 +1,28 @@
 package no.ssb.dc.api;
 
+import no.ssb.dc.api.builder.AddContentBuilder;
+import no.ssb.dc.api.builder.EvalBuilder;
+import no.ssb.dc.api.builder.ExecuteBuilder;
+import no.ssb.dc.api.builder.GetBuilder;
+import no.ssb.dc.api.builder.NextPageBuilder;
+import no.ssb.dc.api.builder.PaginateBuilder;
+import no.ssb.dc.api.builder.ParallelBuilder;
+import no.ssb.dc.api.builder.ProcessBuilder;
+import no.ssb.dc.api.builder.PublishBuilder;
+import no.ssb.dc.api.builder.QueryBuilder;
+import no.ssb.dc.api.builder.RegExBuilder;
+import no.ssb.dc.api.builder.SequenceBuilder;
+import no.ssb.dc.api.builder.WhenVariableIsNullBuilder;
+import no.ssb.dc.api.builder.XPathBuilder;
+
 public class Builders {
 
-    public static Flow.GetBuilder get(String nodeId) {
-        return new Flow.GetBuilder(nodeId);
+    public static GetBuilder get(String nodeId) {
+        return new GetBuilder(nodeId);
     }
 
-    public static Flow.PaginateBuilder paginate(String nodeId) {
-        return new Flow.PaginateBuilder(nodeId);
+    public static PaginateBuilder paginate(String nodeId) {
+        return new PaginateBuilder(nodeId);
     }
 
     /**
@@ -16,47 +31,47 @@ public class Builders {
      * @param builder
      * @return
      */
-    public static Flow.SequenceBuilder sequence(Flow.QueryBuilder builder) {
-        return new Flow.SequenceBuilder(builder);
+    public static SequenceBuilder sequence(QueryBuilder builder) {
+        return new SequenceBuilder(builder);
     }
 
-    public static Flow.NextPageBuilder nextPage() {
-        return new Flow.NextPageBuilder();
+    public static NextPageBuilder nextPage() {
+        return new NextPageBuilder();
     }
 
-    public static Flow.ParallelBuilder parallel(Flow.QueryBuilder builder) {
-        return new Flow.ParallelBuilder(builder);
+    public static ParallelBuilder parallel(QueryBuilder builder) {
+        return new ParallelBuilder(builder);
     }
 
-    public static Flow.ExecuteBuilder execute(String id) {
-        return new Flow.ExecuteBuilder(id);
+    public static ExecuteBuilder execute(String id) {
+        return new ExecuteBuilder(id);
     }
 
-    public static Flow.ProcessBuilder process(Class<? extends Processor> processorClass) {
-        return new Flow.ProcessBuilder(processorClass);
+    public static ProcessBuilder process(Class<? extends Processor> processorClass) {
+        return new ProcessBuilder(processorClass);
     }
 
-    public static Flow.AddContentBuilder addContent(String positionVariable, String contentKey) {
-        return new Flow.AddContentBuilder(positionVariable, contentKey);
+    public static AddContentBuilder addContent(String positionVariable, String contentKey) {
+        return new AddContentBuilder(positionVariable, contentKey);
     }
 
-    public static Flow.PublishBuilder publish(String positionVariable) {
-        return new Flow.PublishBuilder(positionVariable);
+    public static PublishBuilder publish(String positionVariable) {
+        return new PublishBuilder(positionVariable);
     }
 
-    public static Flow.EvalBuilder eval(Flow.QueryBuilder queryBuilder, String bindTo, String elExpression) {
-        return new Flow.EvalBuilder(queryBuilder, bindTo, elExpression);
+    public static EvalBuilder eval(QueryBuilder queryBuilder, String bindTo, String elExpression) {
+        return new EvalBuilder(queryBuilder, bindTo, elExpression);
     }
 
-    public static Flow.XPathBuilder xpath(String expression) {
-        return new Flow.XPathBuilder(expression);
+    public static XPathBuilder xpath(String expression) {
+        return new XPathBuilder(expression);
     }
 
-    public static Flow.RegExBuilder regex(Flow.QueryBuilder queryBuilder, String expression) {
-        return new Flow.RegExBuilder(queryBuilder, expression);
+    public static RegExBuilder regex(QueryBuilder queryBuilder, String expression) {
+        return new RegExBuilder(queryBuilder, expression);
     }
 
-    public static Flow.WhenVariableIsNullBuilder whenVariableIsNull(String identifier) {
-        return new Flow.WhenVariableIsNullBuilder().identifier(identifier);
+    public static WhenVariableIsNullBuilder whenVariableIsNull(String identifier) {
+        return new WhenVariableIsNullBuilder().identifier(identifier);
     }
 }

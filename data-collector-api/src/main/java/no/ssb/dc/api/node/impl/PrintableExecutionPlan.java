@@ -1,4 +1,6 @@
-package no.ssb.dc.api;
+package no.ssb.dc.api.node.impl;
+
+import no.ssb.dc.api.node.Node;
 
 import java.util.Arrays;
 import java.util.LinkedHashSet;
@@ -11,28 +13,28 @@ import java.util.stream.Collectors;
  */
 class PrintableExecutionPlan {
 
-    static String build(Interfaces.Node flowNode) {
+    static String build(Node flowNode) {
         StringBuilder builder = new StringBuilder();
-        Nodes.FlowNode.depthFirstPreOrderFullTraversal(0, new LinkedHashSet<>(), new LinkedList<>(), flowNode, (ancestors, visitNode) -> {
+        FlowNode.depthFirstPreOrderFullTraversal(0, new LinkedHashSet<>(), new LinkedList<>(), flowNode, (ancestors, visitNode) -> {
             String indent = Arrays.stream(new String[ancestors.size()]).map(element -> " ").collect(Collectors.joining());
 
             AtomicBoolean handled = new AtomicBoolean();
 
-            visitNode.given(Nodes.GetNode.class, handled, node -> {
+            visitNode.given(GetNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) get(%s) => %s%n", indent, ancestors.size(),
                         node.id(),
                         node.url())
                 );
             });
 
-            visitNode.given(Nodes.ProcessNode.class, handled, node -> {
+            visitNode.given(ProcessNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) process(Class<%s>) produces required-variables: %s%n", indent, ancestors.size(),
                         node.processorClass().getSimpleName(),
                         node.requiredOutputs())
                 );
             });
 
-            visitNode.given(Nodes.ExecuteNode.class, handled, node -> {
+            visitNode.given(ExecuteNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) execute(%s)", indent, ancestors.size(),
                         node.executeId()));
 
@@ -48,7 +50,7 @@ class PrintableExecutionPlan {
                 builder.append(String.format("%n"));
             });
 
-            visitNode.given(Nodes.PaginateNode.class, handled, node -> {
+            visitNode.given(PaginateNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) paginate(%s)", indent, ancestors.size(),
                         node.id())
                 );
@@ -67,17 +69,17 @@ class PrintableExecutionPlan {
                 builder.append(String.format("%n"));
             });
 
-            visitNode.given(Nodes.SequenceNode.class, handled, node -> {
+            visitNode.given(SequenceNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) sequence forEach %s with expected-position %s%n", indent, ancestors.size(),
                         node.splitNode.expression(), node.expectedNode.expression()));
             });
 
-            visitNode.given(Nodes.NextPageNode.class, handled, node -> {
+            visitNode.given(NextPageNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) nextPage output [%s]%n", indent, ancestors.size(),
                         node.outputs().entrySet().stream().map(entry -> (entry.getKey() + "=" + entry.getValue())).collect(Collectors.joining(",")) ));
             });
 
-            visitNode.given(Nodes.ParallelNode.class, handled, node -> {
+            visitNode.given(ParallelNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) parallel each %s", indent, ancestors.size(),
                         node.splitQueryNode.expression())
                 );
@@ -91,11 +93,11 @@ class PrintableExecutionPlan {
                 builder.append(String.format("%n"));
             });
 
-            visitNode.given(Nodes.AddContentNode.class, handled, node -> {
+            visitNode.given(AddContentNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) addContent to %s named '%s'%n", indent, ancestors.size(), node.positionVariableExpression(), node.contentKey()));
             });
 
-            visitNode.given(Nodes.PublishNode.class, handled, node -> {
+            visitNode.given(PublishNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) publish position by %s%n", indent, ancestors.size(),
                         node.positionVariableExpression)
                 );

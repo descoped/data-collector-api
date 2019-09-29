@@ -37,6 +37,8 @@ module no.ssb.dc.api {
     exports no.ssb.dc.api.context;
     exports no.ssb.dc.api.content;
     exports no.ssb.dc.api.delegate;
+    exports no.ssb.dc.api.builder;
+    exports no.ssb.dc.api.node;
     exports no.ssb.dc.api.http;
     exports no.ssb.dc.api.ulid;
     exports no.ssb.dc.api.error;

@@ -5,6 +5,24 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import no.ssb.dc.api.builder.AbstractNodeBuilder;
+import no.ssb.dc.api.builder.AddContentBuilder;
+import no.ssb.dc.api.builder.ConditionBuilder;
+import no.ssb.dc.api.builder.EvalBuilder;
+import no.ssb.dc.api.builder.ExecuteBuilder;
+import no.ssb.dc.api.builder.FlowBuilder;
+import no.ssb.dc.api.builder.GetBuilder;
+import no.ssb.dc.api.builder.NextPageBuilder;
+import no.ssb.dc.api.builder.NodeBuilder;
+import no.ssb.dc.api.builder.PaginateBuilder;
+import no.ssb.dc.api.builder.ParallelBuilder;
+import no.ssb.dc.api.builder.ProcessBuilder;
+import no.ssb.dc.api.builder.PublishBuilder;
+import no.ssb.dc.api.builder.QueryBuilder;
+import no.ssb.dc.api.builder.RegExBuilder;
+import no.ssb.dc.api.builder.SequenceBuilder;
+import no.ssb.dc.api.builder.WhenVariableIsNullBuilder;
+import no.ssb.dc.api.builder.XPathBuilder;
 
 import java.io.IOException;
 import java.util.Deque;
@@ -15,7 +33,7 @@ import java.util.stream.Collectors;
 /**
  * TODO Rewrite to a generic deserializer
  */
-public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBuilder> {
+public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder> {
 
     public NodeBuilderDeserializer() {
         this(null);
@@ -26,7 +44,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBu
     }
 
     @Override
-    public Flow.AbstractNodeBuilder deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
+    public AbstractNodeBuilder deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         return handleNodeBuilder(0, context, new LinkedList<>(), null, node);
     }
@@ -39,33 +57,33 @@ public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBu
         }).collect(Collectors.joining("/"));
     }
 
-    private Flow.AbstractNodeBuilder handleNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors,
-                                                       JsonNode previousNode, JsonNode currentNode) {
+    private AbstractNodeBuilder handleNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors,
+                                                  JsonNode previousNode, JsonNode currentNode) {
         if (currentNode == null || !currentNode.has("type")) {
             throw new RuntimeException(String.format("Error resolving node: %s => %s", nodePath(ancestors), ancestors.peekLast()));
         }
         BuilderType type = BuilderType.parse(currentNode.get("type").textValue());
 
         ancestors.add(previousNode);
-        Flow.AbstractNodeBuilder nextNodeBuilder = buildNodeBuilder(depth, context, ancestors, currentNode, type);
+        AbstractNodeBuilder nextNodeBuilder = buildNodeBuilder(depth, context, ancestors, currentNode, type);
         ancestors.remove(previousNode);
         return nextNodeBuilder;
     }
 
-    private Flow.AbstractNodeBuilder buildNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors, JsonNode currentNode, BuilderType type) {
+    private AbstractNodeBuilder buildNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors, JsonNode currentNode, BuilderType type) {
         Objects.requireNonNull(type);
         switch (type) {
             case Flow: {
-                Flow.FlowBuilder builder = Flow.start(currentNode.get("flowName").textValue(), currentNode.get("startNodeId").textValue());
+                FlowBuilder builder = Flow.start(currentNode.get("flowName").textValue(), currentNode.get("startNodeId").textValue());
 
                 currentNode.get("nodes").fields().forEachRemaining(entry ->
-                        builder.node((Flow.NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
+                        builder.node((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
                 return builder;
             }
 
             case Paginate: {
-                Flow.PaginateBuilder builder = new Flow.PaginateBuilder(currentNode.get("id").textValue());
+                PaginateBuilder builder = new PaginateBuilder(currentNode.get("id").textValue());
 
                 currentNode.get("variables").fields().forEachRemaining(entry -> builder.variable(entry.getKey(), entry.getValue().textValue()));
 
@@ -73,36 +91,36 @@ public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBu
                     builder.addPageContent();
                 }
 
-                currentNode.get("children").forEach(child -> builder.step((Flow.ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));
+                currentNode.get("children").forEach(child -> builder.step((ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));
 
                 JsonNode thresholdNode = currentNode.get("threshold");
                 builder.prefetchThreshold(thresholdNode.asDouble());
 
                 JsonNode conditionBuilderNode = currentNode.get("until");
-                builder.until((Flow.ConditionBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, conditionBuilderNode));
+                builder.until((ConditionBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, conditionBuilderNode));
 
                 return builder;
             }
 
             case Sequence: {
-                Flow.SequenceBuilder builder = new Flow.SequenceBuilder(null);
+                SequenceBuilder builder = new SequenceBuilder(null);
 
-                Flow.QueryBuilder splitBuilder = (Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("splitQuery"));
+                QueryBuilder splitBuilder = (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("splitQuery"));
                 builder.splitBuilder(splitBuilder);
 
-                Flow.QueryBuilder expectedBuilder = (Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("expectedQuery"));
+                QueryBuilder expectedBuilder = (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("expectedQuery"));
                 builder.expected(expectedBuilder);
 
                 return builder;
             }
 
             case NextPage: {
-                Flow.NextPageBuilder builder = new Flow.NextPageBuilder();
+                NextPageBuilder builder = new NextPageBuilder();
 
                 currentNode.get("outputs").fields().forEachRemaining(entry ->
                         builder.output(
                                 entry.getKey(),
-                                (Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())
+                                (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())
                         )
                 );
 
@@ -110,18 +128,18 @@ public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBu
             }
 
             case Parallel: {
-                Flow.QueryBuilder splitBuilder = (Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("splitQuery"));
-                Flow.ParallelBuilder builder = new Flow.ParallelBuilder(splitBuilder);
+                QueryBuilder splitBuilder = (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("splitQuery"));
+                ParallelBuilder builder = new ParallelBuilder(splitBuilder);
 
                 currentNode.get("variables").fields().forEachRemaining(entry ->
-                        builder.variable(entry.getKey(), (Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
+                        builder.variable(entry.getKey(), (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
                 JsonNode stepsNode = currentNode.get("steps");
-                stepsNode.forEach(stepNode -> builder.step((Flow.NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                stepsNode.forEach(stepNode -> builder.step((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
 
                 JsonNode publishJsonNode = currentNode.get("publish");
                 if (publishJsonNode != null) {
-                    Flow.PublishBuilder publishBuilder = (Flow.PublishBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, publishJsonNode);
+                    PublishBuilder publishBuilder = (PublishBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, publishJsonNode);
                     builder.publish(publishBuilder);
                 }
 
@@ -129,7 +147,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBu
             }
 
             case Execute: {
-                Flow.ExecuteBuilder builder = new Flow.ExecuteBuilder(currentNode.get("executeId").textValue());
+                ExecuteBuilder builder = new ExecuteBuilder(currentNode.get("executeId").textValue());
 
                 if (currentNode.has("requiredInputs")) {
                     currentNode.get("requiredInputs").forEach(requiredInput -> builder.requiredInput(requiredInput.textValue()));
@@ -137,14 +155,14 @@ public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBu
 
                 if (currentNode.has("inputVariables")) {
                     currentNode.get("inputVariables").fields().forEachRemaining(entry ->
-                            builder.inputVariable(entry.getKey(), (Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
+                            builder.inputVariable(entry.getKey(), (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
                 }
                 return builder;
             }
 
             case Process: {
                 try {
-                    Flow.ProcessBuilder builder = new Flow.ProcessBuilder((Class<? extends Processor>) Class.forName(currentNode.get("processorClass").textValue()));
+                    ProcessBuilder builder = new ProcessBuilder((Class<? extends Processor>) Class.forName(currentNode.get("processorClass").textValue()));
                     currentNode.get("requiredOutputs").forEach(output -> builder.output(output.textValue()));
                     return builder;
                 } catch (ClassNotFoundException e) {
@@ -153,46 +171,46 @@ public class NodeBuilderDeserializer extends StdDeserializer<Flow.AbstractNodeBu
             }
 
             case QueryEval: {
-                Flow.QueryBuilder queryBuilder = (Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("query"));
+                QueryBuilder queryBuilder = (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("query"));
                 String bindToVariableNode = currentNode.get("bindToVariable").textValue();
                 String expression = currentNode.get("expression").textValue();
-                return new Flow.EvalBuilder(queryBuilder, bindToVariableNode, expression);
+                return new EvalBuilder(queryBuilder, bindToVariableNode, expression);
             }
 
             case QueryXPath: {
-                return new Flow.XPathBuilder(currentNode.get("expression").textValue());
+                return new XPathBuilder(currentNode.get("expression").textValue());
             }
 
             case QueryRegEx: {
-                return new Flow.RegExBuilder((Flow.QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("query")), currentNode.get("expression").textValue());
+                return new RegExBuilder((QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("query")), currentNode.get("expression").textValue());
             }
 
             case ConditionWhenVariableIsNull: {
-                Flow.WhenVariableIsNullBuilder builder = new Flow.WhenVariableIsNullBuilder();
+                WhenVariableIsNullBuilder builder = new WhenVariableIsNullBuilder();
                 builder.identifier(currentNode.get("identifier").textValue());
                 return builder;
             }
 
             case AddContent: {
-                return new Flow.AddContentBuilder(currentNode.get("positionVariableExpression").textValue(), currentNode.get("contentKey").textValue());
+                return new AddContentBuilder(currentNode.get("positionVariableExpression").textValue(), currentNode.get("contentKey").textValue());
             }
 
             case Publish: {
-                return new Flow.PublishBuilder(currentNode.get("positionVariableExpression").textValue());
+                return new PublishBuilder(currentNode.get("positionVariableExpression").textValue());
             }
 
             case Get: {
-                Flow.GetBuilder builder = new Flow.GetBuilder(currentNode.get("id").textValue());
+                GetBuilder builder = new GetBuilder(currentNode.get("id").textValue());
 
                 builder.url(currentNode.get("url").textValue());
 
                 ArrayNode returnVariablesNode = (ArrayNode) currentNode.get("returnVariables");
                 if (returnVariablesNode != null) {
-                    returnVariablesNode.forEach(node -> builder.returnVariables.add(node.textValue()));
+                    returnVariablesNode.forEach(node -> builder.returnVariables(node.textValue()));
                 }
 
                 JsonNode stepsNode = currentNode.get("steps");
-                stepsNode.forEach(stepNode -> builder.step((Flow.NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                stepsNode.forEach(stepNode -> builder.step((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
 
                 return builder;
             }
