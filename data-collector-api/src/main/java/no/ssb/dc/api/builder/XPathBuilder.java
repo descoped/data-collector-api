@@ -2,7 +2,6 @@ package no.ssb.dc.api.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import no.ssb.dc.api.NodeBuilderDeserializer;
 import no.ssb.dc.api.node.BaseNode;
 import no.ssb.dc.api.node.impl.XPathNode;
 

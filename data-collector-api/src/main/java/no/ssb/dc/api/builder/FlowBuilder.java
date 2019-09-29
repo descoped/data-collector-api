@@ -3,7 +3,6 @@ package no.ssb.dc.api.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.Flow;
-import no.ssb.dc.api.NodeBuilderDeserializer;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.util.JacksonFactory;
 

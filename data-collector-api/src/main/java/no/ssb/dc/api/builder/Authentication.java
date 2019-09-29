@@ -1,4 +1,4 @@
-package no.ssb.dc.api;
+package no.ssb.dc.api.builder;
 
 public enum Authentication {
     NONE,

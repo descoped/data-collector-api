@@ -1,29 +1,12 @@
-package no.ssb.dc.api;
+package no.ssb.dc.api.builder;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import no.ssb.dc.api.builder.AbstractNodeBuilder;
-import no.ssb.dc.api.builder.AddContentBuilder;
-import no.ssb.dc.api.builder.BuilderType;
-import no.ssb.dc.api.builder.ConditionBuilder;
-import no.ssb.dc.api.builder.EvalBuilder;
-import no.ssb.dc.api.builder.ExecuteBuilder;
-import no.ssb.dc.api.builder.FlowBuilder;
-import no.ssb.dc.api.builder.GetBuilder;
-import no.ssb.dc.api.builder.NextPageBuilder;
-import no.ssb.dc.api.builder.NodeBuilder;
-import no.ssb.dc.api.builder.PaginateBuilder;
-import no.ssb.dc.api.builder.ParallelBuilder;
-import no.ssb.dc.api.builder.ProcessBuilder;
-import no.ssb.dc.api.builder.PublishBuilder;
-import no.ssb.dc.api.builder.QueryBuilder;
-import no.ssb.dc.api.builder.RegExBuilder;
-import no.ssb.dc.api.builder.SequenceBuilder;
-import no.ssb.dc.api.builder.WhenVariableIsNullBuilder;
-import no.ssb.dc.api.builder.XPathBuilder;
+import no.ssb.dc.api.Flow;
+import no.ssb.dc.api.Processor;
 
 import java.io.IOException;
 import java.util.Deque;
