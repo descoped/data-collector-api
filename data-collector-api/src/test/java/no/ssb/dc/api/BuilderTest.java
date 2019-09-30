@@ -1,10 +1,10 @@
 package no.ssb.dc.api;
 
-import no.ssb.dc.api.builder.FlowBuilder;
-import no.ssb.dc.api.builder.GetBuilder;
-import no.ssb.dc.api.builder.NodeBuilder;
-import no.ssb.dc.api.builder.PaginateBuilder;
 import no.ssb.dc.api.context.ExecutionContext;
+import no.ssb.dc.api.node.builder.FlowBuilder;
+import no.ssb.dc.api.node.builder.GetBuilder;
+import no.ssb.dc.api.node.builder.NodeBuilder;
+import no.ssb.dc.api.node.builder.PaginateBuilder;
 import org.testng.annotations.Test;
 
 import static no.ssb.dc.api.Builders.execute;

@@ -2,10 +2,10 @@ package no.ssb.dc.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import no.ssb.dc.api.builder.AbstractNodeBuilder;
-import no.ssb.dc.api.builder.FlowBuilder;
-import no.ssb.dc.api.builder.NodeBuilderDeserializer;
 import no.ssb.dc.api.node.Node;
+import no.ssb.dc.api.node.builder.AbstractNodeBuilder;
+import no.ssb.dc.api.node.builder.FlowBuilder;
+import no.ssb.dc.api.node.builder.NodeBuilderDeserializer;
 import no.ssb.dc.api.util.JacksonFactory;
 
 import java.io.IOException;

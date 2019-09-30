@@ -1,20 +1,20 @@
 package no.ssb.dc.api;
 
-import no.ssb.dc.api.builder.AddContentBuilder;
-import no.ssb.dc.api.builder.EvalBuilder;
-import no.ssb.dc.api.builder.ExecuteBuilder;
-import no.ssb.dc.api.builder.GetBuilder;
-import no.ssb.dc.api.builder.NextPageBuilder;
-import no.ssb.dc.api.builder.PaginateBuilder;
-import no.ssb.dc.api.builder.ParallelBuilder;
-import no.ssb.dc.api.builder.ProcessBuilder;
-import no.ssb.dc.api.builder.PublishBuilder;
-import no.ssb.dc.api.builder.QueryBuilder;
-import no.ssb.dc.api.builder.RegExBuilder;
-import no.ssb.dc.api.builder.SequenceBuilder;
-import no.ssb.dc.api.builder.ValidateRequestBuilder;
-import no.ssb.dc.api.builder.WhenVariableIsNullBuilder;
-import no.ssb.dc.api.builder.XPathBuilder;
+import no.ssb.dc.api.node.builder.AddContentBuilder;
+import no.ssb.dc.api.node.builder.EvalBuilder;
+import no.ssb.dc.api.node.builder.ExecuteBuilder;
+import no.ssb.dc.api.node.builder.GetBuilder;
+import no.ssb.dc.api.node.builder.NextPageBuilder;
+import no.ssb.dc.api.node.builder.PaginateBuilder;
+import no.ssb.dc.api.node.builder.ParallelBuilder;
+import no.ssb.dc.api.node.builder.ProcessBuilder;
+import no.ssb.dc.api.node.builder.PublishBuilder;
+import no.ssb.dc.api.node.builder.QueryBuilder;
+import no.ssb.dc.api.node.builder.RegExBuilder;
+import no.ssb.dc.api.node.builder.SequenceBuilder;
+import no.ssb.dc.api.node.builder.ValidateRequestBuilder;
+import no.ssb.dc.api.node.builder.WhenVariableIsNullBuilder;
+import no.ssb.dc.api.node.builder.XPathBuilder;
 
 public class Builders {
 
