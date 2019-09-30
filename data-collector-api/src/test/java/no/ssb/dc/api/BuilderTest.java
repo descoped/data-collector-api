@@ -38,6 +38,7 @@ public class BuilderTest {
             )
             .node(get("page")
                     .url("http://com.company/endpoint?seq=${from-position}&pageSize=10")
+                    .positionProducer(LongPositionProducer.class)
                     // build expected position list
                     .step(sequence(xpath("/feed/entry"))
                             .expected(xpath("/entry/content/ns2:lagretHendelse/ns2:sekvensnummer"))
@@ -146,6 +147,14 @@ public class BuilderTest {
         assertNotNull(deserialized);
 
         assertEquals(actual, deserialized);
+    }
+
+    static class LongPositionProducer implements PositionProducer<Long> {
+
+        @Override
+        public Position<Long> produce(String id) {
+            return new Position<>(Long.valueOf(id));
+        }
     }
 
     static class A implements Processor {

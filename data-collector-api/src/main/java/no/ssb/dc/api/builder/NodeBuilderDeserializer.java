@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import no.ssb.dc.api.Flow;
+import no.ssb.dc.api.PositionProducer;
 import no.ssb.dc.api.Processor;
 
 import java.io.IOException;
@@ -188,6 +189,8 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
 
                 builder.url(currentNode.get("url").textValue());
 
+                if (currentNode.has("positionProducerClass")) builder.positionProducer(getPositionProducerClass(currentNode));
+
                 ArrayNode returnVariablesNode = (ArrayNode) currentNode.get("returnVariables");
                 if (returnVariablesNode != null) {
                     returnVariablesNode.forEach(node -> builder.returnVariables(node.textValue()));
@@ -201,5 +204,13 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
         }
 
         throw new UnsupportedOperationException("NodeBuilder type '" + type + "' NOT supported!");
+    }
+
+    private Class<? extends PositionProducer> getPositionProducerClass(JsonNode currentNode) {
+        try {
+            return (Class<? extends PositionProducer>) Class.forName(currentNode.get("positionProducerClass").textValue());
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

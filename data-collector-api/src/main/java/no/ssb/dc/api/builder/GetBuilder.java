@@ -2,6 +2,7 @@ package no.ssb.dc.api.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import no.ssb.dc.api.PositionProducer;
 import no.ssb.dc.api.node.BaseNode;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.impl.GetNode;
@@ -15,6 +16,7 @@ import java.util.Objects;
 public class GetBuilder extends OperationBuilder {
 
     @JsonProperty List<NodeBuilder> steps = new ArrayList<>();
+    @JsonProperty Class<? extends PositionProducer> positionProducerClass;
     @JsonProperty List<String> returnVariables = new ArrayList<>();
 
     GetBuilder() {
@@ -41,6 +43,11 @@ public class GetBuilder extends OperationBuilder {
         return this;
     }
 
+    public GetBuilder positionProducer(Class<? extends PositionProducer> producerClass) {
+        this.positionProducerClass = producerClass;
+        return this;
+    }
+
     public GetBuilder returnVariables(String... variableKeys) {
         for (String variableKey : variableKeys) {
             returnVariables.add(variableKey);
@@ -56,7 +63,7 @@ public class GetBuilder extends OperationBuilder {
             Node stepNode = (Node) stepBuilder.build(nodeBuilderById, nodeInstanceById);
             stepNodeList.add(stepNode);
         }
-        return (R) new GetNode(getId(), url, stepNodeList, returnVariables);
+        return (R) new GetNode(getId(), url, stepNodeList, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -66,12 +73,13 @@ public class GetBuilder extends OperationBuilder {
         if (!super.equals(o)) return false;
         GetBuilder that = (GetBuilder) o;
         return Objects.equals(steps, that.steps) &&
+                Objects.equals(positionProducerClass, that.positionProducerClass) &&
                 Objects.equals(returnVariables, that.returnVariables);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), steps, returnVariables);
+        return Objects.hash(super.hashCode(), steps, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -80,6 +88,8 @@ public class GetBuilder extends OperationBuilder {
                 "id='" + id + '\'' +
                 ", url='" + url + '\'' +
                 ", steps=" + steps +
+                ", positionProducerClass=" + positionProducerClass +
+                ", returnVariables=" + returnVariables +
                 '}';
     }
 }

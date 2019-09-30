@@ -1,5 +1,6 @@
 package no.ssb.dc.api.node.impl;
 
+import no.ssb.dc.api.PositionProducer;
 import no.ssb.dc.api.node.Get;
 import no.ssb.dc.api.node.Node;
 
@@ -11,12 +12,14 @@ public class GetNode extends OperationNode implements Get {
 
     final String url;
     final List<Node> steps;
+    final Class<? extends PositionProducer> positionProducerClass;
     final List<String> returnVariables;
 
-    public GetNode(String id, String url, List<Node> steps, List<String> returnVariables) {
+    public GetNode(String id, String url, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
         super(id);
         this.url = url;
         this.steps = steps;
+        this.positionProducerClass = positionProducerClass;
         this.returnVariables = returnVariables;
     }
 
@@ -28,6 +31,11 @@ public class GetNode extends OperationNode implements Get {
     @Override
     public List<? extends Node> steps() {
         return steps;
+    }
+
+    @Override
+    public Class<? extends PositionProducer> positionProducerClass() {
+        return positionProducerClass;
     }
 
     @Override
@@ -47,19 +55,22 @@ public class GetNode extends OperationNode implements Get {
         GetNode getNode = (GetNode) o;
         return url.equals(getNode.url) &&
                 Objects.equals(steps, getNode.steps) &&
+                Objects.equals(positionProducerClass, getNode.positionProducerClass) &&
                 Objects.equals(returnVariables, getNode.returnVariables);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url, steps, returnVariables);
+        return Objects.hash(url, steps, positionProducerClass, returnVariables);
     }
 
     @Override
     public String toString() {
         return "GetNode{" +
-                "url='" + url + '\'' +
+                "id='" + id + '\'' +
+                ", url='" + url + '\'' +
                 ", steps=" + steps +
+                ", positionProducerClass=" + positionProducerClass +
                 ", returnVariables=" + returnVariables +
                 '}';
     }
