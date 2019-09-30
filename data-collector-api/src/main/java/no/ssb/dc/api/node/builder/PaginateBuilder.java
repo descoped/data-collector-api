@@ -2,7 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import no.ssb.dc.api.node.BaseNode;
+import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Condition;
 import no.ssb.dc.api.node.Execute;
 import no.ssb.dc.api.node.Node;
@@ -61,7 +61,7 @@ public class PaginateBuilder extends OperationBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends BaseNode> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
         List<Execute> executeNodeList = new ArrayList<>();
 
         for (ExecuteBuilder executeBuilder : children) {

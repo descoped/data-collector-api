@@ -2,7 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import no.ssb.dc.api.node.BaseNode;
+import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Sequence;
 
@@ -32,7 +32,7 @@ public class SequenceBuilder extends NodeBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends BaseNode> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
         QueryBuilder.QueryNode splitToListQueryNode = (QueryBuilder.QueryNode) splitBuilder.build(nodeBuilderById, nodeInstanceById);
         QueryBuilder.QueryNode splitCriteriaQueryNode = (QueryBuilder.QueryNode) expectedBuilder.build(nodeBuilderById, nodeInstanceById);
         return (R) new SequenceNode(splitToListQueryNode, splitCriteriaQueryNode);

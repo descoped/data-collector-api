@@ -2,7 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import no.ssb.dc.api.node.BaseNode;
+import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.NextPage;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Query;
@@ -28,7 +28,7 @@ public class NextPageBuilder extends NodeBuilder {
     }
 
     @Override
-    <R extends BaseNode> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
         Map<String, QueryBuilder.QueryNode> queryNodeMap = new LinkedHashMap<>();
         for (Map.Entry<String, QueryBuilder> entry : outputMap.entrySet()) {
             queryNodeMap.put(entry.getKey(), (QueryBuilder.QueryNode) entry.getValue().build(nodeBuilderById, nodeInstanceById));

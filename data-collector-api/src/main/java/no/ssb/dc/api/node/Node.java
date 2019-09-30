@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 // implements FlowNode and step-nodes
-public interface Node extends BaseNode {
+public interface Node extends Base {
 
     Iterator<? extends Node> iterator();
 

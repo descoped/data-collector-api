@@ -2,7 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import no.ssb.dc.api.node.BaseNode;
+import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.util.JacksonFactory;
 
 import java.util.LinkedHashMap;
@@ -39,9 +39,9 @@ public abstract class NodeBuilder extends AbstractNodeBuilder {
      * @param nodeInstanceById
      * @return
      */
-    abstract <R extends BaseNode> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById);
+    abstract <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById);
 
-    public <R extends BaseNode> R build() {
+    public <R extends Base> R build() {
         return build(new LinkedHashMap<>(), new LinkedHashMap<>());
     }
 
