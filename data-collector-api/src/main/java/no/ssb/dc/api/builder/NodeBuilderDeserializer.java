@@ -201,6 +201,12 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
 
                 return builder;
             }
+
+            case ValidateRequest: {
+                ValidateRequestBuilder builder = new ValidateRequestBuilder();
+
+                return builder;
+            }
         }
 
         throw new UnsupportedOperationException("NodeBuilder type '" + type + "' NOT supported!");

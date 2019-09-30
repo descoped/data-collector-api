@@ -12,6 +12,7 @@ import no.ssb.dc.api.builder.PublishBuilder;
 import no.ssb.dc.api.builder.QueryBuilder;
 import no.ssb.dc.api.builder.RegExBuilder;
 import no.ssb.dc.api.builder.SequenceBuilder;
+import no.ssb.dc.api.builder.ValidateRequestBuilder;
 import no.ssb.dc.api.builder.WhenVariableIsNullBuilder;
 import no.ssb.dc.api.builder.XPathBuilder;
 
@@ -19,6 +20,10 @@ public class Builders {
 
     public static GetBuilder get(String nodeId) {
         return new GetBuilder(nodeId);
+    }
+
+    public static ValidateRequestBuilder validateRequest() {
+        return new ValidateRequestBuilder();
     }
 
     public static PaginateBuilder paginate(String nodeId) {

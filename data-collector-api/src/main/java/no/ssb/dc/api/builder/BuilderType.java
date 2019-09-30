@@ -14,7 +14,8 @@ public enum BuilderType {
     ConditionWhenVariableIsNull,
     AddContent,
     Publish,
-    Get;
+    Get,
+    ValidateRequest;
 
     public static BuilderType parse(String name) {
         for (BuilderType builderType : values()) {
