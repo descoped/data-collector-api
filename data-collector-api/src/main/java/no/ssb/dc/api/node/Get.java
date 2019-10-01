@@ -18,7 +18,7 @@ public interface Get extends Operation {
 
     List<String> returnVariables();
 
-    default PositionProducer<?> createPositionProducer() {
+    default PositionProducer<?> createOrGetPositionProducer() {
         boolean isDefaultProducer = positionProducerClass() == null;
         Class<? extends PositionProducer> producerClass = isDefaultProducer ? DefaultStringPositionProducer.class : positionProducerClass();
 
