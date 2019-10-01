@@ -3,6 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.PositionProducer;
+import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Get;
 import no.ssb.dc.api.node.Node;
@@ -16,6 +17,7 @@ import java.util.Objects;
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class GetBuilder extends OperationBuilder {
 
+    @JsonProperty Headers requestHeaders = new Headers();
     @JsonProperty List<NodeBuilder> steps = new ArrayList<>();
     @JsonProperty Class<? extends PositionProducer> positionProducerClass;
     @JsonProperty List<String> returnVariables = new ArrayList<>();
@@ -36,6 +38,11 @@ public class GetBuilder extends OperationBuilder {
 
     public GetBuilder url(String urlString) {
         this.url = urlString;
+        return this;
+    }
+
+    public GetBuilder header(String name, String value) {
+        requestHeaders.put(name, value);
         return this;
     }
 
@@ -64,7 +71,7 @@ public class GetBuilder extends OperationBuilder {
             Node stepNode = (Node) stepBuilder.build(nodeBuilderById, nodeInstanceById);
             stepNodeList.add(stepNode);
         }
-        return (R) new GetNode(getId(), url, stepNodeList, positionProducerClass, returnVariables);
+        return (R) new GetNode(getId(), url, requestHeaders, stepNodeList, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -97,13 +104,15 @@ public class GetBuilder extends OperationBuilder {
     static class GetNode extends OperationNode implements Get {
 
         final String url;
+        final Headers headers;
         final List<Node> steps;
         final Class<? extends PositionProducer> positionProducerClass;
         final List<String> returnVariables;
 
-        GetNode(String id, String url, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
+        GetNode(String id, String url, Headers headers, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
             super(id);
             this.url = url;
+            this.headers = headers;
             this.steps = steps;
             this.positionProducerClass = positionProducerClass;
             this.returnVariables = returnVariables;
@@ -112,6 +121,10 @@ public class GetBuilder extends OperationBuilder {
         @Override
         public String url() {
             return url;
+        }
+
+        public Headers headers() {
+            return headers;
         }
 
         @Override

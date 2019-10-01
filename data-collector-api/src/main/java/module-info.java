@@ -35,11 +35,11 @@ module no.ssb.dc.api {
     exports no.ssb.dc.api;
     exports no.ssb.dc.api.application;
     exports no.ssb.dc.api.context;
+    exports no.ssb.dc.api.node;
     exports no.ssb.dc.api.node.builder;
     exports no.ssb.dc.api.el;
     exports no.ssb.dc.api.content;
     exports no.ssb.dc.api.handler;
-    exports no.ssb.dc.api.node;
     exports no.ssb.dc.api.http;
     exports no.ssb.dc.api.ulid;
     exports no.ssb.dc.api.error;
