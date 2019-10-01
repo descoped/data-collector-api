@@ -1,5 +1,6 @@
 package no.ssb.dc.api.http;
 
+import javax.net.ssl.SSLContext;
 import java.util.ServiceLoader;
 
 public interface Client {
@@ -23,6 +24,8 @@ public interface Client {
 
     interface Builder {
         Builder version(Version version);
+
+        Builder sslContext(SSLContext sslContext);
 
         Client build();
     }
