@@ -62,7 +62,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
                 FlowBuilder builder = Flow.start(currentNode.get("flowName").textValue(), currentNode.get("startNodeId").textValue());
 
                 currentNode.get("nodes").fields().forEachRemaining(entry ->
-                        builder.node((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
+                        builder.node((NodeWithIdBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
                 return builder;
             }

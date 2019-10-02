@@ -24,7 +24,7 @@ public class FlowBuilder extends AbstractNodeBuilder {
         this.startNodeId = startNodeId;
     }
 
-    public FlowBuilder node(NodeBuilder builder) {
+    public FlowBuilder node(NodeWithIdBuilder builder) {
         nodeBuilderById.put(builder.getId(), builder);
         return this;
     }
