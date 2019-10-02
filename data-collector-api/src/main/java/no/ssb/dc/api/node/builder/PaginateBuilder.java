@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class PaginateBuilder extends OperationBuilder {
+public class PaginateBuilder extends NodeWithIdBuilder {
 
     @JsonProperty Map<String, String> variables = new LinkedHashMap<>();
     @JsonProperty List<ExecuteBuilder> children = new ArrayList<>();
@@ -104,7 +104,7 @@ public class PaginateBuilder extends OperationBuilder {
                 '}';
     }
 
-    static class PaginateNode extends OperationNode implements Paginate {
+    static class PaginateNode extends FlowNodeWithId implements Paginate {
 
         final Map<String, String> variables;
         final boolean addPageContent;

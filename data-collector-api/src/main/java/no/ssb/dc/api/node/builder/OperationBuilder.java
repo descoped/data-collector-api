@@ -3,7 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import no.ssb.dc.api.node.Operation;
 
-public abstract class OperationBuilder extends NodeBuilder {
+public abstract class OperationBuilder extends NodeWithIdBuilder {
 
     @JsonProperty String url;
 

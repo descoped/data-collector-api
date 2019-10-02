@@ -15,7 +15,7 @@ class PrintableExecutionPlan {
 
     static String build(Node flowNode) {
         StringBuilder builder = new StringBuilder();
-        FlowNode.depthFirstPreOrderFullTraversal(0, new LinkedHashSet<>(), new LinkedList<>(), flowNode, (ancestors, visitNode) -> {
+        NodeBuilder.FlowNode.depthFirstPreOrderFullTraversal(0, new LinkedHashSet<>(), new LinkedList<>(), flowNode, (ancestors, visitNode) -> {
             String indent = Arrays.stream(new String[ancestors.size()]).map(element -> " ").collect(Collectors.joining());
 
             AtomicBoolean handled = new AtomicBoolean();

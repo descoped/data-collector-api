@@ -5,6 +5,9 @@ import no.ssb.dc.api.node.Base;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
+/**
+ * Base for node implementation classes
+ */
 public abstract class AbstractBaseNode implements Base {
 
     @Override
