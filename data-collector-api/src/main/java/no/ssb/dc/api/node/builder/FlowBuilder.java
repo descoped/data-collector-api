@@ -32,7 +32,7 @@ public class FlowBuilder extends AbstractNodeBuilder {
     public Flow end() {
         BuildContext buildContext = BuildContext.fromNodeBuilderById(nodeBuilderById);
 
-        // add child nodes recursively to nodeInstanceById map
+        // add child nodes recursively to buildContext.nodeInstanceById map
         for (Map.Entry<String, NodeBuilder> entry : nodeBuilderById.entrySet()) {
             String nodeBuilderId = entry.getKey();
             NodeBuilder nodeBuilder = entry.getValue();
