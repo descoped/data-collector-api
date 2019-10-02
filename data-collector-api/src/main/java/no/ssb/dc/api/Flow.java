@@ -32,6 +32,7 @@ public class Flow {
             ObjectMapper mapper = JacksonFactory.yamlInstance().objectMapper();
             SimpleModule module = new SimpleModule();
             module.addDeserializer(AbstractNodeBuilder.class, new NodeBuilderDeserializer());
+            module.addDeserializer(AbstractNodeBuilder.class, new NodeBuilderDeserializer());
             mapper.registerModule(module);
             return mapper.readValue(source, builderClass);
         } catch (IOException e) {

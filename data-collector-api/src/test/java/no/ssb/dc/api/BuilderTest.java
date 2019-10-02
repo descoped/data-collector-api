@@ -16,7 +16,6 @@ import static no.ssb.dc.api.Builders.process;
 import static no.ssb.dc.api.Builders.publish;
 import static no.ssb.dc.api.Builders.regex;
 import static no.ssb.dc.api.Builders.sequence;
-import static no.ssb.dc.api.Builders.validateRequest;
 import static no.ssb.dc.api.Builders.whenVariableIsNull;
 import static no.ssb.dc.api.Builders.xpath;
 import static org.testng.Assert.assertEquals;
@@ -41,7 +40,7 @@ public class BuilderTest {
                     .url("http://com.company/endpoint?seq=${from-position}&pageSize=10")
                     .positionProducer(LongPositionProducer.class)
                     // build expected position list
-                    .step(validateRequest())
+                    .validateResponse().success(200)
                     .step(sequence(xpath("/feed/entry"))
                             .expected(xpath("/entry/content/ns2:lagretHendelse/ns2:sekvensnummer"))
                     )
@@ -82,11 +81,11 @@ public class BuilderTest {
         FlowBuilder actual = flowBuilder;
         String serialized = actual.serialize();
         assertNotNull(serialized);
-        System.out.printf("%s%n", serialized);
+        System.out.printf("serialized:%n%s%n", serialized);
 
         FlowBuilder deserialized = Flow.deserialize(serialized, FlowBuilder.class);
         assertNotNull(deserialized);
-        System.out.printf("%s%n", serialized);
+        System.out.printf("deserialized:%n%s%n", serialized);
 
         assertEquals(actual, deserialized);
     }

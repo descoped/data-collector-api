@@ -65,4 +65,13 @@ public class FlowBuilder extends AbstractNodeBuilder {
     public int hashCode() {
         return Objects.hash(super.hashCode(), flowName, startNodeId, nodeBuilderById);
     }
+
+    @Override
+    public String toString() {
+        return "FlowBuilder{" +
+                "flowName='" + flowName + '\'' +
+                ", startNodeId='" + startNodeId + '\'' +
+                ", nodeBuilderById=" + nodeBuilderById +
+                '}';
+    }
 }

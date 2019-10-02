@@ -189,6 +189,23 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
 
                 builder.url(currentNode.get("url").textValue());
 
+                JsonNode validateResponseNode = currentNode.get("validateResponse");
+                if (validateResponseNode != null) {
+                    ValidateResponseBuilder<GetBuilder> validateResponseBuilder = new ValidateResponseBuilder<>(builder);
+
+                    JsonNode success = validateResponseNode.get("success");
+                    if (success != null) {
+                        success.forEach(code -> validateResponseBuilder.success(code.intValue()));
+                    }
+
+                    JsonNode failed = validateResponseNode.get("failed");
+                    if (failed != null) {
+                        failed.forEach(code -> validateResponseBuilder.fail(code.intValue()));
+                    }
+
+                    builder.setValidateResponseBuilder(validateResponseBuilder);
+                }
+
                 if (currentNode.has("positionProducerClass")) builder.positionProducer(getPositionProducerClass(currentNode));
 
                 ArrayNode returnVariablesNode = (ArrayNode) currentNode.get("returnVariables");
@@ -202,10 +219,8 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
                 return builder;
             }
 
-            case ValidateRequest: {
-                ValidateRequestBuilder builder = new ValidateRequestBuilder();
-
-                return builder;
+            case ValidateResponse: {
+                throw new IllegalStateException("ValidateResponseBuilder should be built in context of a Operation builder!");
             }
         }
 

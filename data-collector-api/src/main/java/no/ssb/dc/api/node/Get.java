@@ -15,6 +15,8 @@ public interface Get extends Operation {
 
     Headers headers();
 
+    ValidateResponse validateResponse();
+
     List<? extends Node> steps();
 
     Class<? extends PositionProducer> positionProducerClass();
