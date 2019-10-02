@@ -124,6 +124,7 @@ public class GetBuilder extends OperationBuilder {
             return url;
         }
 
+        @Override
         public Headers headers() {
             return headers;
         }

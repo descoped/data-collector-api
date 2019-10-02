@@ -2,6 +2,7 @@ package no.ssb.dc.api.node;
 
 import no.ssb.dc.api.DefaultStringPositionProducer;
 import no.ssb.dc.api.PositionProducer;
+import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.services.InstanceCache;
 import no.ssb.dc.api.services.ObjectCreator;
 import no.ssb.dc.api.services.Services;
@@ -11,6 +12,8 @@ import java.util.List;
 public interface Get extends Operation {
 
     String url();
+
+    Headers headers();
 
     List<? extends Node> steps();
 
