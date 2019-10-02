@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Objects;
 
+/**
+ * Base for builder classes
+ */
 public abstract class AbstractNodeBuilder {
 
     @JsonProperty final BuilderType type;
