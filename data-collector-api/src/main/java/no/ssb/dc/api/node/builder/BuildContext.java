@@ -7,6 +7,8 @@ import java.util.Map;
  * Cache build instances during build and use instance map to lookup already created nodes.
  * E.g. the PaginateBuilder creates GetNode and put it to the nodeInstanceById Map. During build in Flow.end()
  * the GetNode instance is resolved and referenced.
+ *
+ * The BuildContext is ignored by leaf nodes unless the node instance should be cached.
  */
 class BuildContext {
     private final Map<String, NodeBuilder> nodeBuilderById;
