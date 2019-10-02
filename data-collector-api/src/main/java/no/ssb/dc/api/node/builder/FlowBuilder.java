@@ -3,7 +3,6 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.Flow;
-import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.util.JacksonFactory;
 
 import java.util.LinkedHashMap;
@@ -35,10 +34,12 @@ public class FlowBuilder extends AbstractNodeBuilder {
 
         // add child nodes recursively to nodeInstanceById map
         for (Map.Entry<String, NodeBuilder> entry : nodeBuilderById.entrySet()) {
-            buildContext.nodeInstanceById().put(entry.getKey(), entry.getValue().build(buildContext));
+            String nodeBuilderId = entry.getKey();
+            NodeBuilder nodeBuilder = entry.getValue();
+            buildContext.cacheInstance(nodeBuilderId, nodeBuilder.build(buildContext));
         }
 
-        return Flow.create(flowName, (Node) buildContext.nodeInstanceById().get(startNodeId), buildContext.nodeInstanceById());
+        return Flow.create(flowName, buildContext.getInstance(startNodeId), buildContext.nodeInstanceById());
     }
 
     public NodeBuilder get(String nodeId) {

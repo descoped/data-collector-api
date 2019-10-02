@@ -44,15 +44,15 @@ public class ExecuteBuilder extends NodeBuilder {
         Map<String, QueryBuilder.QueryNode> inputVariableMap = inputVariables.entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, e -> (QueryBuilder.QueryNode) e.getValue().build(buildContext)));
 
-        if (!buildContext.nodeBuilderById().containsKey(executeId)) {
+        if (!buildContext.containsBuilder(executeId)) {
             throw new RuntimeException("Builder" + this.getClass() + " points to an undefined node: " + this.executeId);
         }
 
-        OperationBuilder.OperationNode targetExecuteNode = (OperationBuilder.OperationNode) (buildContext.nodeInstanceById().containsKey(executeId) ?
-                buildContext.nodeInstanceById().get(executeId) :
-                buildContext.nodeBuilderById().get(executeId).build(buildContext));
+        OperationBuilder.OperationNode targetExecuteNode = (buildContext.containsInstance(executeId) ?
+                buildContext.getInstance(executeId) :
+                buildContext.getBuilder(executeId).build(buildContext));
 
-        buildContext.nodeInstanceById().computeIfAbsent(executeId, node -> targetExecuteNode);
+        buildContext.cacheInstanceIfAbsent(executeId, node -> targetExecuteNode);
 
         return (R) new ExecuteNode(executeId, requiredInputs, inputVariableMap, targetExecuteNode);
     }

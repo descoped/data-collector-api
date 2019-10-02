@@ -22,7 +22,6 @@ public class EvalBuilder extends QueryBuilder {
         this.elExpression = elExpression;
     }
 
-
     @Override
     <R extends Base> R build(BuildContext buildContext) {
         QueryNode queryNode = queryBuilder.build(buildContext);
