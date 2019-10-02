@@ -6,7 +6,6 @@ import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.ValidateRequest;
 
 import java.util.Iterator;
-import java.util.Map;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class ValidateRequestBuilder extends NodeBuilder {
@@ -16,7 +15,7 @@ public class ValidateRequestBuilder extends NodeBuilder {
     }
 
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(BuildContext buildContext) {
         return (R) new ValidateRequestNode();
     }
 

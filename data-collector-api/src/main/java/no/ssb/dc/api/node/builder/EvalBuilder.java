@@ -6,7 +6,6 @@ import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Eval;
 import no.ssb.dc.api.node.Query;
 
-import java.util.Map;
 import java.util.Objects;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
@@ -25,8 +24,8 @@ public class EvalBuilder extends QueryBuilder {
 
 
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
-        QueryNode queryNode = (QueryNode) queryBuilder.build(nodeBuilderById, nodeInstanceById);
+    <R extends Base> R build(BuildContext buildContext) {
+        QueryNode queryNode = queryBuilder.build(buildContext);
         return (R) new EvalNode(queryNode, bindToVariable, elExpression);
     }
 

@@ -45,22 +45,22 @@ public class ParallelBuilder extends NodeBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
-        QueryBuilder.QueryNode splitToListQueryNode = (QueryBuilder.QueryNode) splitBuilder.build(nodeBuilderById, nodeInstanceById);
+    <R extends Base> R build(BuildContext buildContext) {
+        QueryBuilder.QueryNode splitToListQueryNode = splitBuilder.build(buildContext);
 
         Map<String, QueryBuilder.QueryNode> contextVariablesMap = new LinkedHashMap<>();
         for (Map.Entry<String, QueryBuilder> entry : variables.entrySet()) {
-            QueryBuilder.QueryNode node = (QueryBuilder.QueryNode) entry.getValue().build(nodeBuilderById, nodeInstanceById);
+            QueryBuilder.QueryNode node = entry.getValue().build(buildContext);
             contextVariablesMap.put(entry.getKey(), node);
         }
 
         List<Node> stepList = new ArrayList<>();
         for (NodeBuilder builder : steps) {
-            Node node = (Node) builder.build(nodeBuilderById, nodeInstanceById);
+            Node node = builder.build(buildContext);
             stepList.add(node);
         }
 
-        PublishBuilder.PublishNode publishNode = publishBuilder == null ? null : (PublishBuilder.PublishNode) publishBuilder.build(nodeBuilderById, nodeInstanceById);
+        PublishBuilder.PublishNode publishNode = publishBuilder == null ? null : (PublishBuilder.PublishNode) publishBuilder.build(buildContext);
 
         return (R) new ParallelNode(splitToListQueryNode, contextVariablesMap, stepList, publishNode);
     }

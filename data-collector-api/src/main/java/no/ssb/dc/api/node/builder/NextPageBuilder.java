@@ -28,10 +28,10 @@ public class NextPageBuilder extends NodeBuilder {
     }
 
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(BuildContext buildContext) {
         Map<String, QueryBuilder.QueryNode> queryNodeMap = new LinkedHashMap<>();
         for (Map.Entry<String, QueryBuilder> entry : outputMap.entrySet()) {
-            queryNodeMap.put(entry.getKey(), (QueryBuilder.QueryNode) entry.getValue().build(nodeBuilderById, nodeInstanceById));
+            queryNodeMap.put(entry.getKey(), entry.getValue().build(buildContext));
         }
         return (R) new NextPageNode(queryNodeMap);
     }

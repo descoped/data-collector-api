@@ -11,7 +11,6 @@ import no.ssb.dc.api.node.Node;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
@@ -65,10 +64,10 @@ public class GetBuilder extends OperationBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(BuildContext buildContext) {
         List<Node> stepNodeList = new ArrayList<>();
         for (NodeBuilder stepBuilder : steps) {
-            Node stepNode = (Node) stepBuilder.build(nodeBuilderById, nodeInstanceById);
+            Node stepNode = stepBuilder.build(buildContext);
             stepNodeList.add(stepNode);
         }
         return (R) new GetNode(getId(), url, requestHeaders, stepNodeList, positionProducerClass, returnVariables);

@@ -7,7 +7,6 @@ import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Publish;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
@@ -22,7 +21,7 @@ public class PublishBuilder extends NodeBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(BuildContext buildContext) {
         return (R) new PublishNode(positionVariableExpression);
     }
 

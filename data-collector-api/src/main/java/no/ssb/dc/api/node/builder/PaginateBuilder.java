@@ -61,15 +61,15 @@ public class PaginateBuilder extends OperationBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(BuildContext buildContext) {
         List<Execute> executeNodeList = new ArrayList<>();
 
         for (ExecuteBuilder executeBuilder : children) {
-            Execute executeNode = (Execute) executeBuilder.build(nodeBuilderById, nodeInstanceById);
+            Execute executeNode = executeBuilder.build(buildContext);
             executeNodeList.add(executeNode);
         }
 
-        ConditionBuilder.ConditionNode conditionNode = (ConditionBuilder.ConditionNode) conditionBuilder.build(nodeBuilderById, nodeInstanceById);
+        ConditionBuilder.ConditionNode conditionNode = conditionBuilder.build(buildContext);
 
         return (R) new PaginateNode(getId(), variables, addPageContent, executeNodeList, threshold, conditionNode);
     }

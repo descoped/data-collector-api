@@ -40,19 +40,19 @@ public class ExecuteBuilder extends NodeBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
+    <R extends Base> R build(BuildContext buildContext) {
         Map<String, QueryBuilder.QueryNode> inputVariableMap = inputVariables.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> (QueryBuilder.QueryNode) e.getValue().build(nodeBuilderById, nodeInstanceById)));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> (QueryBuilder.QueryNode) e.getValue().build(buildContext)));
 
-        if (!nodeBuilderById.containsKey(executeId)) {
+        if (!buildContext.getNodeBuilderById().containsKey(executeId)) {
             throw new RuntimeException("Builder" + this.getClass() + " points to an undefined node: " + this.executeId);
         }
 
-        OperationBuilder.OperationNode targetExecuteNode = (OperationBuilder.OperationNode) (nodeInstanceById.containsKey(executeId) ?
-                nodeInstanceById.get(executeId) :
-                nodeBuilderById.get(executeId).build(nodeBuilderById, nodeInstanceById));
+        OperationBuilder.OperationNode targetExecuteNode = (OperationBuilder.OperationNode) (buildContext.getNodeInstanceById().containsKey(executeId) ?
+                buildContext.getNodeInstanceById().get(executeId) :
+                buildContext.getNodeBuilderById().get(executeId).build(buildContext));
 
-        nodeInstanceById.computeIfAbsent(executeId, node -> (R) targetExecuteNode);
+        buildContext.getNodeInstanceById().computeIfAbsent(executeId, node -> (R) targetExecuteNode);
 
         return (R) new ExecuteNode(executeId, requiredInputs, inputVariableMap, targetExecuteNode);
     }

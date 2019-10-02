@@ -6,7 +6,6 @@ import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Query;
 import no.ssb.dc.api.node.RegEx;
 
-import java.util.Map;
 import java.util.Objects;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
@@ -22,8 +21,8 @@ public class RegExBuilder extends QueryBuilder {
     }
 
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
-        QueryNode queryNode = (QueryNode) queryBuilder.build(nodeBuilderById, nodeInstanceById);
+    <R extends Base> R build(BuildContext buildContext) {
+        QueryNode queryNode = queryBuilder.build(buildContext);
         return (R) new RegExNode(queryNode, expression);
     }
 

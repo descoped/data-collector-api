@@ -7,7 +7,6 @@ import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Sequence;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
@@ -32,9 +31,9 @@ public class SequenceBuilder extends NodeBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById) {
-        QueryBuilder.QueryNode splitToListQueryNode = (QueryBuilder.QueryNode) splitBuilder.build(nodeBuilderById, nodeInstanceById);
-        QueryBuilder.QueryNode splitCriteriaQueryNode = (QueryBuilder.QueryNode) expectedBuilder.build(nodeBuilderById, nodeInstanceById);
+    <R extends Base> R build(BuildContext buildContext) {
+        QueryBuilder.QueryNode splitToListQueryNode = splitBuilder.build(buildContext);
+        QueryBuilder.QueryNode splitCriteriaQueryNode = expectedBuilder.build(buildContext);
         return (R) new SequenceNode(splitToListQueryNode, splitCriteriaQueryNode);
     }
 

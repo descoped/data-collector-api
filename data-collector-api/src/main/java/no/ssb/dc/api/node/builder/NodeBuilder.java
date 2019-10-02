@@ -6,7 +6,6 @@ import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.util.JacksonFactory;
 
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -33,16 +32,14 @@ public abstract class NodeBuilder extends AbstractNodeBuilder {
 
     /**
      * Successor is responsible for its own creation and must add itself to nodeInstanceById.
-     * Lazy initialization is dont through nodeBuilderById.
+     * Lazy initialization is done through nodeBuilderById.
      *
-     * @param nodeBuilderById
-     * @param nodeInstanceById
-     * @return
+     * @param buildContext @return
      */
-    abstract <R extends Base> R build(Map<String, NodeBuilder> nodeBuilderById, Map<String, R> nodeInstanceById);
+    abstract <R extends Base> R build(BuildContext buildContext);
 
     public <R extends Base> R build() {
-        return build(new LinkedHashMap<>(), new LinkedHashMap<>());
+        return build(new BuildContext(new LinkedHashMap<>(), new LinkedHashMap<>()));
     }
 
     @Override
