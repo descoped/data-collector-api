@@ -11,6 +11,6 @@ public interface Execute extends Node {
 
     Map<String, Query> inputVariable();
 
-    Operation target();
+    NodeWithId target();
 
 }

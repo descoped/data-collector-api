@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Execute;
 import no.ssb.dc.api.node.Node;
-import no.ssb.dc.api.node.Operation;
+import no.ssb.dc.api.node.NodeWithId;
 import no.ssb.dc.api.node.Query;
 
 import java.util.ArrayList;
@@ -48,7 +48,7 @@ public class ExecuteBuilder extends NodeBuilder {
             throw new RuntimeException("Builder" + this.getClass() + " points to an undefined node: " + this.executeId);
         }
 
-        OperationBuilder.OperationNode targetExecuteNode = (buildContext.containsInstance(executeId) ?
+        NodeWithIdBuilder.FlowNodeWithId targetExecuteNode = (buildContext.containsInstance(executeId) ?
                 buildContext.getInstance(executeId) :
                 buildContext.getBuilder(executeId).build(buildContext));
 
@@ -86,9 +86,9 @@ public class ExecuteBuilder extends NodeBuilder {
         final String executeId;
         final List<String> requiredInputs;
         final Map<String, QueryBuilder.QueryNode> inputVariables;
-        final OperationBuilder.OperationNode targetNode;
+        final NodeWithIdBuilder.FlowNodeWithId targetNode;
 
-        ExecuteNode(String executeId, List<String> requiredInputs, Map<String, QueryBuilder.QueryNode> inputVariables, OperationBuilder.OperationNode targetNode) {
+        ExecuteNode(String executeId, List<String> requiredInputs, Map<String, QueryBuilder.QueryNode> inputVariables, NodeWithIdBuilder.FlowNodeWithId targetNode) {
             if (targetNode == null) {
                 throw new IllegalArgumentException("adjacent executeNode is null");
             }
@@ -114,7 +114,7 @@ public class ExecuteBuilder extends NodeBuilder {
         }
 
         @Override
-        public Operation target() {
+        public NodeWithId target() {
             return targetNode;
         }
 
