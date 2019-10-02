@@ -28,14 +28,15 @@ public class PublishBuilder extends NodeBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof PublishBuilder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         PublishBuilder that = (PublishBuilder) o;
-        return Objects.equals(positionVariableExpression, that.positionVariableExpression);
+        return positionVariableExpression.equals(that.positionVariableExpression);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(positionVariableExpression);
+        return Objects.hash(super.hashCode(), positionVariableExpression);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class PublishBuilder extends NodeBuilder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             PublishNode that = (PublishNode) o;
-            return Objects.equals(positionVariableExpression, that.positionVariableExpression);
+            return positionVariableExpression.equals(that.positionVariableExpression);
         }
 
         @Override
@@ -82,6 +83,5 @@ public class PublishBuilder extends NodeBuilder {
                     "positionVariableExpression='" + positionVariableExpression + '\'' +
                     '}';
         }
-
     }
 }

@@ -79,12 +79,12 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        PaginateBuilder builder = (PaginateBuilder) o;
-        return Double.compare(builder.threshold, threshold) == 0 &&
-                addPageContent == builder.addPageContent &&
-                Objects.equals(variables, builder.variables) &&
-                Objects.equals(children, builder.children) &&
-                Objects.equals(conditionBuilder, builder.conditionBuilder);
+        PaginateBuilder that = (PaginateBuilder) o;
+        return Double.compare(that.threshold, threshold) == 0 &&
+                addPageContent == that.addPageContent &&
+                Objects.equals(variables, that.variables) &&
+                Objects.equals(children, that.children) &&
+                Objects.equals(conditionBuilder, that.conditionBuilder);
     }
 
     @Override

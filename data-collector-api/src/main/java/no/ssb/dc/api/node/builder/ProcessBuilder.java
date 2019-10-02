@@ -37,15 +37,16 @@ public class ProcessBuilder extends NodeBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ProcessBuilder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         ProcessBuilder that = (ProcessBuilder) o;
-        return Objects.equals(processorClass, that.processorClass) &&
+        return processorClass.equals(that.processorClass) &&
                 Objects.equals(requiredOutputs, that.requiredOutputs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(processorClass, requiredOutputs);
+        return Objects.hash(super.hashCode(), processorClass, requiredOutputs);
     }
 
     @Override
@@ -86,7 +87,7 @@ public class ProcessBuilder extends NodeBuilder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ProcessNode that = (ProcessNode) o;
-            return Objects.equals(processorClass, that.processorClass) &&
+            return processorClass.equals(that.processorClass) &&
                     Objects.equals(requiredOutputs, that.requiredOutputs);
         }
 

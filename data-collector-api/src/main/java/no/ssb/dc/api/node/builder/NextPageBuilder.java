@@ -39,9 +39,10 @@ public class NextPageBuilder extends NodeBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof NextPageBuilder)) return false;
-        NextPageBuilder builder = (NextPageBuilder) o;
-        return Objects.equals(outputMap, builder.outputMap);
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        NextPageBuilder that = (NextPageBuilder) o;
+        return Objects.equals(outputMap, that.outputMap);
     }
 
     @Override
@@ -72,6 +73,26 @@ public class NextPageBuilder extends NodeBuilder {
         @Override
         public Iterator<? extends Node> iterator() {
             return createNodeList().iterator();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            NextPageNode that = (NextPageNode) o;
+            return Objects.equals(queryNodeMap, that.queryNodeMap);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(queryNodeMap);
+        }
+
+        @Override
+        public String toString() {
+            return "NextPageNode{" +
+                    "queryNodeMap=" + queryNodeMap +
+                    '}';
         }
     }
 }

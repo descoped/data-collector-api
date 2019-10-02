@@ -79,14 +79,15 @@ public class GetBuilder extends OperationBuilder {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         GetBuilder that = (GetBuilder) o;
-        return Objects.equals(steps, that.steps) &&
+        return Objects.equals(requestHeaders, that.requestHeaders) &&
+                Objects.equals(steps, that.steps) &&
                 Objects.equals(positionProducerClass, that.positionProducerClass) &&
                 Objects.equals(returnVariables, that.returnVariables);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), steps, positionProducerClass, returnVariables);
+        return Objects.hash(super.hashCode(), requestHeaders, steps, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -94,6 +95,7 @@ public class GetBuilder extends OperationBuilder {
         return "GetBuilder{" +
                 "id='" + id + '\'' +
                 ", url='" + url + '\'' +
+                ", requestHeaders=" + requestHeaders +
                 ", steps=" + steps +
                 ", positionProducerClass=" + positionProducerClass +
                 ", returnVariables=" + returnVariables +
@@ -151,7 +153,8 @@ public class GetBuilder extends OperationBuilder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             GetNode getNode = (GetNode) o;
-            return url.equals(getNode.url) &&
+            return Objects.equals(url, getNode.url) &&
+                    Objects.equals(headers, getNode.headers) &&
                     Objects.equals(steps, getNode.steps) &&
                     Objects.equals(positionProducerClass, getNode.positionProducerClass) &&
                     Objects.equals(returnVariables, getNode.returnVariables);
@@ -159,7 +162,7 @@ public class GetBuilder extends OperationBuilder {
 
         @Override
         public int hashCode() {
-            return Objects.hash(url, steps, positionProducerClass, returnVariables);
+            return Objects.hash(url, headers, steps, positionProducerClass, returnVariables);
         }
 
         @Override
@@ -167,6 +170,7 @@ public class GetBuilder extends OperationBuilder {
             return "GetNode{" +
                     "id='" + id + '\'' +
                     ", url='" + url + '\'' +
+                    ", headers=" + headers +
                     ", steps=" + steps +
                     ", positionProducerClass=" + positionProducerClass +
                     ", returnVariables=" + returnVariables +

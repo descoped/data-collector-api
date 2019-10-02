@@ -68,7 +68,8 @@ public class ParallelBuilder extends NodeBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ParallelBuilder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         ParallelBuilder that = (ParallelBuilder) o;
         return Objects.equals(splitBuilder, that.splitBuilder) &&
                 Objects.equals(variables, that.variables) &&
@@ -78,7 +79,7 @@ public class ParallelBuilder extends NodeBuilder {
 
     @Override
     public int hashCode() {
-        return Objects.hash(splitBuilder, variables, steps, publishBuilder);
+        return Objects.hash(super.hashCode(), splitBuilder, variables, steps, publishBuilder);
     }
 
     @Override
@@ -154,10 +155,10 @@ public class ParallelBuilder extends NodeBuilder {
         @Override
         public String toString() {
             return "ParallelNode{" +
-                    "splitBuilder=" + splitQueryNode +
+                    "splitQueryNode=" + splitQueryNode +
                     ", variables=" + variables +
                     ", steps=" + steps +
-                    ", publishBuilder=" + publishNode +
+                    ", publishNode=" + publishNode +
                     '}';
         }
     }

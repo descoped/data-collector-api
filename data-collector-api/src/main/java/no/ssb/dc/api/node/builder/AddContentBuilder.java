@@ -32,6 +32,7 @@ public class AddContentBuilder extends NodeBuilder {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         AddContentBuilder that = (AddContentBuilder) o;
         return positionVariableExpression.equals(that.positionVariableExpression) &&
                 contentKey.equals(that.contentKey);

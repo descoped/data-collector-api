@@ -30,14 +30,10 @@ public class WhenVariableIsNullBuilder extends ConditionBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof WhenVariableIsNullBuilder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         WhenVariableIsNullBuilder that = (WhenVariableIsNullBuilder) o;
-        return Objects.equals(identifier, that.identifier);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(identifier);
+        return identifier.equals(that.identifier);
     }
 
     @Override
@@ -47,6 +43,10 @@ public class WhenVariableIsNullBuilder extends ConditionBuilder {
                 '}';
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), identifier);
+    }
 
     static class WhenVariableIsNullNode extends ConditionNode implements WhenVariableIsNull {
 
@@ -66,7 +66,7 @@ public class WhenVariableIsNullBuilder extends ConditionBuilder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             WhenVariableIsNullNode that = (WhenVariableIsNullNode) o;
-            return Objects.equals(identifier, that.identifier);
+            return identifier.equals(that.identifier);
         }
 
         @Override

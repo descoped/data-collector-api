@@ -60,25 +60,17 @@ public class ExecuteBuilder extends NodeBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof ExecuteBuilder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         ExecuteBuilder that = (ExecuteBuilder) o;
-        return Objects.equals(executeId, that.executeId) &&
+        return executeId.equals(that.executeId) &&
                 Objects.equals(requiredInputs, that.requiredInputs) &&
                 Objects.equals(inputVariables, that.inputVariables);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(executeId, requiredInputs, inputVariables);
-    }
-
-    @Override
-    public String toString() {
-        return "ExecuteBuilder{" +
-                "executeId='" + executeId + '\'' +
-                ", requiredInputs=" + requiredInputs +
-                ", inputVariables=" + inputVariables +
-                '}';
+        return Objects.hash(super.hashCode(), executeId, requiredInputs, inputVariables);
     }
 
     static class ExecuteNode extends FlowNode implements Execute {
@@ -130,22 +122,15 @@ public class ExecuteBuilder extends NodeBuilder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             ExecuteNode that = (ExecuteNode) o;
-            return Objects.equals(executeId, that.executeId);
+            return executeId.equals(that.executeId) &&
+                    Objects.equals(requiredInputs, that.requiredInputs) &&
+                    Objects.equals(inputVariables, that.inputVariables) &&
+                    targetNode.equals(that.targetNode);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(executeId);
-        }
-
-        @Override
-        public String toString() {
-            return "ExecuteNode{" +
-                    "executeId='" + executeId + '\'' +
-                    ", requiredInputs=" + requiredInputs +
-                    ", inputVariables=" + inputVariables +
-                    ", executeNode=" + targetNode +
-                    '}';
+            return Objects.hash(executeId, requiredInputs, inputVariables, targetNode);
         }
     }
 }

@@ -29,15 +29,11 @@ public class RegExBuilder extends QueryBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof RegExBuilder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         RegExBuilder that = (RegExBuilder) o;
-        return Objects.equals(queryBuilder, that.queryBuilder) &&
-                Objects.equals(expression, that.expression);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), queryBuilder, expression);
+        return queryBuilder.equals(that.queryBuilder) &&
+                expression.equals(that.expression);
     }
 
     @Override
@@ -46,6 +42,11 @@ public class RegExBuilder extends QueryBuilder {
                 "queryBuilder=" + queryBuilder +
                 ", expression='" + expression + '\'' +
                 '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), queryBuilder, expression);
     }
 
     static class RegExNode extends QueryNode implements RegEx {
@@ -72,23 +73,23 @@ public class RegExBuilder extends QueryBuilder {
         @Override
         public boolean equals(Object o) {
             if (this == o) return true;
-            if (!(o instanceof RegExNode)) return false;
+            if (o == null || getClass() != o.getClass()) return false;
             RegExNode regExNode = (RegExNode) o;
-            return Objects.equals(queryNode, regExNode.queryNode) &&
-                    Objects.equals(expression, regExNode.expression);
+            return queryNode.equals(regExNode.queryNode) &&
+                    expression.equals(regExNode.expression);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(queryNode, expression);
         }
+
         @Override
         public String toString() {
             return "RegExNode{" +
-                    "query=" + queryNode +
+                    "queryNode=" + queryNode +
                     ", expression='" + expression + '\'' +
                     '}';
         }
-
     }
 }

@@ -40,15 +40,16 @@ public class SequenceBuilder extends NodeBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof SequenceBuilder)) return false;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
         SequenceBuilder that = (SequenceBuilder) o;
-        return Objects.equals(splitBuilder, that.splitBuilder) &&
-                Objects.equals(expectedBuilder, that.expectedBuilder);
+        return splitBuilder.equals(that.splitBuilder) &&
+                expectedBuilder.equals(that.expectedBuilder);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(splitBuilder, expectedBuilder);
+        return Objects.hash(super.hashCode(), splitBuilder, expectedBuilder);
     }
 
     @Override
@@ -89,8 +90,8 @@ public class SequenceBuilder extends NodeBuilder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             SequenceNode that = (SequenceNode) o;
-            return Objects.equals(splitNode, that.splitNode) &&
-                    Objects.equals(expectedNode, that.expectedNode);
+            return splitNode.equals(that.splitNode) &&
+                    expectedNode.equals(that.expectedNode);
         }
 
         @Override

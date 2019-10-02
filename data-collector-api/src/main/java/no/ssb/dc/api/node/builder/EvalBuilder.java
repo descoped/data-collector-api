@@ -44,6 +44,15 @@ public class EvalBuilder extends QueryBuilder {
         return Objects.hash(super.hashCode(), queryBuilder, bindToVariable, elExpression);
     }
 
+    @Override
+    public String toString() {
+        return "EvalBuilder{" +
+                "queryBuilder=" + queryBuilder +
+                ", bindToVariable='" + bindToVariable + '\'' +
+                ", elExpression='" + elExpression + '\'' +
+                '}';
+    }
+
     static class EvalNode extends QueryNode implements Eval {
 
         final Query query;
@@ -70,21 +79,6 @@ public class EvalBuilder extends QueryBuilder {
         @Override
         public String expression() {
             return expression;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            EvalNode evalNode = (EvalNode) o;
-            return query.equals(evalNode.query) &&
-                    bindToVariable.equals(evalNode.bindToVariable) &&
-                    expression.equals(evalNode.expression);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(query, bindToVariable, expression);
         }
 
         @Override

@@ -53,24 +53,16 @@ public class FlowBuilder extends AbstractNodeBuilder {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof FlowBuilder)) return false;
-        FlowBuilder builder = (FlowBuilder) o;
-        return Objects.equals(flowName, builder.flowName) &&
-                Objects.equals(startNodeId, builder.startNodeId) &&
-                Objects.equals(nodeBuilderById, builder.nodeBuilderById);
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        FlowBuilder that = (FlowBuilder) o;
+        return flowName.equals(that.flowName) &&
+                startNodeId.equals(that.startNodeId) &&
+                Objects.equals(nodeBuilderById, that.nodeBuilderById);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(flowName, startNodeId, nodeBuilderById);
-    }
-
-    @Override
-    public String toString() {
-        return "FlowBuilder{" +
-                "flowName='" + flowName + '\'' +
-                ", startNodeId='" + startNodeId + '\'' +
-                ", nodeBuilderById=" + nodeBuilderById +
-                '}';
+        return Objects.hash(super.hashCode(), flowName, startNodeId, nodeBuilderById);
     }
 }
