@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.util.JacksonFactory;
 
-import java.util.LinkedHashMap;
 import java.util.Objects;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -39,7 +38,7 @@ public abstract class NodeBuilder extends AbstractNodeBuilder {
     abstract <R extends Base> R build(BuildContext buildContext);
 
     public <R extends Base> R build() {
-        return build(new BuildContext(new LinkedHashMap<>(), new LinkedHashMap<>()));
+        return build(BuildContext.empty());
     }
 
     @Override

@@ -31,15 +31,14 @@ public class FlowBuilder extends AbstractNodeBuilder {
     }
 
     public Flow end() {
-//        Map<String, Node> nodeInstanceById = new LinkedHashMap<>();
+        BuildContext buildContext = BuildContext.fromNodeBuilderById(nodeBuilderById);
 
         // add child nodes recursively to nodeInstanceById map
-        BuildContext buildContext = new BuildContext(nodeBuilderById, new LinkedHashMap<>());
         for (Map.Entry<String, NodeBuilder> entry : nodeBuilderById.entrySet()) {
-            buildContext.nodeInstanceById.put(entry.getKey(), entry.getValue().build(buildContext));
+            buildContext.nodeInstanceById().put(entry.getKey(), entry.getValue().build(buildContext));
         }
 
-        return Flow.create(flowName, (Node) buildContext.nodeInstanceById.get(startNodeId), (Map<String, Node>) buildContext.nodeInstanceById);
+        return Flow.create(flowName, (Node) buildContext.nodeInstanceById().get(startNodeId), buildContext.nodeInstanceById());
     }
 
     public NodeBuilder get(String nodeId) {
