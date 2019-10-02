@@ -7,7 +7,7 @@ import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Get;
 import no.ssb.dc.api.node.Node;
-import no.ssb.dc.api.node.ValidateResponse;
+import no.ssb.dc.api.node.Validator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -18,7 +18,7 @@ import java.util.Objects;
 public class GetBuilder extends OperationBuilder {
 
     @JsonProperty Headers requestHeaders = new Headers();
-    @JsonProperty("validateResponse") ValidateResponseBuilder<GetBuilder> validateResponseBuilder;
+    @JsonProperty("responseValidators") List<LeafNodeBuilder> validators = new ArrayList<>();
     @JsonProperty List<NodeBuilder> steps = new ArrayList<>();
     @JsonProperty Class<? extends PositionProducer> positionProducerClass;
     @JsonProperty List<String> returnVariables = new ArrayList<>();
@@ -47,15 +47,9 @@ public class GetBuilder extends OperationBuilder {
         return this;
     }
 
-    void setValidateResponseBuilder(ValidateResponseBuilder validateResponseBuilder) {
-        this.validateResponseBuilder = validateResponseBuilder;
-    }
-
-    public ValidateResponseBuilder<GetBuilder> validateResponse() {
-        if (validateResponseBuilder == null) {
-            validateResponseBuilder =  new ValidateResponseBuilder<>(this);
-        }
-        return validateResponseBuilder;
+    public GetBuilder validate(LeafNodeBuilder validationBuilder) {
+        validators.add(validationBuilder);
+        return this;
     }
 
     public GetBuilder step(NodeBuilder builder) {
@@ -78,7 +72,11 @@ public class GetBuilder extends OperationBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        ValidateResponse validateResponse = (validateResponseBuilder != null ? validateResponseBuilder.build(buildContext) : null);
+        List<Validator> validators = new ArrayList<>();
+        for (LeafNodeBuilder validatorBuilder : this.validators) {
+            Validator validator = validatorBuilder.build(buildContext);
+            validators.add(validator);
+        }
 
         List<Node> stepNodeList = new ArrayList<>();
         for (NodeBuilder stepBuilder : steps) {
@@ -86,7 +84,7 @@ public class GetBuilder extends OperationBuilder {
             stepNodeList.add(stepNode);
         }
 
-        return (R) new GetNode(getId(), url, requestHeaders, validateResponse, stepNodeList, positionProducerClass, returnVariables);
+        return (R) new GetNode(getId(), url, requestHeaders, validators, stepNodeList, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -96,7 +94,7 @@ public class GetBuilder extends OperationBuilder {
         if (!super.equals(o)) return false;
         GetBuilder that = (GetBuilder) o;
         return Objects.equals(requestHeaders, that.requestHeaders) &&
-                Objects.equals(validateResponseBuilder, that.validateResponseBuilder) &&
+                Objects.equals(validators, that.validators) &&
                 Objects.equals(steps, that.steps) &&
                 Objects.equals(positionProducerClass, that.positionProducerClass) &&
                 Objects.equals(returnVariables, that.returnVariables);
@@ -104,7 +102,7 @@ public class GetBuilder extends OperationBuilder {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), requestHeaders, validateResponseBuilder, steps, positionProducerClass, returnVariables);
+        return Objects.hash(super.hashCode(), requestHeaders, validators, steps, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -113,7 +111,7 @@ public class GetBuilder extends OperationBuilder {
                 "id='" + id + '\'' +
                 ", url='" + url + '\'' +
                 ", requestHeaders=" + requestHeaders +
-                ", validateResponseBuilder=" + validateResponseBuilder +
+                ", validators=" + validators +
                 ", steps=" + steps +
                 ", positionProducerClass=" + positionProducerClass +
                 ", returnVariables=" + returnVariables +
@@ -124,12 +122,12 @@ public class GetBuilder extends OperationBuilder {
 
         final String url;
         final Headers headers;
-        final ValidateResponse validateResponse;
+        private final List<Validator> validateResponse;
         final List<Node> steps;
         final Class<? extends PositionProducer> positionProducerClass;
         final List<String> returnVariables;
 
-        GetNode(String id, String url, Headers headers, ValidateResponse validateResponse, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
+        GetNode(String id, String url, Headers headers, List<Validator> validateResponse, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
             super(id);
             this.url = url;
             this.headers = headers;
@@ -150,7 +148,7 @@ public class GetBuilder extends OperationBuilder {
         }
 
         @Override
-        public ValidateResponse validateResponse() {
+        public List<Validator> responseValidators() {
             return validateResponse;
         }
 
@@ -179,7 +177,7 @@ public class GetBuilder extends OperationBuilder {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             GetNode getNode = (GetNode) o;
-            return url.equals(getNode.url) &&
+            return Objects.equals(url, getNode.url) &&
                     Objects.equals(headers, getNode.headers) &&
                     Objects.equals(validateResponse, getNode.validateResponse) &&
                     Objects.equals(steps, getNode.steps) &&

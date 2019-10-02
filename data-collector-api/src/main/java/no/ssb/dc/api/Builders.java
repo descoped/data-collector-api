@@ -4,6 +4,7 @@ import no.ssb.dc.api.node.builder.AddContentBuilder;
 import no.ssb.dc.api.node.builder.EvalBuilder;
 import no.ssb.dc.api.node.builder.ExecuteBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
+import no.ssb.dc.api.node.builder.HttpStatusValidationBuilder;
 import no.ssb.dc.api.node.builder.NextPageBuilder;
 import no.ssb.dc.api.node.builder.PaginateBuilder;
 import no.ssb.dc.api.node.builder.ParallelBuilder;
@@ -19,6 +20,10 @@ public class Builders {
 
     public static GetBuilder get(String nodeId) {
         return new GetBuilder(nodeId);
+    }
+
+    public static HttpStatusValidationBuilder status() {
+        return new HttpStatusValidationBuilder();
     }
 
     public static PaginateBuilder paginate(String nodeId) {

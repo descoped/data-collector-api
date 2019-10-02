@@ -2,10 +2,11 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Leaf;
 import no.ssb.dc.api.util.JacksonFactory;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public abstract class LeafNodeBuilder extends AbstractNodeBuilder {
+public abstract class LeafNodeBuilder extends AbstractBuilder {
 
     LeafNodeBuilder(BuilderType type) {
         super(type);
@@ -27,7 +28,7 @@ public abstract class LeafNodeBuilder extends AbstractNodeBuilder {
         return build(BuildContext.empty());
     }
 
-    public abstract static class LeafNode extends AbstractBaseNode implements Base {
+    public abstract static class LeafNode extends AbstractBaseNode implements Leaf {
 
     }
 }

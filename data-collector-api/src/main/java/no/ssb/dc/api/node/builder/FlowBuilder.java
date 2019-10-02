@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class FlowBuilder extends AbstractNodeBuilder {
+public class FlowBuilder extends AbstractBuilder {
 
     @JsonProperty String flowName;
     @JsonProperty String startNodeId;

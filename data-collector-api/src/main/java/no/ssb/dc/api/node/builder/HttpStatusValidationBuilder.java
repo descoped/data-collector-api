@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.http.HttpStatusCode;
 import no.ssb.dc.api.node.Base;
-import no.ssb.dc.api.node.ValidateResponse;
+import no.ssb.dc.api.node.HttpStatusValidation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,40 +12,38 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class ValidateResponseBuilder<T extends OperationBuilder> extends LeafNodeBuilder {
+public class HttpStatusValidationBuilder extends LeafNodeBuilder {
 
-    private final T parentBuilder;
     @JsonProperty List<Integer> success = new ArrayList<>();
     @JsonProperty List<Integer> failed = new ArrayList<>();
 
-    public ValidateResponseBuilder(T parentBuilder) {
-        super(BuilderType.ValidateResponse);
-        this.parentBuilder = parentBuilder;
+    public HttpStatusValidationBuilder() {
+        super(BuilderType.HttpStatusValidation);
     }
 
-    public T success(Integer... statusCode) {
+    public HttpStatusValidationBuilder success(Integer... statusCode) {
         success.addAll(List.of(statusCode));
-        return parentBuilder;
+        return this;
     }
 
-    public T success(Integer fromStatusCodeInclusive, Integer toStatusCodeInclusive) {
+    public HttpStatusValidationBuilder success(Integer fromStatusCodeInclusive, Integer toStatusCodeInclusive) {
         success.addAll(HttpStatusCode.range(fromStatusCodeInclusive, toStatusCodeInclusive).stream().map(HttpStatusCode::statusCode).collect(Collectors.toList()));
-        return parentBuilder;
+        return this;
     }
 
-    public T fail(Integer... statusCode) {
+    public HttpStatusValidationBuilder fail(Integer... statusCode) {
         failed.addAll(List.of(statusCode));
-        return parentBuilder;
+        return this;
     }
 
-    public T fail(Integer fromStatusCodeInclusive, Integer toStatusCodeInclusive) {
+    public HttpStatusValidationBuilder fail(Integer fromStatusCodeInclusive, Integer toStatusCodeInclusive) {
         failed.addAll(HttpStatusCode.range(fromStatusCodeInclusive, toStatusCodeInclusive).stream().map(HttpStatusCode::statusCode).collect(Collectors.toList()));
-        return parentBuilder;
+        return this;
     }
 
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        return (R) new ValidateResponseNode(success, failed);
+        return (R) new HttpStatusValidationNode(success, failed);
     }
 
     @Override
@@ -53,7 +51,7 @@ public class ValidateResponseBuilder<T extends OperationBuilder> extends LeafNod
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        ValidateResponseBuilder that = (ValidateResponseBuilder) o;
+        HttpStatusValidationBuilder that = (HttpStatusValidationBuilder) o;
         return Objects.equals(success, that.success) &&
                 Objects.equals(failed, that.failed);
     }
@@ -63,22 +61,14 @@ public class ValidateResponseBuilder<T extends OperationBuilder> extends LeafNod
         return Objects.hash(super.hashCode(), success, failed);
     }
 
-    @Override
-    public String toString() {
-        return "ValidateResponseBuilder{" +
-                "success=" + success +
-                ", failed=" + failed +
-                '}';
-    }
-
-    static class ValidateResponseNode extends LeafNode implements ValidateResponse {
+    static class HttpStatusValidationNode extends LeafNode implements HttpStatusValidation {
 
         final List<HttpStatusCode> success;
         final List<HttpStatusCode> failed;
 
-        ValidateResponseNode(List<Integer> success, List<Integer> failed) {
-            this.success = success.stream().map(code -> HttpStatusCode.valueOf(code)).collect(Collectors.toList());
-            this.failed = failed.stream().map(code -> HttpStatusCode.valueOf(code)).collect(Collectors.toList());
+        HttpStatusValidationNode(List<Integer> success, List<Integer> failed) {
+            this.success = success.stream().map(HttpStatusCode::valueOf).collect(Collectors.toList());
+            this.failed = failed.stream().map(HttpStatusCode::valueOf).collect(Collectors.toList());
         }
 
         @Override
@@ -95,7 +85,7 @@ public class ValidateResponseBuilder<T extends OperationBuilder> extends LeafNod
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-            ValidateResponseNode that = (ValidateResponseNode) o;
+            HttpStatusValidationNode that = (HttpStatusValidationNode) o;
             return Objects.equals(success, that.success) &&
                     Objects.equals(failed, that.failed);
         }
@@ -107,7 +97,7 @@ public class ValidateResponseBuilder<T extends OperationBuilder> extends LeafNod
 
         @Override
         public String toString() {
-            return "ValidateResponseNode{" +
+            return "HttpStatusNode{" +
                     "success=" + success +
                     ", failed=" + failed +
                     '}';

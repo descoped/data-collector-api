@@ -15,7 +15,7 @@ public interface Get extends Operation {
 
     Headers headers();
 
-    ValidateResponse validateResponse();
+    List<Validator> responseValidators();
 
     List<? extends Node> steps();
 

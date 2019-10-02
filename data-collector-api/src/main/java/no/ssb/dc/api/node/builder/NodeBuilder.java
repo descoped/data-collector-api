@@ -13,7 +13,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
-public abstract class NodeBuilder extends AbstractNodeBuilder {
+public abstract class NodeBuilder extends AbstractBuilder {
 
     NodeBuilder(BuilderType type) {
         super(type);

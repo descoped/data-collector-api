@@ -3,7 +3,7 @@ package no.ssb.dc.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import no.ssb.dc.api.node.Node;
-import no.ssb.dc.api.node.builder.AbstractNodeBuilder;
+import no.ssb.dc.api.node.builder.AbstractBuilder;
 import no.ssb.dc.api.node.builder.FlowBuilder;
 import no.ssb.dc.api.node.builder.NodeBuilderDeserializer;
 import no.ssb.dc.api.util.JacksonFactory;
@@ -27,12 +27,11 @@ public class Flow {
         return new FlowBuilder(name, startNodeId);
     }
 
-    public static <R extends AbstractNodeBuilder> R deserialize(String source, Class<R> builderClass) {
+    public static <R extends AbstractBuilder> R deserialize(String source, Class<R> builderClass) {
         try {
             ObjectMapper mapper = JacksonFactory.yamlInstance().objectMapper();
             SimpleModule module = new SimpleModule();
-            module.addDeserializer(AbstractNodeBuilder.class, new NodeBuilderDeserializer());
-            module.addDeserializer(AbstractNodeBuilder.class, new NodeBuilderDeserializer());
+            module.addDeserializer(AbstractBuilder.class, new NodeBuilderDeserializer());
             mapper.registerModule(module);
             return mapper.readValue(source, builderClass);
         } catch (IOException e) {

@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 /**
  * TODO Rewrite to a generic deserializer
  */
-public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder> {
+public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
 
     public NodeBuilderDeserializer() {
         this(null);
@@ -29,7 +29,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
     }
 
     @Override
-    public AbstractNodeBuilder deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
+    public AbstractBuilder deserialize(JsonParser jsonParser, DeserializationContext context) throws IOException {
         JsonNode node = jsonParser.getCodec().readTree(jsonParser);
         return handleNodeBuilder(0, context, new LinkedList<>(), null, node);
     }
@@ -42,20 +42,20 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
         }).collect(Collectors.joining("/"));
     }
 
-    private AbstractNodeBuilder handleNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors,
-                                                  JsonNode previousNode, JsonNode currentNode) {
+    private AbstractBuilder handleNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors,
+                                              JsonNode previousNode, JsonNode currentNode) {
         if (currentNode == null || !currentNode.has("type")) {
             throw new RuntimeException(String.format("Error resolving node: %s => %s", nodePath(ancestors), ancestors.peekLast()));
         }
         BuilderType type = BuilderType.parse(currentNode.get("type").textValue());
 
         ancestors.add(previousNode);
-        AbstractNodeBuilder nextNodeBuilder = buildNodeBuilder(depth, context, ancestors, currentNode, type);
+        AbstractBuilder nextNodeBuilder = buildNodeBuilder(depth, context, ancestors, currentNode, type);
         ancestors.remove(previousNode);
         return nextNodeBuilder;
     }
 
-    private AbstractNodeBuilder buildNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors, JsonNode currentNode, BuilderType type) {
+    private AbstractBuilder buildNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors, JsonNode currentNode, BuilderType type) {
         Objects.requireNonNull(type);
         switch (type) {
             case Flow: {
@@ -189,24 +189,16 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
 
                 builder.url(currentNode.get("url").textValue());
 
-                JsonNode validateResponseNode = currentNode.get("validateResponse");
+                JsonNode validateResponseNode = currentNode.get("responseValidators");
                 if (validateResponseNode != null) {
-                    ValidateResponseBuilder<GetBuilder> validateResponseBuilder = new ValidateResponseBuilder<>(builder);
-
-                    JsonNode success = validateResponseNode.get("success");
-                    if (success != null) {
-                        success.forEach(code -> validateResponseBuilder.success(code.intValue()));
-                    }
-
-                    JsonNode failed = validateResponseNode.get("failed");
-                    if (failed != null) {
-                        failed.forEach(code -> validateResponseBuilder.fail(code.intValue()));
-                    }
-
-                    builder.setValidateResponseBuilder(validateResponseBuilder);
+                    validateResponseNode.forEach(validatorNode -> {
+                        LeafNodeBuilder validatorBuilder = (LeafNodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, validatorNode);
+                        builder.validate(validatorBuilder);
+                    });
                 }
 
-                if (currentNode.has("positionProducerClass")) builder.positionProducer(getPositionProducerClass(currentNode));
+                if (currentNode.has("positionProducerClass"))
+                    builder.positionProducer(getPositionProducerClass(currentNode));
 
                 ArrayNode returnVariablesNode = (ArrayNode) currentNode.get("returnVariables");
                 if (returnVariablesNode != null) {
@@ -219,8 +211,20 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractNodeBuilder
                 return builder;
             }
 
-            case ValidateResponse: {
-                throw new IllegalStateException("ValidateResponseBuilder should be built in context of a Operation builder!");
+            case HttpStatusValidation: {
+                HttpStatusValidationBuilder builder = new HttpStatusValidationBuilder();
+
+                JsonNode success = currentNode.get("success");
+                if (success != null) {
+                    success.forEach(code -> builder.success(code.intValue()));
+                }
+
+                JsonNode failed = currentNode.get("failed");
+                if (failed != null) {
+                    failed.forEach(code -> builder.fail(code.intValue()));
+                }
+
+                return builder;
             }
         }
 

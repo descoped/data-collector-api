@@ -7,11 +7,11 @@ import java.util.Objects;
 /**
  * Base for node builder classes
  */
-public abstract class AbstractNodeBuilder {
+public abstract class AbstractBuilder {
 
     @JsonProperty final BuilderType type;
 
-    AbstractNodeBuilder(BuilderType type) {
+    AbstractBuilder(BuilderType type) {
         this.type = type;
     }
 
@@ -19,7 +19,7 @@ public abstract class AbstractNodeBuilder {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        AbstractNodeBuilder that = (AbstractNodeBuilder) o;
+        AbstractBuilder that = (AbstractBuilder) o;
         return type == that.type;
     }
 
