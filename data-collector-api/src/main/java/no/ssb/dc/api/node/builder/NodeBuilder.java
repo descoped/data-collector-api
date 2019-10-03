@@ -32,8 +32,13 @@ public abstract class NodeBuilder extends AbstractBuilder {
      */
     abstract <R extends Base> R build(BuildContext buildContext);
 
+    // see FLowBuilder.end()
     public <R extends Base> R build() {
-        return build(BuildContext.empty());
+        BuildContext buildContext = BuildContext.empty();
+        Configurations.Builder configurationsBuilder = new Configurations.Builder();
+        Configurations configurations = configurationsBuilder.build();
+        buildContext.cacheInstance(FlowBuilder.GLOBAL_CONFIGURATION, configurations);
+        return build(buildContext);
     }
 
     public abstract static class FlowNode extends AbstractBaseNode implements Node {

@@ -5,12 +5,13 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.builder.AbstractBuilder;
+import no.ssb.dc.api.node.builder.BuildContext;
 import no.ssb.dc.api.node.builder.FlowBuilder;
+import no.ssb.dc.api.node.builder.FlowContextBuilder;
 import no.ssb.dc.api.node.builder.NodeBuilderDeserializer;
 import no.ssb.dc.api.util.JacksonFactory;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Flow {
@@ -21,7 +22,7 @@ public class Flow {
     final Map<String, Node> nodeById;
 
     private Flow(String name, Node startNode, Map<String, Node> nodeById) {
-        this(name, new Configurations(new LinkedHashMap<>()), startNode, nodeById);
+        this(name, new Configurations.Builder().add(new FlowContextBuilder().build(BuildContext.empty())).build(), startNode, nodeById);
     }
 
     private Flow(String name, Configurations configurations, Node startNode, Map<String, Node> nodeById) {

@@ -85,7 +85,7 @@ public class BuilderTest {
     @Test
     public void thatFlowBuilderIsSerializedThenDeserialized() {
         FlowBuilder actual = flowBuilder;
-        FlowContext actualFlowContext = actual.end().configurations.flowContext().orElseThrow();
+        FlowContext actualFlowContext = actual.end().configurations.flowContext();
         String serialized = actual.serialize();
         assertNotNull(serialized);
         System.out.printf("serialized:%n%s%n", serialized);
@@ -97,7 +97,7 @@ public class BuilderTest {
         assertEquals(actual, deserialized);
 
         Flow end = deserialized.end();
-        FlowContext derserializedFlowContext = actual.end().configurations.flowContext().orElseThrow();
+        FlowContext derserializedFlowContext = actual.end().configurations.flowContext();
         assertEquals(actualFlowContext, derserializedFlowContext);
         ;
     }

@@ -13,7 +13,7 @@ import java.util.function.Function;
  * <p>
  * The BuildContext is ignored by leaf nodes unless the node instance should be cached.
  */
-class BuildContext {
+public class BuildContext {
     private final Map<String, NodeBuilder> nodeBuilderById;
     private final Map<String, Object> nodeInstanceById;
 
@@ -30,7 +30,7 @@ class BuildContext {
         return new BuildContext(nodeBuilderById, new LinkedHashMap<>());
     }
 
-    static BuildContext empty() {
+    public static BuildContext empty() {
         return new BuildContext(new LinkedHashMap<>(), new LinkedHashMap<>());
     }
 
@@ -64,5 +64,9 @@ class BuildContext {
 
     <V extends Base> V cacheInstanceIfAbsent(String key, Function<? super String, V> mappingFunction) {
         return (V) nodeInstanceById.computeIfAbsent(key, mappingFunction);
+    }
+
+    public boolean isEmpty() {
+        return nodeBuilderById.isEmpty() && nodeInstanceById.isEmpty();
     }
 }

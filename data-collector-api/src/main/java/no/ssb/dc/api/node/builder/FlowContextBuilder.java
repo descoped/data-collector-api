@@ -28,6 +28,11 @@ public class FlowContextBuilder extends ConfigurationBuilder {
         return headers.asMap();
     }
 
+    public FlowContextBuilder topic(String topicName) {
+        globalState("global.topic", topicName);
+        return this;
+    }
+
     public FlowContextBuilder header(String name, String value) {
         headers.put(name, value);
         return this;
@@ -43,10 +48,21 @@ public class FlowContextBuilder extends ConfigurationBuilder {
         return this;
     }
 
+    public Object globalState(Object key) {
+        return globalState.get(key);
+    }
+
+    /*
+     * TODO the ExecutionContext.join() and overlays of context state must be improved. Possible race conditions here.
+     * see FlowBuilder.end() and NodeBuilder.build().
+     */
     @Override
-    <R extends Base> R build(BuildContext buildContext) {
+    public <R extends Base> R build(BuildContext buildContext) {
         ExecutionContext context = ExecutionContext.empty();
-        context.state(Headers.class, headers);
+        // do not set set if headers is empty
+        if (!headers.asMap().isEmpty()) {
+            context.state(Headers.class, headers);
+        }
         context.variables().putAll(variables);
         globalState.forEach(context::globalState);
         return (R) new FlowContextNode(context);
@@ -83,6 +99,14 @@ public class FlowContextBuilder extends ConfigurationBuilder {
 
         FlowContextNode(ExecutionContext context) {
             this.context = context;
+        }
+
+        public String topic() {
+            String topic = context.state("global.topic");
+            if (topic == null) {
+                throw new RuntimeException("Topic is NOT configured!");
+            }
+            return topic;
         }
 
         @Override

@@ -1,9 +1,11 @@
 package no.ssb.dc.api.node;
 
+import no.ssb.dc.api.node.builder.BuildContext;
+import no.ssb.dc.api.node.builder.FlowContextBuilder;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 public class Configurations {
 
@@ -13,23 +15,8 @@ public class Configurations {
         this.configurationMap = configurationMap;
     }
 
-    public Optional<FlowContext> flowContext() {
-        FlowContext configuration = (FlowContext) configurationMap.get(FlowContext.class);
-        return Optional.ofNullable(configuration);
-    }
-
-    public static class Builder {
-        final Map<Class<? extends Configuration>, Configuration> configurationMap = new LinkedHashMap<>();
-
-        public Builder add(Configuration configuration) {
-            Class<? extends Configuration> anInterface = (Class<? extends Configuration>) configuration.getClass().getInterfaces()[0];
-            configurationMap.put(anInterface, configuration);
-            return this;
-        }
-
-        public Configurations build() {
-            return new Configurations(configurationMap);
-        }
+    public FlowContext flowContext() {
+        return (FlowContext) configurationMap.get(FlowContext.class);
     }
 
     @Override
@@ -50,5 +37,30 @@ public class Configurations {
         return "Configurations{" +
                 "configurationMap=" + configurationMap +
                 '}';
+    }
+
+    public static class Builder {
+        final Map<Class<? extends Configuration>, Configuration> configurationMap = new LinkedHashMap<>();
+
+        public Builder add(Configuration configuration) {
+            Class<? extends Configuration> anInterface = (Class<? extends Configuration>) configuration.getClass().getInterfaces()[0];
+            configurationMap.put(anInterface, configuration);
+            return this;
+        }
+
+        void createDefaultConfigurationIfAbsent() {
+            if (!configurationMap.containsKey(FlowContext.class)) {
+                FlowContextBuilder flowContextBuilder = new FlowContextBuilder();
+                if (flowContextBuilder.globalState("global.topic") == null) {
+                    flowContextBuilder.globalState("global.topic", "topic");
+                }
+                configurationMap.put(FlowContext.class, flowContextBuilder.build(BuildContext.empty()));
+            }
+        }
+
+        public Configurations build() {
+            createDefaultConfigurationIfAbsent();
+            return new Configurations(configurationMap);
+        }
     }
 }

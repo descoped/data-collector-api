@@ -41,6 +41,9 @@ public class FlowBuilder extends AbstractBuilder {
         return this;
     }
 
+    /*
+     * see NodeBuilder.build()
+     */
     public Flow end() {
         BuildContext buildContext = BuildContext.fromNodeBuilderById(nodeBuilderById);
 
