@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.PositionProducer;
 import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Get;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Validator;
@@ -84,7 +85,7 @@ public class GetBuilder extends OperationBuilder {
             stepNodeList.add(stepNode);
         }
 
-        return (R) new GetNode(getId(), url, requestHeaders, validators, stepNodeList, positionProducerClass, returnVariables);
+        return (R) new GetNode(getId(), buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), url, requestHeaders, validators, stepNodeList, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -127,8 +128,8 @@ public class GetBuilder extends OperationBuilder {
         final Class<? extends PositionProducer> positionProducerClass;
         final List<String> returnVariables;
 
-        GetNode(String id, String url, Headers headers, List<Validator> validateResponse, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
-            super(id);
+        GetNode(String id, Configurations configurations, String url, Headers headers, List<Validator> validateResponse, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
+            super(configurations, id);
             this.url = url;
             this.headers = headers;
             this.validateResponse = validateResponse;

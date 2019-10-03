@@ -30,12 +30,24 @@ public class ExecutionContext {
         this.state = state;
     }
 
+    public static ExecutionContext empty() {
+        return new Builder().build();
+    }
+
     public static ExecutionContext of(ExecutionContext input) {
         return new Builder().of(input).build();
     }
 
-    public static ExecutionContext empty() {
-        return new Builder().build();
+    public ExecutionContext join(ExecutionContext anotherContext) {
+        ExecutionContext copyOfThis = of(this);
+        ExecutionContext accumulated = of(anotherContext);
+        accumulated.variables.putAll(copyOfThis.variables);
+        accumulated.globalState.putAll(copyOfThis.globalState);
+        accumulated.state.putAll(copyOfThis.state);
+        this.variables.putAll(accumulated.variables);
+        this.globalState.putAll(accumulated.globalState);
+        this.state.putAll(accumulated.state);
+        return this;
     }
 
     public Services services() {

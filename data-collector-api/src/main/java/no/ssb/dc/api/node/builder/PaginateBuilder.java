@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Condition;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Execute;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Paginate;
@@ -71,7 +72,7 @@ public class PaginateBuilder extends NodeWithIdBuilder {
 
         ConditionBuilder.ConditionNode conditionNode = conditionBuilder.build(buildContext);
 
-        return (R) new PaginateNode(getId(), variables, addPageContent, executeNodeList, threshold, conditionNode);
+        return (R) new PaginateNode(getId(), buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), variables, addPageContent, executeNodeList, threshold, conditionNode);
     }
 
     @Override
@@ -112,8 +113,8 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         final double threshold;
         final ConditionBuilder.ConditionNode conditionNode;
 
-        PaginateNode(String id, Map<String, String> variables, boolean addPageContent, List<Execute> children, double threshold, ConditionBuilder.ConditionNode conditionNode) {
-            super(id);
+        PaginateNode(String id, Configurations configurations, Map<String, String> variables, boolean addPageContent, List<Execute> children, double threshold, ConditionBuilder.ConditionNode conditionNode) {
+            super(configurations, id);
             this.variables = variables;
             this.addPageContent = addPageContent;
             this.children = children;

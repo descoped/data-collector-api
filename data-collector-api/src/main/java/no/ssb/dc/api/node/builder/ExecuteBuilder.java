@@ -3,6 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Execute;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.NodeWithId;
@@ -54,7 +55,7 @@ public class ExecuteBuilder extends NodeBuilder {
 
         buildContext.cacheInstanceIfAbsent(executeId, node -> targetExecuteNode);
 
-        return (R) new ExecuteNode(executeId, requiredInputs, inputVariableMap, targetExecuteNode);
+        return (R) new ExecuteNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), executeId, requiredInputs, inputVariableMap, targetExecuteNode);
     }
 
     @Override
@@ -80,7 +81,8 @@ public class ExecuteBuilder extends NodeBuilder {
         final Map<String, QueryBuilder.QueryNode> inputVariables;
         final NodeWithIdBuilder.FlowNodeWithId targetNode;
 
-        ExecuteNode(String executeId, List<String> requiredInputs, Map<String, QueryBuilder.QueryNode> inputVariables, NodeWithIdBuilder.FlowNodeWithId targetNode) {
+        ExecuteNode(Configurations configurations, String executeId, List<String> requiredInputs, Map<String, QueryBuilder.QueryNode> inputVariables, NodeWithIdBuilder.FlowNodeWithId targetNode) {
+            super(configurations);
             if (targetNode == null) {
                 throw new IllegalArgumentException("adjacent executeNode is null");
             }

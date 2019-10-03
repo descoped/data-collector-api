@@ -3,6 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Publish;
 
@@ -22,7 +23,7 @@ public class PublishBuilder extends NodeBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        return (R) new PublishNode(positionVariableExpression);
+        return (R) new PublishNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), positionVariableExpression);
     }
 
     @Override
@@ -50,7 +51,8 @@ public class PublishBuilder extends NodeBuilder {
 
         final String positionVariableExpression;
 
-        PublishNode(String positionVariableExpression) {
+        PublishNode(Configurations configurations, String positionVariableExpression) {
+            super(configurations);
             this.positionVariableExpression = positionVariableExpression;
         }
 

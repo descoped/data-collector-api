@@ -2,6 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.util.JacksonFactory;
 
@@ -36,6 +37,17 @@ public abstract class NodeBuilder extends AbstractBuilder {
     }
 
     public abstract static class FlowNode extends AbstractBaseNode implements Node {
+
+        final Configurations configurations;
+
+        public FlowNode(Configurations configurations) {
+            this.configurations = configurations;
+        }
+
+        @Override
+        public Configurations configurations() {
+            return configurations;
+        }
 
         static void depthFirstPreOrderFullTraversal(int depth, Set<Node> visitedNodeIds,
                                                     List<Node> ancestors, Node currentNode,

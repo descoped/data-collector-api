@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.Processor;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Process;
 
@@ -31,7 +32,7 @@ public class ProcessBuilder extends NodeBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        return (R) new ProcessNode(processorClass, requiredOutputs);
+        return (R) new ProcessNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), processorClass, requiredOutputs);
     }
 
     @Override
@@ -62,7 +63,8 @@ public class ProcessBuilder extends NodeBuilder {
         final Class<? extends Processor> processorClass;
         final Set<String> requiredOutputs;
 
-        ProcessNode(Class<? extends Processor> processorClass, Set<String> requiredOutputs) {
+        ProcessNode(Configurations configurations, Class<? extends Processor> processorClass, Set<String> requiredOutputs) {
+            super(configurations);
             this.processorClass = processorClass;
             this.requiredOutputs = requiredOutputs;
         }

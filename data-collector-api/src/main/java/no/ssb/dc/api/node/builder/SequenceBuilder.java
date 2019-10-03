@@ -3,6 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Sequence;
 
@@ -34,7 +35,7 @@ public class SequenceBuilder extends NodeBuilder {
     <R extends Base> R build(BuildContext buildContext) {
         QueryBuilder.QueryNode splitToListQueryNode = splitBuilder.build(buildContext);
         QueryBuilder.QueryNode splitCriteriaQueryNode = expectedBuilder.build(buildContext);
-        return (R) new SequenceNode(splitToListQueryNode, splitCriteriaQueryNode);
+        return (R) new SequenceNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), splitToListQueryNode, splitCriteriaQueryNode);
     }
 
     @Override
@@ -65,7 +66,8 @@ public class SequenceBuilder extends NodeBuilder {
         final QueryBuilder.QueryNode splitNode;
         final QueryBuilder.QueryNode expectedNode;
 
-        SequenceNode(QueryBuilder.QueryNode splitNode, QueryBuilder.QueryNode expectedNode) {
+        SequenceNode(Configurations configurations, QueryBuilder.QueryNode splitNode, QueryBuilder.QueryNode expectedNode) {
+            super(configurations);
             this.splitNode = splitNode;
             this.expectedNode = expectedNode;
         }

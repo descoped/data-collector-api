@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.AddContent;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 
 import java.util.Iterator;
@@ -25,7 +26,7 @@ public class AddContentBuilder extends NodeBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        return (R) new AddContentNode(positionVariableExpression, contentKey);
+        return (R) new AddContentNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), positionVariableExpression, contentKey);
     }
 
     @Override
@@ -56,7 +57,8 @@ public class AddContentBuilder extends NodeBuilder {
         final String positionVariableExpression;
         final String contentKey;
 
-        AddContentNode(String positionVariableExpression, String contentKey) {
+        AddContentNode(Configurations configurations, String positionVariableExpression, String contentKey) {
+            super(configurations);
             this.positionVariableExpression = positionVariableExpression;
             this.contentKey = contentKey;
         }

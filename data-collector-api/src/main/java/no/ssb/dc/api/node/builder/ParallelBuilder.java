@@ -3,6 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Parallel;
 import no.ssb.dc.api.node.Publish;
@@ -62,7 +63,7 @@ public class ParallelBuilder extends NodeBuilder {
 
         PublishBuilder.PublishNode publishNode = publishBuilder == null ? null : (PublishBuilder.PublishNode) publishBuilder.build(buildContext);
 
-        return (R) new ParallelNode(splitToListQueryNode, contextVariablesMap, stepList, publishNode);
+        return (R) new ParallelNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), splitToListQueryNode, contextVariablesMap, stepList, publishNode);
     }
 
     @Override
@@ -99,7 +100,8 @@ public class ParallelBuilder extends NodeBuilder {
         final List<Node> steps;
         final Publish publishNode;
 
-        ParallelNode(QueryBuilder.QueryNode splitQueryNode, Map<String, QueryBuilder.QueryNode> variables, List<Node> steps, Publish publishNode) {
+        ParallelNode(Configurations configurations, QueryBuilder.QueryNode splitQueryNode, Map<String, QueryBuilder.QueryNode> variables, List<Node> steps, Publish publishNode) {
+            super(configurations);
             this.splitQueryNode = splitQueryNode;
             this.variables = variables;
             this.steps = steps;

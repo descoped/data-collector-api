@@ -17,6 +17,8 @@ import java.util.Optional;
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class FlowBuilder extends AbstractBuilder {
 
+    static final String GLOBAL_CONFIGURATION = "GLOBAL_CONFIGURATION";
+
     @JsonProperty String flowName;
     @JsonProperty String startNodeId;
 
@@ -47,6 +49,7 @@ public class FlowBuilder extends AbstractBuilder {
             configurationsBuilder.add(configurationBuilder.build(buildContext));
         }
         Configurations configurations = configurationsBuilder.build();
+        buildContext.cacheInstance(GLOBAL_CONFIGURATION, configurations);
 
         // add child nodes recursively to buildContext.nodeInstanceById map
         for (Map.Entry<String, NodeBuilder> entry : nodeBuilderById.entrySet()) {

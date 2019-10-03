@@ -3,6 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.NextPage;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Query;
@@ -33,7 +34,7 @@ public class NextPageBuilder extends NodeBuilder {
         for (Map.Entry<String, QueryBuilder> entry : outputMap.entrySet()) {
             queryNodeMap.put(entry.getKey(), entry.getValue().build(buildContext));
         }
-        return (R) new NextPageNode(queryNodeMap);
+        return (R) new NextPageNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), queryNodeMap);
     }
 
     @Override
@@ -61,7 +62,8 @@ public class NextPageBuilder extends NodeBuilder {
 
         private final Map<String, QueryBuilder.QueryNode> queryNodeMap;
 
-        NextPageNode(Map<String, QueryBuilder.QueryNode> queryNodeMap) {
+        NextPageNode(Configurations configurations, Map<String, QueryBuilder.QueryNode> queryNodeMap) {
+            super(configurations);
             this.queryNodeMap = queryNodeMap;
         }
 

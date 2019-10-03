@@ -1,6 +1,7 @@
 package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.NodeWithId;
 
 import java.util.Objects;
@@ -46,7 +47,8 @@ public abstract class NodeWithIdBuilder extends NodeBuilder {
     public abstract static class FlowNodeWithId extends FlowNode implements NodeWithId {
         final String id;
 
-        FlowNodeWithId(String id) {
+        FlowNodeWithId(Configurations configurations, String id) {
+            super(configurations);
             this.id = id;
         }
 
