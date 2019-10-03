@@ -24,8 +24,6 @@ module no.ssb.dc.api {
     requires org.bouncycastle.pkix;
     requires org.bouncycastle.provider;
 
-    requires undertow.core;
-
     uses Client.Builder;
     uses Request.Builder;
     uses Response.Builder;
@@ -33,7 +31,6 @@ module no.ssb.dc.api {
     provides ContentStoreInitializer with DiscardingContentStoreInitializer;
 
     exports no.ssb.dc.api;
-    exports no.ssb.dc.api.application;
     exports no.ssb.dc.api.context;
     exports no.ssb.dc.api.node;
     exports no.ssb.dc.api.node.builder;
