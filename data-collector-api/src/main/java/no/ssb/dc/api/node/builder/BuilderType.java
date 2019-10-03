@@ -2,6 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 public enum BuilderType {
     Flow,
+    FlowContext,
     Paginate,
     Sequence,
     NextPage,

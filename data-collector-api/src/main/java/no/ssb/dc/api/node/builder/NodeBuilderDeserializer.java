@@ -61,8 +61,43 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
             case Flow: {
                 FlowBuilder builder = Flow.start(currentNode.get("flowName").textValue(), currentNode.get("startNodeId").textValue());
 
+                JsonNode configureNode = currentNode.get("configure");
+                if (configureNode != null) {
+                    for (JsonNode configurationNode : configureNode) {
+                        ConfigurationBuilder configurationBuilder = (ConfigurationBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, configurationNode);
+                        builder.configure(configurationBuilder);
+                    }
+                }
+
                 currentNode.get("nodes").fields().forEachRemaining(entry ->
                         builder.node((NodeWithIdBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
+
+                return builder;
+            }
+
+            case FlowContext: {
+                FlowContextBuilder builder = new FlowContextBuilder();
+
+                JsonNode headerNode = currentNode.get("headers");
+                if (headerNode != null) {
+                    headerNode.fields().forEachRemaining(entry -> {
+                        entry.getValue().forEach(headerValueNode -> builder.header(entry.getKey(), headerValueNode.textValue()));
+                    });
+                }
+
+                JsonNode variableNode = currentNode.get("variables");
+                if (variableNode != null) {
+                    variableNode.fields().forEachRemaining(entry -> {
+                        builder.variable(entry.getKey(), entry.getValue());
+                    });
+                }
+
+                JsonNode globalStateNode = currentNode.get("globalState");
+                if (globalStateNode != null) {
+                    globalStateNode.fields().forEachRemaining(entry -> {
+                        builder.globalState(entry.getKey(), entry.getValue());
+                    });
+                }
 
                 return builder;
             }

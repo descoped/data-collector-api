@@ -1,0 +1,113 @@
+package no.ssb.dc.api.node.builder;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import no.ssb.dc.api.context.ExecutionContext;
+import no.ssb.dc.api.http.Headers;
+import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.FlowContext;
+
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+@JsonDeserialize(using = NodeBuilderDeserializer.class)
+public class FlowContextBuilder extends ConfigurationBuilder {
+
+    Headers headers = new Headers();
+    @JsonProperty Map<String, Object> variables = new LinkedHashMap<>();
+    @JsonProperty Map<Object, Object> globalState = new LinkedHashMap<>();
+
+    public FlowContextBuilder() {
+        super(BuilderType.FlowContext);
+    }
+
+    @JsonProperty("headers")
+    public Map<String, List<String>> headerMap() {
+        return headers.asMap();
+    }
+
+    public FlowContextBuilder header(String name, String value) {
+        headers.put(name, value);
+        return this;
+    }
+
+    public FlowContextBuilder variable(String name, Object value) {
+        variables.put(name, value);
+        return this;
+    }
+
+    public FlowContextBuilder globalState(Object key, Object value) {
+        globalState.put(key, value);
+        return this;
+    }
+
+    @Override
+    <R extends Base> R build(BuildContext buildContext) {
+        ExecutionContext context = ExecutionContext.empty();
+        context.state(Headers.class, headers);
+        context.variables().putAll(variables);
+        globalState.forEach(context::globalState);
+        return (R) new FlowContextNode(context);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        FlowContextBuilder that = (FlowContextBuilder) o;
+        return Objects.equals(headers, that.headers) &&
+                Objects.equals(variables, that.variables) &&
+                Objects.equals(globalState, that.globalState);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), headers, variables, globalState);
+    }
+
+    @Override
+    public String toString() {
+        return "FlowContextBuilder{" +
+                "headers=" + headers +
+                ", variables=" + variables +
+                ", globalState=" + globalState +
+                '}';
+    }
+
+    static class FlowContextNode extends LeafNode implements FlowContext {
+
+        private final ExecutionContext context;
+
+        FlowContextNode(ExecutionContext context) {
+            this.context = context;
+        }
+
+        @Override
+        public ExecutionContext globalContext() {
+            return context;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            FlowContextNode that = (FlowContextNode) o;
+            return Objects.equals(context, that.context);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(context);
+        }
+
+        @Override
+        public String toString() {
+            return "FlowContextNode{" +
+                    "context=" + context +
+                    '}';
+        }
+    }
+}

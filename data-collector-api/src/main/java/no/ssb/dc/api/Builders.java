@@ -3,6 +3,7 @@ package no.ssb.dc.api;
 import no.ssb.dc.api.node.builder.AddContentBuilder;
 import no.ssb.dc.api.node.builder.EvalBuilder;
 import no.ssb.dc.api.node.builder.ExecuteBuilder;
+import no.ssb.dc.api.node.builder.FlowContextBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
 import no.ssb.dc.api.node.builder.HttpStatusValidationBuilder;
 import no.ssb.dc.api.node.builder.NextPageBuilder;
@@ -17,6 +18,10 @@ import no.ssb.dc.api.node.builder.WhenVariableIsNullBuilder;
 import no.ssb.dc.api.node.builder.XPathBuilder;
 
 public class Builders {
+
+    public static FlowContextBuilder context() {
+        return new FlowContextBuilder();
+    }
 
     public static GetBuilder get(String nodeId) {
         return new GetBuilder(nodeId);

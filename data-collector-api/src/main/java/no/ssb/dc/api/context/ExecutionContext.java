@@ -30,6 +30,14 @@ public class ExecutionContext {
         this.state = state;
     }
 
+    public static ExecutionContext of(ExecutionContext input) {
+        return new Builder().of(input).build();
+    }
+
+    public static ExecutionContext empty() {
+        return new Builder().build();
+    }
+
     public Services services() {
         Objects.requireNonNull(services);
         return services;
@@ -95,12 +103,28 @@ public class ExecutionContext {
         return this;
     }
 
-    public static ExecutionContext of(ExecutionContext input) {
-        return new Builder().of(input).build();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ExecutionContext context = (ExecutionContext) o;
+        return Objects.equals(globalState, context.globalState) &&
+                Objects.equals(variables, context.variables) &&
+                Objects.equals(state, context.state);
     }
 
-    public static ExecutionContext empty() {
-        return new Builder().build();
+    @Override
+    public int hashCode() {
+        return Objects.hash(globalState, variables, state);
+    }
+
+    @Override
+    public String toString() {
+        return "ExecutionInput{" +
+                "globalState=" + globalState +
+                ", state=" + state +
+                ", variables=" + variables +
+                '}';
     }
 
     public static class Builder {
@@ -172,14 +196,5 @@ public class ExecutionContext {
                     ofNullable(state).orElseGet(LinkedHashMap::new)
             );
         }
-    }
-
-    @Override
-    public String toString() {
-        return "ExecutionInput{" +
-                "globalState=" + globalState +
-                ", state=" + state +
-                ", variables=" + variables +
-                '}';
     }
 }

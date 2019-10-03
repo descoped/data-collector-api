@@ -1,12 +1,15 @@
 package no.ssb.dc.api;
 
 import no.ssb.dc.api.context.ExecutionContext;
+import no.ssb.dc.api.node.FlowContext;
 import no.ssb.dc.api.node.builder.FlowBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
 import no.ssb.dc.api.node.builder.NodeBuilder;
 import no.ssb.dc.api.node.builder.PaginateBuilder;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
+import static no.ssb.dc.api.Builders.context;
 import static no.ssb.dc.api.Builders.execute;
 import static no.ssb.dc.api.Builders.get;
 import static no.ssb.dc.api.Builders.nextPage;
@@ -25,6 +28,7 @@ import static org.testng.Assert.assertNotNull;
 public class BuilderTest {
 
     static final FlowBuilder flowBuilder = Flow.start("name of flow", "getstartposition")
+            .configure(context().variable("foo", "bar").header("accept", "application/xml").globalState("key", "value"))
             .node(get("getstartposition")
                     .url("http://com.company/getstartposition")
                     .step(process(A.class).output("next-position"))
@@ -72,6 +76,7 @@ public class BuilderTest {
                     .step(process(Processor.class).output("event-id"))
             );
 
+    @Ignore
     @Test
     public void printExecutionPlan() {
         System.out.printf("Execution-plan:%n%n%s%n", flowBuilder.end().startNode().toPrintableExecutionPlan());
@@ -80,6 +85,7 @@ public class BuilderTest {
     @Test
     public void thatFlowBuilderIsSerializedThenDeserialized() {
         FlowBuilder actual = flowBuilder;
+        FlowContext actualFlowContext = actual.end().configurations.flowContext().orElseThrow();
         String serialized = actual.serialize();
         assertNotNull(serialized);
         System.out.printf("serialized:%n%s%n", serialized);
@@ -89,6 +95,11 @@ public class BuilderTest {
         System.out.printf("deserialized:%n%s%n", serialized);
 
         assertEquals(actual, deserialized);
+
+        Flow end = deserialized.end();
+        FlowContext derserializedFlowContext = actual.end().configurations.flowContext().orElseThrow();
+        assertEquals(actualFlowContext, derserializedFlowContext);
+        ;
     }
 
     @Test

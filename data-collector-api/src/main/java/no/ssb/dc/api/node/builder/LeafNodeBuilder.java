@@ -28,7 +28,6 @@ public abstract class LeafNodeBuilder extends AbstractBuilder {
         return build(BuildContext.empty());
     }
 
-    public abstract static class LeafNode extends AbstractBaseNode implements Leaf {
-
+    abstract static class LeafNode extends AbstractBaseNode implements Leaf {
     }
 }
