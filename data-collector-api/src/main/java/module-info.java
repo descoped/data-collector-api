@@ -13,16 +13,11 @@ module no.ssb.dc.api {
     requires io.github.classgraph;
     requires de.huxhorn.sulky.ulid;
     requires commons.jexl3;
-
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.dataformat.yaml;
-
     requires java.xml;
-
-    requires org.bouncycastle.pkix;
-    requires org.bouncycastle.provider;
 
     uses Client.Builder;
     uses Request.Builder;
@@ -40,7 +35,6 @@ module no.ssb.dc.api {
     exports no.ssb.dc.api.http;
     exports no.ssb.dc.api.ulid;
     exports no.ssb.dc.api.error;
-    exports no.ssb.dc.api.security;
     exports no.ssb.dc.api.services;
     exports no.ssb.dc.api.util;
     exports no.ssb.dc.content;
