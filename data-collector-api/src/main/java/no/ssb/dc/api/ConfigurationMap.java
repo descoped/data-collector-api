@@ -21,4 +21,8 @@ public class ConfigurationMap {
     public Map<String, String> asMap() {
         return configMap;
     }
+
+    public void put(String key, String value) {
+        configMap.put(key, value);
+    }
 }
