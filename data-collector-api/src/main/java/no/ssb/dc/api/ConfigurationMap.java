@@ -10,8 +10,15 @@ public class ConfigurationMap {
         this.configMap = configMap;
     }
 
+    public boolean contains(String key) {
+        return configMap.containsKey(key);
+    }
+
     public String get(String key) {
         return configMap.get(key);
     }
 
+    public Map<String, String> asMap() {
+        return configMap;
+    }
 }
