@@ -35,7 +35,7 @@ public class BuilderTest {
                     .globalState("key", "value")
             )
             .configure(security()
-                    .sslBundlename("ske-test-certs")
+                    .sslBundleName("ske-test-certs")
             )
             .node(get("getstartposition")
                     .url("http://com.company/getstartposition")

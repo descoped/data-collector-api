@@ -107,7 +107,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
 
                 JsonNode sslBundleNameNode = currentNode.get("bundleName");
                 if (sslBundleNameNode != null) {
-                    builder.sslBundlename(sslBundleNameNode.textValue());
+                    builder.sslBundleName(sslBundleNameNode.textValue());
                 }
 
                 return builder;

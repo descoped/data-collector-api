@@ -16,7 +16,7 @@ public class SecurityBuilder extends ConfigurationBuilder {
         super(BuilderType.Security);
     }
 
-    public SecurityBuilder sslBundlename(String bundleName) {
+    public SecurityBuilder sslBundleName(String bundleName) {
         this.bundleName = bundleName;
         return this;
     }
