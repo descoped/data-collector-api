@@ -2,6 +2,7 @@ package no.ssb.dc.api.node;
 
 import no.ssb.dc.api.node.builder.BuildContext;
 import no.ssb.dc.api.node.builder.FlowContextBuilder;
+import no.ssb.dc.api.node.builder.SecurityBuilder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,6 +18,10 @@ public class Configurations {
 
     public FlowContext flowContext() {
         return (FlowContext) configurationMap.get(FlowContext.class);
+    }
+
+    public Security security() {
+        return (Security) configurationMap.get(Security.class);
     }
 
     @Override
@@ -55,6 +60,11 @@ public class Configurations {
                     flowContextBuilder.globalState("global.topic", "topic");
                 }
                 configurationMap.put(FlowContext.class, flowContextBuilder.build(BuildContext.empty()));
+            }
+
+            if (!configurationMap.containsKey(Security.class)) {
+                SecurityBuilder securityBuilder = new SecurityBuilder();
+                configurationMap.put(Security.class, securityBuilder.build(BuildContext.empty()));
             }
         }
 

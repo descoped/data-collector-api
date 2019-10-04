@@ -42,7 +42,7 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
     }
 
     @Override
-    <R extends Base> R build(BuildContext buildContext) {
+    public <R extends Base> R build(BuildContext buildContext) {
         return (R) new HttpStatusValidationNode(success, failed);
     }
 

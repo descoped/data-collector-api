@@ -22,7 +22,7 @@ public abstract class LeafNodeBuilder extends AbstractBuilder {
      *
      * @param buildContext @return
      */
-    abstract <R extends Base> R build(BuildContext buildContext);
+    public abstract <R extends Base> R build(BuildContext buildContext);
 
     public <R extends Base> R build() {
         return build(BuildContext.empty());

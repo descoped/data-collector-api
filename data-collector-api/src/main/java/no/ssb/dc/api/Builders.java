@@ -13,6 +13,7 @@ import no.ssb.dc.api.node.builder.ProcessBuilder;
 import no.ssb.dc.api.node.builder.PublishBuilder;
 import no.ssb.dc.api.node.builder.QueryBuilder;
 import no.ssb.dc.api.node.builder.RegExBuilder;
+import no.ssb.dc.api.node.builder.SecurityBuilder;
 import no.ssb.dc.api.node.builder.SequenceBuilder;
 import no.ssb.dc.api.node.builder.WhenVariableIsNullBuilder;
 import no.ssb.dc.api.node.builder.XPathBuilder;
@@ -21,6 +22,10 @@ public class Builders {
 
     public static FlowContextBuilder context() {
         return new FlowContextBuilder();
+    }
+
+    public static SecurityBuilder security() {
+        return new SecurityBuilder();
     }
 
     public static GetBuilder get(String nodeId) {

@@ -102,6 +102,17 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return builder;
             }
 
+            case Security: {
+                SecurityBuilder builder = new SecurityBuilder();
+
+                JsonNode sslBundleNameNode = currentNode.get("bundleName");
+                if (sslBundleNameNode != null) {
+                    builder.sslBundlename(sslBundleNameNode.textValue());
+                }
+
+                return builder;
+            }
+
             case Paginate: {
                 PaginateBuilder builder = new PaginateBuilder(currentNode.get("id").textValue());
 

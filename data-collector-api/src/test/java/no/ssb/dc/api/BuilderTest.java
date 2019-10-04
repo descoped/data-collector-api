@@ -18,6 +18,7 @@ import static no.ssb.dc.api.Builders.parallel;
 import static no.ssb.dc.api.Builders.process;
 import static no.ssb.dc.api.Builders.publish;
 import static no.ssb.dc.api.Builders.regex;
+import static no.ssb.dc.api.Builders.security;
 import static no.ssb.dc.api.Builders.sequence;
 import static no.ssb.dc.api.Builders.status;
 import static no.ssb.dc.api.Builders.whenVariableIsNull;
@@ -28,7 +29,14 @@ import static org.testng.Assert.assertNotNull;
 public class BuilderTest {
 
     static final FlowBuilder flowBuilder = Flow.start("name of flow", "getstartposition")
-            .configure(context().variable("foo", "bar").header("accept", "application/xml").globalState("key", "value"))
+            .configure(context()
+                    .variable("foo", "bar")
+                    .header("accept", "application/xml")
+                    .globalState("key", "value")
+            )
+            .configure(security()
+                    .sslBundlename("ske-test-certs")
+            )
             .node(get("getstartposition")
                     .url("http://com.company/getstartposition")
                     .step(process(A.class).output("next-position"))
