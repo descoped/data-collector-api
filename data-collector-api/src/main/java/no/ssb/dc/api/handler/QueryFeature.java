@@ -14,10 +14,10 @@ public interface QueryFeature {
 
     Object deserialize(byte[] source);
 
-    List<?> queryList(Object data);
+    List<?> evaluateList(Object data);
 
-    Object queryObject(Object data);
+    Object evaluateObject(Object data);
 
-    String queryStringLiteral(Object data);
+    String evaluateStringLiteral(Object data);
 
 }
