@@ -1,5 +1,6 @@
 package no.ssb.dc.content;
 
+import no.ssb.dc.api.content.ContentStateKey;
 import no.ssb.dc.api.content.ContentStore;
 import no.ssb.dc.api.content.ContentStream;
 import no.ssb.dc.api.content.ContentStreamBuffer;
@@ -10,7 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscardingContentStore implements ContentStore {
@@ -18,27 +22,29 @@ public class DiscardingContentStore implements ContentStore {
     private final static Logger LOG = LoggerFactory.getLogger(DiscardingContentStore.class);
 
     final AtomicReference<String> lastPositionRef = new AtomicReference<>();
+    final Map<ContentStateKey, Set<String>> contentBuffers = new ConcurrentHashMap<>();
 
     @Override
-    public String lastPosition(String namespace) {
+    public String lastPosition(String topic) {
         return lastPositionRef.get();
     }
 
     @Override
-    public Set<String> contentKeys(String namespace, String position) {
-        return new HashSet<>();
+    public Set<String> contentKeys(String topic, String position) {
+        Set<String> buffers = contentBuffers.get(new ContentStateKey(topic, position));
+        return (buffers == null ? new HashSet<>() : buffers);
     }
 
     @Override
-    public void addPaginationDocument(String namespace, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
+    public void addPaginationDocument(String topic, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
         ContentStream contentStream = new DiscardingContentStream();
-        ContentStreamProducer producer = contentStream.producer(namespace + "-pages");
+        ContentStreamProducer producer = contentStream.producer(topic + "-pages");
         ContentStreamBuffer.Builder bufferBuilder = producer.builder();
 
         String position = httpRequestInfo.getCorrelationIds().first().toString();
-        MetadataContent manifest = getMetadataContent(namespace + "-pages", position, contentKey, content, MetadataContent.ResourceType.PAGE, httpRequestInfo);
+        MetadataContent manifest = getMetadataContent(topic + "-pages", position, contentKey, content, MetadataContent.ResourceType.PAGE, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("PAGE: {}", manifest.toJSON());
+            LOG.trace("Buffer Page: {}", manifest.toJSON());
         }
 
         bufferBuilder.position(position);
@@ -48,15 +54,17 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void bufferPaginationEntryDocument(String namespace, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
-        MetadataContent manifest = getMetadataContent(namespace, position, contentKey, content, MetadataContent.ResourceType.ENTRY, httpRequestInfo);
+    public void bufferPaginationEntryDocument(String topic, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
+        MetadataContent manifest = getMetadataContent(topic, position, contentKey, content, MetadataContent.ResourceType.ENTRY, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
             System.out.printf("%n");
-            LOG.trace("ENTRY: {}", manifest.toJSON());
+            LOG.trace("Buffer Entry: {}", manifest.toJSON());
         }
 
+        contentBuffers.computeIfAbsent(new ContentStateKey(topic, position), keys -> new HashSet<>()).add(contentKey);
+
         ContentStream contentStream = new DiscardingContentStream();
-        ContentStreamProducer producer = contentStream.producer(namespace);
+        ContentStreamProducer producer = contentStream.producer(topic);
         ContentStreamBuffer.Builder bufferBuilder = producer.builder();
         bufferBuilder.position(position).buffer(contentKey, content, manifest);
 
@@ -64,14 +72,16 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void bufferDocument(String namespace, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
-        MetadataContent manifest = getMetadataContent(namespace, position, contentKey, content, MetadataContent.ResourceType.DOCUMENT, httpRequestInfo);
+    public void bufferDocument(String topic, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
+        MetadataContent manifest = getMetadataContent(topic, position, contentKey, content, MetadataContent.ResourceType.DOCUMENT, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
-            LOG.trace("DOCUMENT: {}", manifest.toJSON());
+            LOG.trace("Buffer Document: {}", manifest.toJSON());
         }
 
+        contentBuffers.computeIfAbsent(new ContentStateKey(topic, position), keys -> new HashSet<>()).add(contentKey);
+
         ContentStream contentStream = new DiscardingContentStream();
-        ContentStreamProducer producer = contentStream.producer(namespace);
+        ContentStreamProducer producer = contentStream.producer(topic);
         ContentStreamBuffer.Builder bufferBuilder = producer.builder();
         bufferBuilder.position(position).buffer(contentKey, content, manifest);
 
@@ -79,18 +89,24 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void publish(String namespace, String... position) {
+    public void publish(String topic, String... position) {
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("Publish Positions: {}", List.of(position));
+        }
         for (String pos : position) {
+            if (LOG.isTraceEnabled()) {
+            }
             lastPositionRef.set(pos);
+            contentBuffers.remove(new ContentStateKey(topic, pos));
         }
     }
 
-    MetadataContent getMetadataContent(String namespace, String position, String contentKey, byte[] content, MetadataContent.ResourceType resourceType, HttpRequestInfo httpRequestInfo) {
+    MetadataContent getMetadataContent(String topic, String position, String contentKey, byte[] content, MetadataContent.ResourceType resourceType, HttpRequestInfo httpRequestInfo) {
         return new MetadataContent.Builder()
                 .resourceType(resourceType)
                 .correlationId(httpRequestInfo.getCorrelationIds())
                 .url(httpRequestInfo.getUrl())
-                .namespace(namespace)
+                .topic(topic)
                 .position(position)
                 .contentKey(contentKey)
                 .contentType(httpRequestInfo.getResponseHeaders().firstValue("content-type").orElseGet(() -> "application/octet-stream"))

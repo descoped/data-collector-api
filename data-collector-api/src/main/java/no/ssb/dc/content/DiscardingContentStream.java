@@ -17,12 +17,12 @@ public class DiscardingContentStream implements ContentStream {
 
 
     @Override
-    public String lastPosition(String namespace) {
+    public String lastPosition(String topic) {
         return null;
     }
 
     @Override
-    public ContentStreamProducer producer(String namespace) {
+    public ContentStreamProducer producer(String topic) {
         return new DiscardingContentProducer();
     }
 }

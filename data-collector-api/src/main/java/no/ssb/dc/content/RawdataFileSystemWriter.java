@@ -27,9 +27,9 @@ public class RawdataFileSystemWriter {
     private final AtomicBoolean forceShutdown = new AtomicBoolean(false);
     private final Object lock = new Object();
 
-    public RawdataFileSystemWriter(RawdataClient rawdataClient, String namespace, Path rootPath) {
-        this.consumer = rawdataClient.consumer(namespace);
-        this.rootPath = rootPath.resolve(namespace);
+    public RawdataFileSystemWriter(RawdataClient rawdataClient, String topic, Path rootPath) {
+        this.consumer = rawdataClient.consumer(topic);
+        this.rootPath = rootPath.resolve(topic);
     }
 
     private void nap(long millis) {
