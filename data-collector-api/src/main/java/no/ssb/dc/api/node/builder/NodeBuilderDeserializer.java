@@ -70,7 +70,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 }
 
                 currentNode.get("nodes").fields().forEachRemaining(entry ->
-                        builder.node((NodeWithIdBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
+                        builder.function((NodeWithIdBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
                 return builder;
             }
@@ -122,7 +122,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                     builder.addPageContent();
                 }
 
-                currentNode.get("children").forEach(child -> builder.step((ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));
+                currentNode.get("children").forEach(child -> builder.iterate((ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));
 
                 JsonNode thresholdNode = currentNode.get("threshold");
                 builder.prefetchThreshold(thresholdNode.asDouble());
@@ -166,7 +166,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                         builder.variable(entry.getKey(), (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
                 JsonNode stepsNode = currentNode.get("steps");
-                stepsNode.forEach(stepNode -> builder.step((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
 
                 JsonNode publishJsonNode = currentNode.get("publish");
                 if (publishJsonNode != null) {
@@ -252,7 +252,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 }
 
                 JsonNode stepsNode = currentNode.get("steps");
-                stepsNode.forEach(stepNode -> builder.step((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
 
                 return builder;
             }

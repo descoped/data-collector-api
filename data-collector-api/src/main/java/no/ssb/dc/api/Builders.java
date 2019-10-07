@@ -28,16 +28,16 @@ public class Builders {
         return new SecurityBuilder();
     }
 
-    public static GetBuilder get(String nodeId) {
-        return new GetBuilder(nodeId);
+    public static GetBuilder get(String functionId) {
+        return new GetBuilder(functionId);
     }
 
     public static HttpStatusValidationBuilder status() {
         return new HttpStatusValidationBuilder();
     }
 
-    public static PaginateBuilder paginate(String nodeId) {
-        return new PaginateBuilder(nodeId);
+    public static PaginateBuilder paginate(String function) {
+        return new PaginateBuilder(function);
     }
 
     /**
@@ -58,8 +58,8 @@ public class Builders {
         return new ParallelBuilder(builder);
     }
 
-    public static ExecuteBuilder execute(String executeId) {
-        return new ExecuteBuilder(executeId);
+    public static ExecuteBuilder execute(String function) {
+        return new ExecuteBuilder(function);
     }
 
     public static ProcessBuilder process(Class<? extends Processor> processorClass) {

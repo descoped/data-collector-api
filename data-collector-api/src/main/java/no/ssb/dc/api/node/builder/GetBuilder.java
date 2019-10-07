@@ -53,7 +53,7 @@ public class GetBuilder extends OperationBuilder {
         return this;
     }
 
-    public GetBuilder step(NodeBuilder builder) {
+    public GetBuilder pipe(NodeBuilder builder) {
         steps.add(builder);
         return this;
     }

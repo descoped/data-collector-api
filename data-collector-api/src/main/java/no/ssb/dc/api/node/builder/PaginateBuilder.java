@@ -40,7 +40,7 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         return this;
     }
 
-    public PaginateBuilder step(ExecuteBuilder executeBuilder) {
+    public PaginateBuilder iterate(ExecuteBuilder executeBuilder) {
         children.add(executeBuilder);
         return this;
     }

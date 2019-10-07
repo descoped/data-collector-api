@@ -34,7 +34,7 @@ public class ParallelBuilder extends NodeBuilder {
         return this;
     }
 
-    public ParallelBuilder step(NodeBuilder builder) {
+    public ParallelBuilder pipe(NodeBuilder builder) {
         steps.add(builder);
         return this;
     }

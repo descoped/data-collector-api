@@ -36,7 +36,7 @@ public class FlowBuilder extends AbstractBuilder {
         return this;
     }
 
-    public FlowBuilder node(NodeWithIdBuilder builder) {
+    public FlowBuilder function(NodeWithIdBuilder builder) {
         nodeBuilderById.put(builder.getId(), builder);
         return this;
     }
