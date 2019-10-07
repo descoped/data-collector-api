@@ -41,8 +41,8 @@ public class MetadataContent {
             return this;
         }
 
-        public Builder namespace(String namespace) {
-            metadataNode.put("namespace", namespace);
+        public Builder topic(String topic) {
+            metadataNode.put("topic", topic);
             return this;
         }
 

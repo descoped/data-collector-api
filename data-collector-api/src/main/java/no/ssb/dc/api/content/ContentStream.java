@@ -2,8 +2,8 @@ package no.ssb.dc.api.content;
 
 public interface ContentStream {
 
-    String lastPosition(String namespace);
+    String lastPosition(String topic);
 
-    ContentStreamProducer producer(String namespace);
+    ContentStreamProducer producer(String topic);
 
 }
