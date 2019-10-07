@@ -43,6 +43,16 @@ steps:
     depends_on:
       - test
 
+  - name: code-analysis
+    image: aosapps/drone-sonar-plugin
+    settings:
+      sonar_host:
+        from_secret: sonar_host
+      sonar_token:
+        from_secret: sonar_token
+    depends_on:
+      - sonarqube
+
   - name: publish-maven
     image: maven:3-jdk-11
     commands:
@@ -55,7 +65,7 @@ steps:
       MAVEN_HOME: /drone/src/.m2
       M2_HOME: /drone/src/.m2
     depends_on:
-      - sonarqube
+      - code-analysis
 
   - name: slack
     image: plugins/slack
