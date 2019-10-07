@@ -8,7 +8,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
 import static java.util.Optional.ofNullable;
@@ -21,7 +20,6 @@ public class ExecutionContext {
     final Map<Object, Object> globalState;
     final Map<String, Object> variables;
     final Map<Object, Object> state;
-    final AtomicReference<Throwable> failureCause = new AtomicReference<>();
 
     private ExecutionContext(Services services, Map<Object, Object> globalState, Map<String, Object> variables, Map<Object, Object> state) {
         this.globalState = globalState;
@@ -94,19 +92,6 @@ public class ExecutionContext {
         if (state.remove(key) == null) {
             LOG.error("unable to release state key={}", key);
         }
-    }
-
-    public boolean isFailure() {
-        return failureCause.get() != null;
-    }
-
-    public ExecutionContext failure(Throwable cause) {
-        failureCause.set(cause);
-        return this;
-    }
-
-    public Throwable getFailureCause() {
-        return failureCause.get();
     }
 
     public ExecutionContext merge(ExecutionContext context) {
