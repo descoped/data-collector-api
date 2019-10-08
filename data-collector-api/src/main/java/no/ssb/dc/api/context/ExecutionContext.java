@@ -80,6 +80,10 @@ public class ExecutionContext {
         return this;
     }
 
+    public <R> R state(Class<R> key) {
+        return (R) state((Object) key);
+    }
+
     public <R> R state(Object key) {
         R r = (R) state.get(key);
         if (r == null) {

@@ -15,13 +15,11 @@ import java.util.stream.Collectors;
 
 public class PageContext {
 
-    private final Object lock = new Object();
     private final List<Position<?>> expectedPositions;
     private final List<String> nextPositionVariableNames;
     private final Map<String, Position<?>> nextPositionMap;
     private final List<Entry> parallelFutures = new ArrayList<>();
     private final CompletionInfo completionInfo = new CompletionInfo();
-    private final AtomicBoolean prefetchNextPage = new AtomicBoolean(false);
     private final AtomicBoolean endOfStream = new AtomicBoolean(false);
     private final AtomicReference<Throwable> failureCause = new AtomicReference<>();
 
@@ -71,36 +69,6 @@ public class PageContext {
 
     public void incrementCompletionCount() {
         completionInfo.completedCount.incrementAndGet();
-    }
-
-    public boolean isPageThresholdValid(PageThresholdEvent pageThresholdEvent) {
-        if (prefetchNextPage.get()) {
-            return false;
-        }
-        int pageSize = expectedPositions.size();
-        long completedCount = completionInfo.completedCount().get();
-        double threshold = pageThresholdEvent.getThreshold();
-
-        double remainingPageEntries = (pageSize - completedCount);
-        double thresholdPageEntries = (pageSize * threshold);
-        return remainingPageEntries <= thresholdPageEntries;
-    }
-
-    public boolean firePreFetchEventOnThreshold(PageThresholdEvent pageThresholdEvent) {
-        synchronized (lock) {
-            if (prefetchNextPage.get()) {
-                return false;
-            }
-
-            boolean nextPage = isPageThresholdValid(pageThresholdEvent);
-
-            if (nextPage) {
-                prefetchNextPage.set(true);
-                pageThresholdEvent.preFetchNextPageCallback().accept(this);
-            }
-
-            return prefetchNextPage.get();
-        }
     }
 
     public boolean isEndOfStream() {

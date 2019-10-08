@@ -13,7 +13,7 @@ public interface Paginate extends NodeWithId {
 
     List<Execute> targets();
 
-    double threshold();
+    int threshold();
 
     Condition condition();
 

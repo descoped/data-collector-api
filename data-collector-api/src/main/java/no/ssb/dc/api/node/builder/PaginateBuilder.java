@@ -22,7 +22,7 @@ public class PaginateBuilder extends NodeWithIdBuilder {
 
     @JsonProperty Map<String, String> variables = new LinkedHashMap<>();
     @JsonProperty List<ExecuteBuilder> children = new ArrayList<>();
-    @JsonProperty double threshold;
+    @JsonProperty int threshold;
     @JsonProperty("until") ConditionBuilder conditionBuilder;
     @JsonProperty boolean addPageContent;
 
@@ -45,7 +45,7 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         return this;
     }
 
-    public PaginateBuilder prefetchThreshold(double threshold) {
+    public PaginateBuilder prefetchThreshold(int threshold) {
         this.threshold = threshold;
         return this;
     }
@@ -110,10 +110,10 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         final Map<String, String> variables;
         final boolean addPageContent;
         final List<Execute> children;
-        final double threshold;
+        final int threshold;
         final ConditionBuilder.ConditionNode conditionNode;
 
-        PaginateNode(String id, Configurations configurations, Map<String, String> variables, boolean addPageContent, List<Execute> children, double threshold, ConditionBuilder.ConditionNode conditionNode) {
+        PaginateNode(String id, Configurations configurations, Map<String, String> variables, boolean addPageContent, List<Execute> children, int threshold, ConditionBuilder.ConditionNode conditionNode) {
             super(configurations, id);
             this.variables = variables;
             this.addPageContent = addPageContent;
@@ -143,7 +143,7 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         }
 
         @Override
-        public double threshold() {
+        public int threshold() {
             return threshold;
         }
 

@@ -125,7 +125,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 currentNode.get("children").forEach(child -> builder.iterate((ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));
 
                 JsonNode thresholdNode = currentNode.get("threshold");
-                builder.prefetchThreshold(thresholdNode.asDouble());
+                builder.prefetchThreshold(thresholdNode.asInt());
 
                 JsonNode conditionBuilderNode = currentNode.get("until");
                 builder.until((ConditionBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, conditionBuilderNode));

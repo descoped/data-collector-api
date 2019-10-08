@@ -46,7 +46,7 @@ public class BuilderTest {
             .function(paginate("page-loop")
                     .variable("from-position", "${next-position}")
                     .iterate(execute("page"))
-                    .prefetchThreshold(0.5)
+                    .prefetchThreshold(5)
                     .until(whenVariableIsNull("next-position"))
             )
             .function(get("page")
