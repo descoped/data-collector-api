@@ -10,10 +10,6 @@ public interface QueryFeature {
         STRING_LITERAL;
     }
 
-    byte[] serialize(Object node);
-
-    Object deserialize(byte[] source);
-
     List<?> evaluateList(Object data);
 
     Object evaluateObject(Object data);
