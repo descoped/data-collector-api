@@ -21,7 +21,7 @@ import java.util.Set;
 public class PaginateBuilder extends NodeWithIdBuilder {
 
     @JsonProperty Map<String, String> variables = new LinkedHashMap<>();
-    @JsonProperty List<ExecuteBuilder> children = new ArrayList<>();
+    @JsonProperty("iterate") List<ExecuteBuilder> children = new ArrayList<>();
     @JsonProperty int threshold;
     @JsonProperty("until") ConditionBuilder conditionBuilder;
     @JsonProperty boolean addPageContent;

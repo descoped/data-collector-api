@@ -5,9 +5,9 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import no.ssb.dc.api.Flow;
 import no.ssb.dc.api.PositionProducer;
 import no.ssb.dc.api.Processor;
+import no.ssb.dc.api.Specification;
 
 import java.io.IOException;
 import java.util.Deque;
@@ -59,7 +59,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
         Objects.requireNonNull(type);
         switch (type) {
             case Flow: {
-                FlowBuilder builder = Flow.start(currentNode.get("flowName").textValue(), currentNode.get("startNodeId").textValue());
+                FlowBuilder builder = Specification.start(currentNode.get("flowName").textValue(), currentNode.get("startNodeId").textValue());
 
                 JsonNode configureNode = currentNode.get("configure");
                 if (configureNode != null) {
@@ -69,7 +69,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                     }
                 }
 
-                currentNode.get("nodes").fields().forEachRemaining(entry ->
+                currentNode.get("functions").fields().forEachRemaining(entry ->
                         builder.function((NodeWithIdBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
                 return builder;
@@ -122,7 +122,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                     builder.addPageContent();
                 }
 
-                currentNode.get("children").forEach(child -> builder.iterate((ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));
+                currentNode.get("iterate").forEach(child -> builder.iterate((ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));
 
                 JsonNode thresholdNode = currentNode.get("threshold");
                 builder.prefetchThreshold(thresholdNode.asInt());
@@ -165,7 +165,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 currentNode.get("variables").fields().forEachRemaining(entry ->
                         builder.variable(entry.getKey(), (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
-                JsonNode stepsNode = currentNode.get("steps");
+                JsonNode stepsNode = currentNode.get("pipes");
                 stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
 
                 JsonNode publishJsonNode = currentNode.get("publish");
@@ -251,7 +251,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                     returnVariablesNode.forEach(node -> builder.returnVariables(node.textValue()));
                 }
 
-                JsonNode stepsNode = currentNode.get("steps");
+                JsonNode stepsNode = currentNode.get("pipes");
                 stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
 
                 return builder;

@@ -28,7 +28,7 @@ import static org.testng.Assert.assertNotNull;
 
 public class BuilderTest {
 
-    static final FlowBuilder flowBuilder = Flow.start("name of flow", "getstartposition")
+    static final FlowBuilder flowBuilder = Specification.start("name of flow", "getstartposition")
             .configure(context()
                     .variable("foo", "bar")
                     .header("accept", "application/xml")
@@ -98,13 +98,13 @@ public class BuilderTest {
         assertNotNull(serialized);
         System.out.printf("serialized:%n%s%n", serialized);
 
-        FlowBuilder deserialized = Flow.deserialize(serialized, FlowBuilder.class);
+        FlowBuilder deserialized = Specification.deserialize(serialized, FlowBuilder.class);
         assertNotNull(deserialized);
         System.out.printf("deserialized:%n%s%n", serialized);
 
         assertEquals(actual, deserialized);
 
-        Flow end = deserialized.end();
+        Specification end = deserialized.end();
         FlowContext derserializedFlowContext = actual.end().configurations.flowContext();
         assertEquals(actualFlowContext, derserializedFlowContext);
         ;
@@ -116,7 +116,7 @@ public class BuilderTest {
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
-        GetBuilder deserialized = Flow.deserialize(serialized, GetBuilder.class);
+        GetBuilder deserialized = Specification.deserialize(serialized, GetBuilder.class);
         assertNotNull(deserialized);
 
         assertEquals(actual, deserialized);
@@ -128,7 +128,7 @@ public class BuilderTest {
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
-        PaginateBuilder deserialized = Flow.deserialize(serialized, PaginateBuilder.class);
+        PaginateBuilder deserialized = Specification.deserialize(serialized, PaginateBuilder.class);
         assertNotNull(deserialized);
 
         assertEquals(actual, deserialized);
@@ -140,7 +140,7 @@ public class BuilderTest {
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
-        GetBuilder deserialized = Flow.deserialize(serialized, GetBuilder.class);
+        GetBuilder deserialized = Specification.deserialize(serialized, GetBuilder.class);
         assertNotNull(deserialized);
 
         assertEquals(actual, deserialized);
@@ -152,7 +152,7 @@ public class BuilderTest {
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
-        GetBuilder deserialized = Flow.deserialize(serialized, GetBuilder.class);
+        GetBuilder deserialized = Specification.deserialize(serialized, GetBuilder.class);
         assertNotNull(deserialized);
 
         assertEquals(actual, deserialized);
@@ -164,7 +164,7 @@ public class BuilderTest {
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
-        GetBuilder deserialized = Flow.deserialize(serialized, GetBuilder.class);
+        GetBuilder deserialized = Specification.deserialize(serialized, GetBuilder.class);
         assertNotNull(deserialized);
 
         assertEquals(actual, deserialized);

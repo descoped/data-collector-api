@@ -21,7 +21,7 @@ public class ParallelBuilder extends NodeBuilder {
 
     @JsonProperty("splitQuery") QueryBuilder splitBuilder;
     @JsonProperty Map<String, QueryBuilder> variables = new LinkedHashMap<>();
-    @JsonProperty List<NodeBuilder> steps = new ArrayList<>();
+    @JsonProperty("pipes") List<NodeBuilder> pipes = new ArrayList<>();
     @JsonProperty("publish") PublishBuilder publishBuilder;
 
     public ParallelBuilder(QueryBuilder splitBuilder) {
@@ -35,7 +35,7 @@ public class ParallelBuilder extends NodeBuilder {
     }
 
     public ParallelBuilder pipe(NodeBuilder builder) {
-        steps.add(builder);
+        pipes.add(builder);
         return this;
     }
 
@@ -56,7 +56,7 @@ public class ParallelBuilder extends NodeBuilder {
         }
 
         List<Node> stepList = new ArrayList<>();
-        for (NodeBuilder builder : steps) {
+        for (NodeBuilder builder : pipes) {
             Node node = builder.build(buildContext);
             stepList.add(node);
         }
@@ -74,13 +74,13 @@ public class ParallelBuilder extends NodeBuilder {
         ParallelBuilder that = (ParallelBuilder) o;
         return Objects.equals(splitBuilder, that.splitBuilder) &&
                 Objects.equals(variables, that.variables) &&
-                Objects.equals(steps, that.steps) &&
+                Objects.equals(pipes, that.pipes) &&
                 Objects.equals(publishBuilder, that.publishBuilder);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), splitBuilder, variables, steps, publishBuilder);
+        return Objects.hash(super.hashCode(), splitBuilder, variables, pipes, publishBuilder);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class ParallelBuilder extends NodeBuilder {
         return "ParallelBuilder{" +
                 "splitBuilder=" + splitBuilder +
                 ", variables=" + variables +
-                ", steps=" + steps +
+                ", steps=" + pipes +
                 ", publishBuilder=" + publishBuilder +
                 '}';
     }

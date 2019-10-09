@@ -2,10 +2,10 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import no.ssb.dc.api.Flow;
+import no.ssb.dc.api.Specification;
 import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
-import no.ssb.dc.api.util.JacksonFactory;
+import no.ssb.dc.api.util.JsonParser;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -23,7 +23,7 @@ public class FlowBuilder extends AbstractBuilder {
     @JsonProperty String startNodeId;
 
     @JsonProperty("configure") List<ConfigurationBuilder> configurationBuilders = new ArrayList<>();
-    @JsonProperty("nodes") Map<String, NodeBuilder> nodeBuilderById = new LinkedHashMap<>();
+    @JsonProperty("functions") Map<String, NodeBuilder> nodeBuilderById = new LinkedHashMap<>();
 
     public FlowBuilder(String flowName, String startNodeId) {
         super(BuilderType.Flow);
@@ -44,7 +44,7 @@ public class FlowBuilder extends AbstractBuilder {
     /*
      * see NodeBuilder.build()
      */
-    public Flow end() {
+    public Specification end() {
         BuildContext buildContext = BuildContext.fromNodeBuilderById(nodeBuilderById);
 
         Configurations.Builder configurationsBuilder = new Configurations.Builder();
@@ -62,7 +62,7 @@ public class FlowBuilder extends AbstractBuilder {
             buildContext.cacheInstance(nodeBuilderId, nodeInstance);
         }
 
-        return Flow.create(flowName, configurations, buildContext.getInstance(startNodeId), buildContext.nodeInstanceById());
+        return Specification.create(flowName, configurations, buildContext.getInstance(startNodeId), buildContext.nodeInstanceById());
     }
 
     public NodeBuilder get(String nodeId) {
@@ -70,7 +70,7 @@ public class FlowBuilder extends AbstractBuilder {
     }
 
     public String serialize() {
-        return JacksonFactory.yamlInstance().toPrettyJSON(this);
+        return JsonParser.createJsonParser().toPrettyJSON(this);
     }
 
     @Override

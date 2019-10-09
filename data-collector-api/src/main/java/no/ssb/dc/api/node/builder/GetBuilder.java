@@ -20,7 +20,7 @@ public class GetBuilder extends OperationBuilder {
 
     @JsonProperty Headers requestHeaders = new Headers();
     @JsonProperty("responseValidators") List<LeafNodeBuilder> validators = new ArrayList<>();
-    @JsonProperty List<NodeBuilder> steps = new ArrayList<>();
+    @JsonProperty("pipes") List<NodeBuilder> pipes = new ArrayList<>();
     @JsonProperty Class<? extends PositionProducer> positionProducerClass;
     @JsonProperty List<String> returnVariables = new ArrayList<>();
 
@@ -54,7 +54,7 @@ public class GetBuilder extends OperationBuilder {
     }
 
     public GetBuilder pipe(NodeBuilder builder) {
-        steps.add(builder);
+        pipes.add(builder);
         return this;
     }
 
@@ -80,7 +80,7 @@ public class GetBuilder extends OperationBuilder {
         }
 
         List<Node> stepNodeList = new ArrayList<>();
-        for (NodeBuilder stepBuilder : steps) {
+        for (NodeBuilder stepBuilder : pipes) {
             Node stepNode = stepBuilder.build(buildContext);
             stepNodeList.add(stepNode);
         }
@@ -96,14 +96,14 @@ public class GetBuilder extends OperationBuilder {
         GetBuilder that = (GetBuilder) o;
         return Objects.equals(requestHeaders, that.requestHeaders) &&
                 Objects.equals(validators, that.validators) &&
-                Objects.equals(steps, that.steps) &&
+                Objects.equals(pipes, that.pipes) &&
                 Objects.equals(positionProducerClass, that.positionProducerClass) &&
                 Objects.equals(returnVariables, that.returnVariables);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), requestHeaders, validators, steps, positionProducerClass, returnVariables);
+        return Objects.hash(super.hashCode(), requestHeaders, validators, pipes, positionProducerClass, returnVariables);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class GetBuilder extends OperationBuilder {
                 ", url='" + url + '\'' +
                 ", requestHeaders=" + requestHeaders +
                 ", validators=" + validators +
-                ", steps=" + steps +
+                ", steps=" + pipes +
                 ", positionProducerClass=" + positionProducerClass +
                 ", returnVariables=" + returnVariables +
                 '}';
@@ -124,16 +124,16 @@ public class GetBuilder extends OperationBuilder {
         final String url;
         final Headers headers;
         private final List<Validator> validateResponse;
-        final List<Node> steps;
+        final List<Node> pipes;
         final Class<? extends PositionProducer> positionProducerClass;
         final List<String> returnVariables;
 
-        GetNode(String id, Configurations configurations, String url, Headers headers, List<Validator> validateResponse, List<Node> steps, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
+        GetNode(String id, Configurations configurations, String url, Headers headers, List<Validator> validateResponse, List<Node> pipes, Class<? extends PositionProducer> positionProducerClass, List<String> returnVariables) {
             super(configurations, id);
             this.url = url;
             this.headers = headers;
             this.validateResponse = validateResponse;
-            this.steps = steps;
+            this.pipes = pipes;
             this.positionProducerClass = positionProducerClass;
             this.returnVariables = returnVariables;
         }
@@ -155,7 +155,7 @@ public class GetBuilder extends OperationBuilder {
 
         @Override
         public List<? extends Node> steps() {
-            return steps;
+            return pipes;
         }
 
         @Override
@@ -170,7 +170,7 @@ public class GetBuilder extends OperationBuilder {
 
         @Override
         public Iterator<? extends Node> iterator() {
-            return steps.iterator();
+            return pipes.iterator();
         }
 
         @Override
@@ -181,14 +181,14 @@ public class GetBuilder extends OperationBuilder {
             return Objects.equals(url, getNode.url) &&
                     Objects.equals(headers, getNode.headers) &&
                     Objects.equals(validateResponse, getNode.validateResponse) &&
-                    Objects.equals(steps, getNode.steps) &&
+                    Objects.equals(pipes, getNode.pipes) &&
                     Objects.equals(positionProducerClass, getNode.positionProducerClass) &&
                     Objects.equals(returnVariables, getNode.returnVariables);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(url, headers, validateResponse, steps, positionProducerClass, returnVariables);
+            return Objects.hash(url, headers, validateResponse, pipes, positionProducerClass, returnVariables);
         }
 
         @Override
@@ -198,7 +198,7 @@ public class GetBuilder extends OperationBuilder {
                     ", url='" + url + '\'' +
                     ", headers=" + headers +
                     ", validateResponse=" + validateResponse +
-                    ", steps=" + steps +
+                    ", steps=" + pipes +
                     ", positionProducerClass=" + positionProducerClass +
                     ", returnVariables=" + returnVariables +
                     '}';

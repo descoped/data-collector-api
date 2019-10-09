@@ -9,36 +9,36 @@ import no.ssb.dc.api.node.builder.BuildContext;
 import no.ssb.dc.api.node.builder.FlowBuilder;
 import no.ssb.dc.api.node.builder.FlowContextBuilder;
 import no.ssb.dc.api.node.builder.NodeBuilderDeserializer;
-import no.ssb.dc.api.util.JacksonFactory;
+import no.ssb.dc.api.util.JsonParser;
 
 import java.io.IOException;
 import java.util.Map;
 
-public class Flow {
+public class Specification {
 
     final String name;
     final Configurations configurations;
-    final Node startNode;
+    final Node startFunction;
     final Map<String, Node> nodeById;
 
-    private Flow(String name, Node startNode, Map<String, Node> nodeById) {
-        this(name, new Configurations.Builder().add(new FlowContextBuilder().build(BuildContext.empty())).build(), startNode, nodeById);
+    private Specification(String name, Node startFunction, Map<String, Node> nodeById) {
+        this(name, new Configurations.Builder().add(new FlowContextBuilder().build(BuildContext.empty())).build(), startFunction, nodeById);
     }
 
-    private Flow(String name, Configurations configurations, Node startNode, Map<String, Node> nodeById) {
+    private Specification(String name, Configurations configurations, Node startFunction, Map<String, Node> nodeById) {
         this.name = name;
         this.configurations = configurations;
-        this.startNode = startNode;
+        this.startFunction = startFunction;
         this.nodeById = nodeById;
     }
 
-    public static FlowBuilder start(String name, String startNodeId) {
-        return new FlowBuilder(name, startNodeId);
+    public static FlowBuilder start(String name, String startFunction) {
+        return new FlowBuilder(name, startFunction);
     }
 
     public static <R extends AbstractBuilder> R deserialize(String source, Class<R> builderClass) {
         try {
-            ObjectMapper mapper = JacksonFactory.yamlInstance().objectMapper();
+            ObjectMapper mapper = JsonParser.createYamlParser().mapper();
             SimpleModule module = new SimpleModule();
             module.addDeserializer(AbstractBuilder.class, new NodeBuilderDeserializer());
             mapper.registerModule(module);
@@ -48,12 +48,12 @@ public class Flow {
         }
     }
 
-    public static Flow create(String name, Node startNode, Map<String, Node> nodeById) {
-        return new Flow(name, startNode, nodeById);
+    public static Specification create(String name, Node startNode, Map<String, Node> nodeById) {
+        return new Specification(name, startNode, nodeById);
     }
 
-    public static Flow create(String name, Configurations configurations, Node startNode, Map<String, Node> nodeById) {
-        return new Flow(name, configurations, startNode, nodeById);
+    public static Specification create(String name, Configurations configurations, Node startNode, Map<String, Node> nodeById) {
+        return new Specification(name, configurations, startNode, nodeById);
     }
 
     public String name() {
@@ -61,7 +61,7 @@ public class Flow {
     }
 
     public Node startNode() {
-        return startNode;
+        return startFunction;
     }
 
 }

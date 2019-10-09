@@ -3,7 +3,7 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Leaf;
-import no.ssb.dc.api.util.JacksonFactory;
+import no.ssb.dc.api.util.JsonParser;
 
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public abstract class LeafNodeBuilder extends AbstractBuilder {
@@ -13,7 +13,7 @@ public abstract class LeafNodeBuilder extends AbstractBuilder {
     }
 
     public String serialize() {
-        return JacksonFactory.yamlInstance().toPrettyJSON(this);
+        return JsonParser.createJsonParser().toPrettyJSON(this);
     }
 
     /**

@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
-import no.ssb.dc.api.util.JacksonFactory;
+import no.ssb.dc.api.util.JsonParser;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -21,7 +21,7 @@ public abstract class NodeBuilder extends AbstractBuilder {
     }
 
     public String serialize() {
-        return JacksonFactory.yamlInstance().toPrettyJSON(this);
+        return JsonParser.createJsonParser().toPrettyJSON(this);
     }
 
     /**

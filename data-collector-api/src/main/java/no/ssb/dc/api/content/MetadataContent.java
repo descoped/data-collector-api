@@ -3,7 +3,7 @@ package no.ssb.dc.api.content;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import no.ssb.dc.api.CorrelationIds;
 import no.ssb.dc.api.http.Headers;
-import no.ssb.dc.api.util.JacksonFactory;
+import no.ssb.dc.api.util.JsonParser;
 
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,7 +21,7 @@ public class MetadataContent {
     }
 
     public String toJSON() {
-        return JacksonFactory.instance().toJSON(elementNode);
+        return JsonParser.createJsonParser().toJSON(elementNode);
     }
 
     public enum ResourceType {
@@ -32,9 +32,9 @@ public class MetadataContent {
 
     public static class Builder {
 
-        private ObjectNode metadataNode = JacksonFactory.instance().createObjectNode();
-        private ObjectNode requestHeaderNode = JacksonFactory.instance().createObjectNode();
-        private ObjectNode responseHeaderNode = JacksonFactory.instance().createObjectNode();
+        private ObjectNode metadataNode = JsonParser.createJsonParser().createObjectNode();
+        private ObjectNode requestHeaderNode = JsonParser.createJsonParser().createObjectNode();
+        private ObjectNode responseHeaderNode = JsonParser.createJsonParser().createObjectNode();
 
         public Builder correlationId(CorrelationIds correlationIds) {
             metadataNode.put("correlation-id", (correlationIds == null ? null : correlationIds.get().stream().map(UUID::toString).collect(Collectors.joining(","))));
@@ -92,9 +92,10 @@ public class MetadataContent {
         }
 
         public MetadataContent build() {
-            ObjectNode elementNode = JacksonFactory.instance().createObjectNode();
+            JsonParser jsonParser = JsonParser.createJsonParser();
+            ObjectNode elementNode = jsonParser.createObjectNode();
             elementNode.set("metadata", metadataNode);
-            ObjectNode httpInfoNode = JacksonFactory.instance().createObjectNode();
+            ObjectNode httpInfoNode = jsonParser.createObjectNode();
             httpInfoNode.set("request-headers", requestHeaderNode);
             httpInfoNode.set("response-headers", responseHeaderNode);
             elementNode.set("http-info", httpInfoNode);
