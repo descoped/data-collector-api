@@ -88,14 +88,14 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 JsonNode variableNode = currentNode.get("variables");
                 if (variableNode != null) {
                     variableNode.fields().forEachRemaining(entry -> {
-                        builder.variable(entry.getKey(), entry.getValue());
+                        builder.variable(entry.getKey(), entry.getValue().textValue());
                     });
                 }
 
                 JsonNode globalStateNode = currentNode.get("globalState");
                 if (globalStateNode != null) {
                     globalStateNode.fields().forEachRemaining(entry -> {
-                        builder.globalState(entry.getKey(), entry.getValue());
+                        builder.globalState(entry.getKey(), entry.getValue().textValue());
                     });
                 }
 
