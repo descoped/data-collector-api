@@ -36,6 +36,10 @@ public class Specification {
         return new FlowBuilder(name, startFunction);
     }
 
+    public static FlowBuilder deserialize(String source) {
+        return deserialize(source, FlowBuilder.class);
+    }
+
     public static <R extends AbstractBuilder> R deserialize(String source, Class<R> builderClass) {
         try {
             ObjectMapper mapper = JsonParser.createYamlParser().mapper();

@@ -13,7 +13,7 @@ public class EvalBuilder extends QueryBuilder {
 
     @JsonProperty("query") QueryBuilder queryBuilder;
     @JsonProperty("bindToVariable") String bindToVariable;
-    @JsonProperty("elExpression") String elExpression;
+    @JsonProperty("expression") String elExpression;
 
     public EvalBuilder(QueryBuilder queryBuilder, String bindToVariable, String elExpression) {
         super(BuilderType.QueryEval);
