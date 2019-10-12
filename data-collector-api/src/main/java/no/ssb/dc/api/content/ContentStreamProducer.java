@@ -1,6 +1,6 @@
 package no.ssb.dc.api.content;
 
-public interface ContentStreamProducer {
+public interface ContentStreamProducer extends AutoCloseable {
 
     ContentStreamBuffer.Builder builder();
 

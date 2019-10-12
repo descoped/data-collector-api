@@ -116,4 +116,9 @@ public class DiscardingContentStore implements ContentStore {
                 .responseHeaders(httpRequestInfo.getResponseHeaders())
                 .build();
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

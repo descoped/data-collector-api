@@ -23,4 +23,9 @@ public class DiscardingContentProducer implements ContentStreamProducer {
     public void publish(String... position) {
 
     }
+
+    @Override
+    public void close() throws Exception {
+
+    }
 }

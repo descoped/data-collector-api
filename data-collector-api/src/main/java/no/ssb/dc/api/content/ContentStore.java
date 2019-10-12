@@ -2,7 +2,7 @@ package no.ssb.dc.api.content;
 
 import java.util.Set;
 
-public interface ContentStore {
+public interface ContentStore extends AutoCloseable {
 
     String lastPosition(String topic);
 
