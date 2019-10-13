@@ -15,15 +15,15 @@ import java.util.stream.Collectors;
 
 public class PageContext {
 
-    private final List<Position<?>> expectedPositions;
+    private final List<String> expectedPositions;
     private final List<String> nextPositionVariableNames;
-    private final Map<String, Position<?>> nextPositionMap;
+    private final Map<String, String> nextPositionMap; // variableName, positionValue
     private final List<Entry> parallelFutures = new ArrayList<>();
     private final CompletionInfo completionInfo = new CompletionInfo();
     private final AtomicBoolean endOfStream = new AtomicBoolean(false);
     private final AtomicReference<Throwable> failureCause = new AtomicReference<>();
 
-    private PageContext(List<Position<?>> expectedPositions, List<String> nextPositionVariableNames, Map<String, Position<?>> nextPositionMap) {
+    private PageContext(List<String> expectedPositions, List<String> nextPositionVariableNames, Map<String, String> nextPositionMap) {
         this.expectedPositions = expectedPositions;
         this.nextPositionVariableNames = nextPositionVariableNames;
         this.nextPositionMap = nextPositionMap;
@@ -35,7 +35,7 @@ public class PageContext {
         return pageContext;
     }
 
-    public List<Position<?>> expectedPositions() {
+    public List<String> expectedPositions() {
         return expectedPositions;
     }
 
@@ -43,7 +43,7 @@ public class PageContext {
         return nextPositionVariableNames;
     }
 
-    public Map<String, Position<?>> nextPositionMap() {
+    public Map<String, String> nextPositionMap() {
         return nextPositionMap;
     }
 
@@ -122,11 +122,11 @@ public class PageContext {
     }
 
     public static class Builder {
-        private List<Position<?>> expectedPositions;
-        private Map<String, Position<?>> nextPositionMap = new LinkedHashMap<>();
+        private List<String> expectedPositions;
+        private Map<String, String> nextPositionMap = new LinkedHashMap<>();
         private List<String> nextPositionVariableNames;
 
-        public Builder expectedPositions(List<Position<?>> expectedPositions) {
+        public Builder expectedPositions(List<String> expectedPositions) {
             this.expectedPositions = expectedPositions;
             return this;
         }
@@ -140,7 +140,7 @@ public class PageContext {
             return nextPositionVariableNames;
         }
 
-        public Builder addNextPosition(String variableName, Position<?> position) {
+        public Builder addNextPosition(String variableName, String position) {
             nextPositionMap.put(variableName, position);
             return this;
         }
