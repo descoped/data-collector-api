@@ -35,7 +35,7 @@ public class SequenceBuilder extends NodeBuilder {
     <R extends Base> R build(BuildContext buildContext) {
         QueryBuilder.QueryNode splitToListQueryNode = splitBuilder.build(buildContext);
         QueryBuilder.QueryNode splitCriteriaQueryNode = expectedBuilder.build(buildContext);
-        return (R) new SequenceNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), splitToListQueryNode, splitCriteriaQueryNode);
+        return (R) new SequenceNode(buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), splitToListQueryNode, splitCriteriaQueryNode);
     }
 
     @Override

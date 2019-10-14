@@ -63,7 +63,7 @@ public class ParallelBuilder extends NodeBuilder {
 
         PublishBuilder.PublishNode publishNode = publishBuilder == null ? null : (PublishBuilder.PublishNode) publishBuilder.build(buildContext);
 
-        return (R) new ParallelNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), splitToListQueryNode, contextVariablesMap, stepList, publishNode);
+        return (R) new ParallelNode(buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), splitToListQueryNode, contextVariablesMap, stepList, publishNode);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class ParallelBuilder extends NodeBuilder {
         return "ParallelBuilder{" +
                 "splitBuilder=" + splitBuilder +
                 ", variables=" + variables +
-                ", steps=" + pipes +
+                ", pipes=" + pipes +
                 ", publishBuilder=" + publishBuilder +
                 '}';
     }

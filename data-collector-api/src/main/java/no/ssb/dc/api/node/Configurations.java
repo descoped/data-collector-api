@@ -1,8 +1,8 @@
 package no.ssb.dc.api.node;
 
 import no.ssb.dc.api.node.builder.BuildContext;
-import no.ssb.dc.api.node.builder.FlowContextBuilder;
 import no.ssb.dc.api.node.builder.SecurityBuilder;
+import no.ssb.dc.api.node.builder.SpecificationContextBuilder;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -55,11 +55,11 @@ public class Configurations {
 
         void createDefaultConfigurationIfAbsent() {
             if (!configurationMap.containsKey(FlowContext.class)) {
-                FlowContextBuilder flowContextBuilder = new FlowContextBuilder();
-                if (flowContextBuilder.globalState("global.topic") == null) {
-                    flowContextBuilder.globalState("global.topic", "topic");
+                SpecificationContextBuilder specificationContextBuilder = new SpecificationContextBuilder();
+                if (specificationContextBuilder.globalState("global.topic") == null) {
+                    specificationContextBuilder.globalState("global.topic", "topic");
                 }
-                configurationMap.put(FlowContext.class, flowContextBuilder.build(BuildContext.empty()));
+                configurationMap.put(FlowContext.class, specificationContextBuilder.build(BuildContext.empty()));
             }
 
             if (!configurationMap.containsKey(Security.class)) {

@@ -1,8 +1,8 @@
 package no.ssb.dc.api.node.builder;
 
 public enum BuilderType {
-    Flow,
-    FlowContext,
+    Specification,
+    SpecificationContext,
     Security,
     Paginate,
     Sequence,

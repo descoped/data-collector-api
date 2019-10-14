@@ -13,14 +13,14 @@ import java.util.Map;
 import java.util.Objects;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class FlowContextBuilder extends ConfigurationBuilder {
+public class SpecificationContextBuilder extends ConfigurationBuilder {
 
     Headers headers = new Headers();
     @JsonProperty Map<String, Object> variables = new LinkedHashMap<>();
     @JsonProperty Map<Object, Object> globalState = new LinkedHashMap<>();
 
-    public FlowContextBuilder() {
-        super(BuilderType.FlowContext);
+    public SpecificationContextBuilder() {
+        super(BuilderType.SpecificationContext);
     }
 
     @JsonProperty("headers")
@@ -28,22 +28,22 @@ public class FlowContextBuilder extends ConfigurationBuilder {
         return headers.asMap();
     }
 
-    public FlowContextBuilder topic(String topicName) {
+    public SpecificationContextBuilder topic(String topicName) {
         globalState("global.topic", topicName);
         return this;
     }
 
-    public FlowContextBuilder header(String name, String value) {
+    public SpecificationContextBuilder header(String name, String value) {
         headers.put(name, value);
         return this;
     }
 
-    public FlowContextBuilder variable(String name, Object value) {
+    public SpecificationContextBuilder variable(String name, Object value) {
         variables.put(name, value);
         return this;
     }
 
-    public FlowContextBuilder globalState(Object key, Object value) {
+    public SpecificationContextBuilder globalState(Object key, Object value) {
         globalState.put(key, value);
         return this;
     }
@@ -73,7 +73,7 @@ public class FlowContextBuilder extends ConfigurationBuilder {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        FlowContextBuilder that = (FlowContextBuilder) o;
+        SpecificationContextBuilder that = (SpecificationContextBuilder) o;
         return Objects.equals(headers, that.headers) &&
                 Objects.equals(variables, that.variables) &&
                 Objects.equals(globalState, that.globalState);
@@ -86,7 +86,7 @@ public class FlowContextBuilder extends ConfigurationBuilder {
 
     @Override
     public String toString() {
-        return "FlowContextBuilder{" +
+        return "SpecificationContextBuilder{" +
                 "headers=" + headers +
                 ", variables=" + variables +
                 ", globalState=" + globalState +

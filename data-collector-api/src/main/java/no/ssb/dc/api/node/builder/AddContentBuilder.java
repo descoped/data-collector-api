@@ -26,7 +26,7 @@ public class AddContentBuilder extends NodeBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        return (R) new AddContentNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), positionVariableExpression, contentKey);
+        return (R) new AddContentNode(buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), positionVariableExpression, contentKey);
     }
 
     @Override

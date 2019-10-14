@@ -6,9 +6,9 @@ import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.builder.AbstractBuilder;
 import no.ssb.dc.api.node.builder.BuildContext;
-import no.ssb.dc.api.node.builder.FlowBuilder;
-import no.ssb.dc.api.node.builder.FlowContextBuilder;
 import no.ssb.dc.api.node.builder.NodeBuilderDeserializer;
+import no.ssb.dc.api.node.builder.SpecificationBuilder;
+import no.ssb.dc.api.node.builder.SpecificationContextBuilder;
 import no.ssb.dc.api.util.JsonParser;
 
 import java.io.IOException;
@@ -22,7 +22,7 @@ public class Specification {
     final Map<String, Node> nodeById;
 
     private Specification(String name, Node startFunction, Map<String, Node> nodeById) {
-        this(name, new Configurations.Builder().add(new FlowContextBuilder().build(BuildContext.empty())).build(), startFunction, nodeById);
+        this(name, new Configurations.Builder().add(new SpecificationContextBuilder().build(BuildContext.empty())).build(), startFunction, nodeById);
     }
 
     private Specification(String name, Configurations configurations, Node startFunction, Map<String, Node> nodeById) {
@@ -32,12 +32,12 @@ public class Specification {
         this.nodeById = nodeById;
     }
 
-    public static FlowBuilder start(String name, String startFunction) {
-        return new FlowBuilder(name, startFunction);
+    public static SpecificationBuilder start(String name, String startFunction) {
+        return new SpecificationBuilder(name, startFunction);
     }
 
-    public static FlowBuilder deserialize(String source) {
-        return deserialize(source, FlowBuilder.class);
+    public static SpecificationBuilder deserialize(String source) {
+        return deserialize(source, SpecificationBuilder.class);
     }
 
     public static <R extends AbstractBuilder> R deserialize(String source, Class<R> builderClass) {
@@ -52,19 +52,19 @@ public class Specification {
         }
     }
 
-    public static Specification create(String name, Node startNode, Map<String, Node> nodeById) {
-        return new Specification(name, startNode, nodeById);
+    public static Specification create(String name, Node startFunction, Map<String, Node> nodeById) {
+        return new Specification(name, startFunction, nodeById);
     }
 
-    public static Specification create(String name, Configurations configurations, Node startNode, Map<String, Node> nodeById) {
-        return new Specification(name, configurations, startNode, nodeById);
+    public static Specification create(String name, Configurations configurations, Node startFunction, Map<String, Node> nodeById) {
+        return new Specification(name, configurations, startFunction, nodeById);
     }
 
     public String name() {
         return name;
     }
 
-    public Node startNode() {
+    public Node startFunction() {
         return startFunction;
     }
 

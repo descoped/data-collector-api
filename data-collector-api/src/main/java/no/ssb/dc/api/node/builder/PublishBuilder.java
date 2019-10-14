@@ -23,7 +23,7 @@ public class PublishBuilder extends NodeBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        return (R) new PublishNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), positionVariableExpression);
+        return (R) new PublishNode(buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), positionVariableExpression);
     }
 
     @Override

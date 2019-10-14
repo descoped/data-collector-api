@@ -57,8 +57,8 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
     private AbstractBuilder buildNodeBuilder(int depth, DeserializationContext context, Deque<JsonNode> ancestors, JsonNode currentNode, BuilderType type) {
         Objects.requireNonNull(type);
         switch (type) {
-            case Flow: {
-                FlowBuilder builder = Specification.start(currentNode.get("flowName").textValue(), currentNode.get("startNodeId").textValue());
+            case Specification: {
+                SpecificationBuilder builder = Specification.start(currentNode.get("name").textValue(), currentNode.get("startFunctionId").textValue());
 
                 JsonNode configureNode = currentNode.get("configure");
                 if (configureNode != null) {
@@ -74,8 +74,8 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return builder;
             }
 
-            case FlowContext: {
-                FlowContextBuilder builder = new FlowContextBuilder();
+            case SpecificationContext: {
+                SpecificationContextBuilder builder = new SpecificationContextBuilder();
 
                 JsonNode headerNode = currentNode.get("headers");
                 if (headerNode != null) {

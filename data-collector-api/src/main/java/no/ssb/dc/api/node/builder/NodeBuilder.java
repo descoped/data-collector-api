@@ -37,7 +37,7 @@ public abstract class NodeBuilder extends AbstractBuilder {
         BuildContext buildContext = BuildContext.empty();
         Configurations.Builder configurationsBuilder = new Configurations.Builder();
         Configurations configurations = configurationsBuilder.build();
-        buildContext.cacheInstance(FlowBuilder.GLOBAL_CONFIGURATION, configurations);
+        buildContext.cacheInstance(SpecificationBuilder.GLOBAL_CONFIGURATION, configurations);
         return build(buildContext);
     }
 

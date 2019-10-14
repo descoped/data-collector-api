@@ -2,10 +2,10 @@ package no.ssb.dc.api;
 
 import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.node.FlowContext;
-import no.ssb.dc.api.node.builder.FlowBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
 import no.ssb.dc.api.node.builder.NodeBuilder;
 import no.ssb.dc.api.node.builder.PaginateBuilder;
+import no.ssb.dc.api.node.builder.SpecificationBuilder;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
@@ -28,7 +28,7 @@ import static org.testng.Assert.assertNotNull;
 
 public class BuilderTest {
 
-    static final FlowBuilder flowBuilder = Specification.start("name of flow", "getstartposition")
+    static final SpecificationBuilder SPECIFICATION_BUILDER = Specification.start("name of flow", "getstartposition")
             .configure(context()
                     .variable("foo", "bar")
                     .header("accept", "application/xml")
@@ -86,18 +86,18 @@ public class BuilderTest {
     @Ignore
     @Test
     public void printExecutionPlan() {
-        System.out.printf("Execution-plan:%n%n%s%n", flowBuilder.end().startNode().toPrintableExecutionPlan());
+        System.out.printf("Execution-plan:%n%n%s%n", SPECIFICATION_BUILDER.end().startFunction().toPrintableExecutionPlan());
     }
 
     @Test
     public void thatFlowBuilderIsSerializedThenDeserialized() {
-        FlowBuilder actual = flowBuilder;
+        SpecificationBuilder actual = SPECIFICATION_BUILDER;
         FlowContext actualFlowContext = actual.end().configurations.flowContext();
         String serialized = actual.serialize();
         assertNotNull(serialized);
         System.out.printf("serialized:%n%s%n", serialized);
 
-        FlowBuilder deserialized = Specification.deserialize(serialized, FlowBuilder.class);
+        SpecificationBuilder deserialized = Specification.deserialize(serialized, SpecificationBuilder.class);
         assertNotNull(deserialized);
         System.out.printf("deserialized:%n%s%n", serialized);
 
@@ -111,7 +111,7 @@ public class BuilderTest {
 
     @Test
     public void thatGettingStartedBuilderIsSerializedThenDeserialized() {
-        NodeBuilder actual = flowBuilder.get("getstartposition");
+        NodeBuilder actual = SPECIFICATION_BUILDER.get("getstartposition");
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
@@ -123,7 +123,7 @@ public class BuilderTest {
 
     @Test
     public void thatPageLoopBuilderIsSerializedThenDeserialized() {
-        NodeBuilder actual = flowBuilder.get("page-loop");
+        NodeBuilder actual = SPECIFICATION_BUILDER.get("page-loop");
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
@@ -135,7 +135,7 @@ public class BuilderTest {
 
     @Test
     public void thatPageGetBuilderIsSerializedThenDeserialized() {
-        NodeBuilder actual = flowBuilder.get("page");
+        NodeBuilder actual = SPECIFICATION_BUILDER.get("page");
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
@@ -147,7 +147,7 @@ public class BuilderTest {
 
     @Test
     public void thatPersonDocGetBuilderIsSerializedThenDeserialized() {
-        NodeBuilder actual = flowBuilder.get("person-doc");
+        NodeBuilder actual = SPECIFICATION_BUILDER.get("person-doc");
         String serialized = actual.serialize();
         assertNotNull(serialized);
 
@@ -159,7 +159,7 @@ public class BuilderTest {
 
     @Test
     public void thatEventDocGetBuilderIsSerializedThenDeserialized() {
-        NodeBuilder actual = flowBuilder.get("event-doc");
+        NodeBuilder actual = SPECIFICATION_BUILDER.get("event-doc");
         String serialized = actual.serialize();
         assertNotNull(serialized);
 

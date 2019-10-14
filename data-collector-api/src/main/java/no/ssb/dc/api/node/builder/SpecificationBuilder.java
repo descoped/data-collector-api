@@ -15,28 +15,28 @@ import java.util.Objects;
 import java.util.Optional;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class FlowBuilder extends AbstractBuilder {
+public class SpecificationBuilder extends AbstractBuilder {
 
     static final String GLOBAL_CONFIGURATION = "GLOBAL_CONFIGURATION";
 
-    @JsonProperty String flowName;
-    @JsonProperty String startNodeId;
+    @JsonProperty String name;
+    @JsonProperty String startFunctionId;
 
     @JsonProperty("configure") List<ConfigurationBuilder> configurationBuilders = new ArrayList<>();
     @JsonProperty("functions") Map<String, NodeBuilder> nodeBuilderById = new LinkedHashMap<>();
 
-    public FlowBuilder(String flowName, String startNodeId) {
-        super(BuilderType.Flow);
-        this.flowName = flowName;
-        this.startNodeId = startNodeId;
+    public SpecificationBuilder(String name, String startFunctionId) {
+        super(BuilderType.Specification);
+        this.name = name;
+        this.startFunctionId = startFunctionId;
     }
 
-    public FlowBuilder configure(ConfigurationBuilder builder) {
+    public SpecificationBuilder configure(ConfigurationBuilder builder) {
         configurationBuilders.add(builder);
         return this;
     }
 
-    public FlowBuilder function(NodeWithIdBuilder builder) {
+    public SpecificationBuilder function(NodeWithIdBuilder builder) {
         nodeBuilderById.put(builder.getId(), builder);
         return this;
     }
@@ -62,7 +62,7 @@ public class FlowBuilder extends AbstractBuilder {
             buildContext.cacheInstance(nodeBuilderId, nodeInstance);
         }
 
-        return Specification.create(flowName, configurations, buildContext.getInstance(startNodeId), buildContext.nodeInstanceById());
+        return Specification.create(name, configurations, buildContext.getInstance(startFunctionId), buildContext.nodeInstanceById());
     }
 
     public NodeBuilder get(String nodeId) {
@@ -78,22 +78,22 @@ public class FlowBuilder extends AbstractBuilder {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        FlowBuilder that = (FlowBuilder) o;
-        return flowName.equals(that.flowName) &&
-                startNodeId.equals(that.startNodeId) &&
+        SpecificationBuilder that = (SpecificationBuilder) o;
+        return name.equals(that.name) &&
+                startFunctionId.equals(that.startFunctionId) &&
                 Objects.equals(nodeBuilderById, that.nodeBuilderById);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), flowName, startNodeId, nodeBuilderById);
+        return Objects.hash(super.hashCode(), name, startFunctionId, nodeBuilderById);
     }
 
     @Override
     public String toString() {
-        return "FlowBuilder{" +
-                "flowName='" + flowName + '\'' +
-                ", startNodeId='" + startNodeId + '\'' +
+        return "SpecificationBuilder{" +
+                "name='" + name + '\'' +
+                ", startFunctionId='" + startFunctionId + '\'' +
                 ", nodeBuilderById=" + nodeBuilderById +
                 '}';
     }

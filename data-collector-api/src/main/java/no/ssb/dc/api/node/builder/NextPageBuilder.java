@@ -34,7 +34,7 @@ public class NextPageBuilder extends NodeBuilder {
         for (Map.Entry<String, QueryBuilder> entry : outputMap.entrySet()) {
             queryNodeMap.put(entry.getKey(), entry.getValue().build(buildContext));
         }
-        return (R) new NextPageNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), queryNodeMap);
+        return (R) new NextPageNode(buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), queryNodeMap);
     }
 
     @Override

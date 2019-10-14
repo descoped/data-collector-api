@@ -78,7 +78,7 @@ public class GetBuilder extends OperationBuilder {
             stepNodeList.add(stepNode);
         }
 
-        return (R) new GetNode(getId(), buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), url, requestHeaders, validators, stepNodeList, returnVariables);
+        return (R) new GetNode(getId(), buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), url, requestHeaders, validators, stepNodeList, returnVariables);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class GetBuilder extends OperationBuilder {
                 ", url='" + url + '\'' +
                 ", requestHeaders=" + requestHeaders +
                 ", validators=" + validators +
-                ", steps=" + pipes +
+                ", pipes=" + pipes +
                 ", returnVariables=" + returnVariables +
                 '}';
     }

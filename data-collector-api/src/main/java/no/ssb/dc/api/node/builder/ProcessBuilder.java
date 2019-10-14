@@ -32,7 +32,7 @@ public class ProcessBuilder extends NodeBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        return (R) new ProcessNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), processorClass, requiredOutputs);
+        return (R) new ProcessNode(buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), processorClass, requiredOutputs);
     }
 
     @Override

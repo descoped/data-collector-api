@@ -55,7 +55,7 @@ public class ExecuteBuilder extends NodeBuilder {
 
         buildContext.cacheInstanceIfAbsent(executeId, node -> targetExecuteNode);
 
-        return (R) new ExecuteNode(buildContext.getInstance(FlowBuilder.GLOBAL_CONFIGURATION), executeId, requiredInputs, inputVariableMap, targetExecuteNode);
+        return (R) new ExecuteNode(buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), executeId, requiredInputs, inputVariableMap, targetExecuteNode);
     }
 
     @Override
