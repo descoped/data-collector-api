@@ -43,7 +43,7 @@ class PrintableExecutionPlan {
                 }
 
                 if (!node.inputVariable().isEmpty()) {
-                    String inlineInputs = node.inputVariable().entrySet().stream().map(e -> String.format("%s with %s", e.getKey(), e.getValue().expression())).collect(Collectors.joining(", "));
+                    String inlineInputs = node.inputVariable().entrySet().stream().map(e -> String.format("%s to %s", e.getKey(), e.getValue().expression())).collect(Collectors.joining(", "));
                     builder.append(String.format(" bind [%s]", inlineInputs));
                 }
 
@@ -60,7 +60,7 @@ class PrintableExecutionPlan {
                 }
 
                 if (!node.variables.isEmpty()) {
-                    String contextVariables = node.variables.entrySet().stream().map(e -> String.format("%s with %s", e.getKey(), e.getValue())).collect(Collectors.joining(", "));
+                    String contextVariables = node.variables.entrySet().stream().map(e -> String.format("%s to %s", e.getKey(), e.getValue())).collect(Collectors.joining(", "));
                     builder.append(String.format(" bind [%s]", contextVariables));
                 }
 
@@ -70,7 +70,7 @@ class PrintableExecutionPlan {
             });
 
             visitNode.given(SequenceBuilder.SequenceNode.class, handled, node -> {
-                builder.append(String.format("%s(%s) sequence forEach %s with expected-position %s%n", indent, ancestors.size(),
+                builder.append(String.format("%s(%s) sequence forEach [%s] sequenced by [%s]%n", indent, ancestors.size(),
                         node.splitNode.expression(), node.expectedNode.expression()));
             });
 
@@ -80,13 +80,13 @@ class PrintableExecutionPlan {
             });
 
             visitNode.given(ParallelBuilder.ParallelNode.class, handled, node -> {
-                builder.append(String.format("%s(%s) parallel each %s", indent, ancestors.size(),
+                builder.append(String.format("%s(%s) parallel each [%s]", indent, ancestors.size(),
                         node.splitQueryNode.expression())
                 );
 
                 if (!node.variables.isEmpty()) {
                     String contextVariables = node.variables.entrySet().stream()
-                            .map(e -> String.format("%s with %s", e.getKey(), e.getValue().expression())).collect(Collectors.joining(", "));
+                            .map(e -> String.format("%s to %s", e.getKey(), e.getValue().expression())).collect(Collectors.joining(", "));
                     builder.append(String.format(" bind [%s]", contextVariables));
                 }
 

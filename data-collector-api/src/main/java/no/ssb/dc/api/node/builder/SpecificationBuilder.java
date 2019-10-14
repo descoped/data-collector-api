@@ -73,6 +73,10 @@ public class SpecificationBuilder extends AbstractBuilder {
         return JsonParser.createJsonParser().toPrettyJSON(this);
     }
 
+    public String serializeAsYaml() {
+        return JsonParser.createYamlParser().toPrettyJSON(this);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

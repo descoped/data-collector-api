@@ -24,6 +24,10 @@ public abstract class NodeBuilder extends AbstractBuilder {
         return JsonParser.createJsonParser().toPrettyJSON(this);
     }
 
+    public String serializeAsYaml() {
+        return JsonParser.createJsonParser().toPrettyJSON(this);
+    }
+
     /**
      * Successor is responsible for its own creation and must add itself to nodeInstanceById.
      * Lazy initialization is done through nodeBuilderById.
