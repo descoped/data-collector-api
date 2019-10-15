@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
 
-  dataCollector:
+  data-collector:
     image: data-collector:dev
     ports:
     - 9090:9090
@@ -11,25 +11,29 @@ services:
     - ./certs:/certs
     - /tmp/rawdata:/rawdata
     depends_on:
-      - dcPostgresDb
+      - dc-postgres-db
 
-  dcPostgresDb:
+  dc-postgres-db:
     image: postgres:12-alpine
     ports:
     - 5432:5432
     environment:
       POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
     - dc-postgres-test:/var/lib/postgresql/data
     - ./init-db-and-user.sql:/docker-entrypoint-initdb.d/init.sql
 
-  dcAdminer:
+  dc-adminer:
     image: adminer
     ports:
     - 8080:8080
     depends_on:
-      - dcPostgresDb
+      - dc-postgres-db
 
 volumes:
   dc-postgres-test:
-
