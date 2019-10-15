@@ -1,0 +1,11 @@
+/.idea/
+/*.log
+/*.iml
+
+**/*certs
+**/*certs.tgz
+**/*certs.zip
+
+/jsonschemas/
+
+

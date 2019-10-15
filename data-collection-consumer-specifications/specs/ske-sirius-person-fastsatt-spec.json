@@ -1,0 +1,161 @@
+{
+  "type": "Flow",
+  "flowName": "Collect Sirius",
+  "startNodeId": "loop",
+  "configure": [
+    {
+      "type": "FlowContext",
+      "variables": {
+        "baseURL": "https://api-at.sits.no",
+        "rettighetspakke": "ssb",
+        "hentAntallMeldingerOmGangen": "100",
+        "fromSequence": "1",
+        "hendelse": "fastsatt"
+      },
+      "globalState": {
+        "global.topic": "sirius-person-fastsatt"
+      },
+      "headers": {
+        "accept": [
+          "application/xml"
+        ]
+      }
+    },
+    {
+      "type": "Security",
+      "bundleName": "ske-test-certs"
+    }
+  ],
+  "functions": {
+    "loop": {
+      "type": "Paginate",
+      "id": "loop",
+      "variables": {
+        "fromSequence": "${nextSequence}"
+      },
+      "threshold": 150,
+      "addPageContent": true,
+      "iterate": [
+        {
+          "type": "Execute",
+          "executeId": "parts"
+        }
+      ],
+      "until": {
+        "type": "ConditionWhenVariableIsNull",
+        "identifier": "nextSequence"
+      }
+    },
+    "parts": {
+      "type": "Get",
+      "id": "parts",
+      "url": "${baseURL}/api/formueinntekt/skattemelding/utkast/hendelser/?fraSekvensnummer=${fromSequence}&antall=${hentAntallMeldingerOmGangen}",
+      "returnVariables": [
+        "nextSequence"
+      ],
+      "responseValidators": [
+        {
+          "type": "HttpStatusValidation",
+          "success": [
+            200
+          ],
+          "failed": [
+            400,
+            404,
+            500
+          ]
+        }
+      ],
+      "pipes": [
+        {
+          "type": "Sequence",
+          "splitQuery": {
+            "type": "QueryXPath",
+            "expression": "/hendelser/hendelse"
+          },
+          "expectedQuery": {
+            "type": "QueryXPath",
+            "expression": "/hendelse/sekvensnummer"
+          }
+        },
+        {
+          "type": "NextPage",
+          "outputs": {
+            "nextSequence": {
+              "type": "QueryEval",
+              "query": {
+                "type": "QueryXPath",
+                "expression": "/hendelser/hendelse[last()]/sekvensnummer"
+              },
+              "bindToVariable": "lastSequence",
+              "expression": "${cast.toLong(lastSequence) + 1}"
+            }
+          }
+        },
+        {
+          "type": "Parallel",
+          "variables": {
+            "position": {
+              "type": "QueryXPath",
+              "expression": "/hendelse/sekvensnummer"
+            }
+          },
+          "splitQuery": {
+            "type": "QueryXPath",
+            "expression": "/hendelser/hendelse"
+          },
+          "pipes": [
+            {
+              "type": "AddContent",
+              "positionVariableExpression": "${position}",
+              "contentKey": "entry"
+            },
+            {
+              "type": "Execute",
+              "executeId": "utkast-melding",
+              "inputVariables": {
+                "utkastIdentifikator": {
+                  "type": "QueryXPath",
+                  "expression": "/hendelse/identifikator"
+                },
+                "year": {
+                  "type": "QueryXPath",
+                  "expression": "/hendelse/gjelderPeriode"
+                }
+              }
+            },
+            {
+              "type": "Publish",
+              "positionVariableExpression": "${position}"
+            }
+          ]
+        }
+      ]
+    },
+    "utkast-melding": {
+      "type": "Get",
+      "id": "utkast-melding",
+      "url": "${baseURL}/api/formueinntekt/skattemelding/${hendelse}/${rettighetspakke}/${year}/${utkastIdentifikator}",
+      "responseValidators": [
+        {
+          "type": "HttpStatusValidation",
+          "success": [
+            200
+          ],
+          "failed": [
+            400,
+            404,
+            500
+          ]
+        }
+      ],
+      "pipes": [
+        {
+          "type": "AddContent",
+          "positionVariableExpression": "${position}",
+          "contentKey": "skattemelding"
+        }
+      ]
+    }
+  }
+}
