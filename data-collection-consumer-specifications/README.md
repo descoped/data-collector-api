@@ -1,4 +1,4 @@
-# MOD Data Collection Consumers
+# MOD Data Collection Consumer Specifications
 
 ## Pre-requisite
 
