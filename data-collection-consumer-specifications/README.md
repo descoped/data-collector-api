@@ -18,20 +18,21 @@ certs
 
 > Contact Rune Lind or Kenneth Schulstad for getting Cert-bundles.
 
+# Docker container
 
-# Pull latest images 
+## Pull latest images 
 
 ```
 docker-compose pull
 ```
 
-# Start 
+## Start 
 
 ```
 docker-compose up
 ```
 
-# Stop 
+## Stop 
 
 ```
 docker-compose down
@@ -39,10 +40,18 @@ docker-compose down
 docker-compose down -v (remove anonymous db volume)
 ```
 
-# Clean
+## Clean
 
 ```
 docker-compose rm
+```
+
+## Dev test container
+
+> Build dev images in [`data-collector-docker`](https://github.com/statisticsnorway/data-collector-docker) project.
+
+```
+docker-compose -f docker-compose-dev.yml COMMANDS
 ```
 
 # Run worker (Rawdata Producer)
