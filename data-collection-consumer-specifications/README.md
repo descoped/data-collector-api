@@ -1,4 +1,4 @@
-# MOD SSB Data Collector Consumers
+# MOD Data Collection Consumers
 
 ## Pre-requisite
 
