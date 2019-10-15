@@ -2,10 +2,10 @@
 
 ## Pre-requisite
 
-Business SSL bundles should be placed under `./data-collector/certs` directory.
+Business SSL bundles should be placed under `certs` directory.
 
 ```
-certs
+/certs
 ├── ske-test-certs (bundle)
 │   ├── secret.properties
 │   ├── testauth-key.pem
