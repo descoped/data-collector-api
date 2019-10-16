@@ -40,6 +40,8 @@ make TARGET
 
 # Docker Compose Lifecycle
 
+> ⚠️ **Limitation**: only one target provides can be run at once!
+
 ## Postgres Stream Provider
 
 |Target                         |Description                                     |
@@ -64,6 +66,8 @@ make TARGET
 |remove-kafka                   |Remove kafka                                    |
 
 ## Build Data Collector Dev Image
+
+Dev images requires full checkout of the [data-collector-project](https://github.com/statisticsnorway/data-collector-project) repo.
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
