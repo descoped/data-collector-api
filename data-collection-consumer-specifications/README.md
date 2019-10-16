@@ -42,7 +42,7 @@ make TARGET
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
-|pull-postgres                  |Pull postgres images                            |
+|pull-postgres                  |Pull images                            |
 |start-postgres                 |Start postgres                                  |
 |stop-postgres                  |Stop postgres                                   |
 |stop-postgres-clean            |Stop postgres and remove anonymous volumes      |
@@ -52,7 +52,7 @@ make TARGET
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
-|pull-kafka                     |Pull kafka images                               |
+|pull-kafka                     |Pull images                               |
 |start-kafka                    |Start kafka                                     |
 |stop-kafka                     |Stop kafka                                      |
 |stop-kafka-clean               |Stop kafka and remove anonymous volumes         |

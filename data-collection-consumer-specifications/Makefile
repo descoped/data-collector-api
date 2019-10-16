@@ -12,7 +12,7 @@ help:
 #
 
 .PHONY: pull-postgres
-pull-postgres: ## Pull postgres images
+pull-postgres: ## Pull images
 	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml pull
 
 .PHONY: start-postgres
@@ -36,7 +36,7 @@ remove-postgres: ## Remove postgres
 #
 
 .PHONY: pull-kafka
-pull-kafka: ## Pull kafka images
+pull-kafka: ## Pull images
 	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml pull
 
 .PHONY: start-kafka
