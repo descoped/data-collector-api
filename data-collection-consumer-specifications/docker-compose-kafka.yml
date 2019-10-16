@@ -7,7 +7,7 @@ services:
     ports:
       - 9090:9090
     volumes:
-    - $WORKDIR/profile/$PROFILE:/conf
+    - $WORKDIR/profile/$PROFILE/conf:/conf
     - $WORKDIR/certs:/certs
     depends_on:
       - dc-kafka
@@ -34,4 +34,3 @@ services:
       interval: 5s
       timeout: 10s
       retries: 3
-

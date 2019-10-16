@@ -1,5 +1,9 @@
 # MOD Data Collection Consumer Specifications
 
+# Intro
+
+This project uses Makefile to control the docker-compose lifecycle and executing data collector specifications.
+
 ## Pre-requisite
 
 Business SSL bundles should be placed under `certs` directory.
@@ -17,10 +21,6 @@ Business SSL bundles should be placed under `certs` directory.
 ```
 
 > Contact Rune Lind or Kenneth Schulstad for getting Cert-bundles.
-
-# Intro
-
-This project uses Makefile to control the docker-compose lifecycle and executing data collector specifications.
 
 # Use
 

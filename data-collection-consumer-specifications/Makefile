@@ -13,23 +13,23 @@ help:
 
 .PHONY: pull-postgres
 pull-postgres: ## Pull images
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml pull
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml pull
 
 .PHONY: start-postgres
 start-postgres: ## Start postgres
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml up &
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml up &
 
 .PHONY: stop-postgres
 stop-postgres: ## Stop postgres
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml down
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml down
 
 .PHONY: stop-postgres-clean
 stop-postgres-clean: ## Stop postgres and remove anonymous volumes
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml down -v
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml down -v
 
 .PHONY: remove-postgres
 remove-postgres: ## Remove postgres
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml rm
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-postgres.yml rm
 
 #
 # docker-compose kafka
@@ -37,23 +37,23 @@ remove-postgres: ## Remove postgres
 
 .PHONY: pull-kafka
 pull-kafka: ## Pull images
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml pull
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml pull
 
 .PHONY: start-kafka
 start-kafka: ## Start kafka
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml up &
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml up &
 
 .PHONY: stop-kafka
 stop-kafka: ## Stop kafka
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml down
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml down
 
 .PHONY: stop-kafka-clean
 stop-kafka-clean: ## Stop kafka and remove anonymous volumes
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml down -v
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml down -v
 
 .PHONY: remove-kafka
 remove-kafka: ## Remove kafka
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml rm
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=statisticsnorway/data-collector:latest docker-compose -f docker-compose-kafka.yml rm
 
 #
 # build data collector dev image
@@ -69,19 +69,19 @@ build-data-collector-dev-image: ## Build data collector dev image
 
 .PHONY: start-postgres-dev
 start-postgres-dev: ## Start postgres-dev
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml up &
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml up &
 
 .PHONY: stop-postgres-dev
 stop-postgres-dev: ## Stop postgres-dev
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml down
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml down
 
 .PHONY: stop-postgres-dev-clean
 stop-postgres-dev-clean: ## Stop postgres-dev and remove anonymous volumes
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml down -v
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml down -v
 
 .PHONY: remove-postgres-dev
 remove-postgres-dev: ## Remove postgres-dev
-	@WORKDIR=$(PWD) PROFILE=content-stream-postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml rm
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=data-collector:dev docker-compose -f docker-compose-postgres.yml rm
 
 #
 # docker-compose kafka-dev
@@ -89,19 +89,19 @@ remove-postgres-dev: ## Remove postgres-dev
 
 .PHONY: start-kafka-dev
 start-kafka-dev: ## Start kafka-dev
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml up &
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml up &
 
 .PHONY: stop-kafka-dev
 stop-kafka-dev: ## Stop kafka-dev
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml down
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml down
 
 .PHONY: stop-kafka-dev-clean
 stop-kafka-dev-clean: ## Stop kafka-dev and remove anonymous volumes
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml down -v
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml down -v
 
 .PHONY: remove-kafka-dev
 remove-kafka-dev: ## Remove kafka-dev
-	@WORKDIR=$(PWD) PROFILE=content-stream-kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml rm
+	@WORKDIR=$(PWD) PROFILE=kafka DC_IMAGE=data-collector:dev docker-compose -f docker-compose-kafka.yml rm
 
 #
 # execute consumer specifications
