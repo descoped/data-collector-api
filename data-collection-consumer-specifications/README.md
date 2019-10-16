@@ -44,6 +44,8 @@ make TARGET
 
 ## Postgres Stream Provider
 
+> ⚠️ **Important notice**: Postgres is a recommended provider test purposes.
+
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
 |pull-postgres                  |Pull images                                     |
@@ -55,6 +57,8 @@ make TARGET
 |open-postgres-adminer          |Open a web based DB admin tool in your browser  |
 
 ## Kafka Stream Provider
+
+> ⚠️ **Important notice**: The Kafka provider IS NOT a deployment target for MOD Sirius.
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
