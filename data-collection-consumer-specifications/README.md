@@ -44,7 +44,7 @@ make TARGET
 
 ## Postgres Stream Provider
 
-> ⚠️ **Important notice**: Postgres is a recommended provider test purposes.
+> ⚠️ **Important notice**: Postgres is a recommended provider for test purposes.
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
