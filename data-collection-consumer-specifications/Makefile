@@ -2,6 +2,7 @@ SHELL=/bin/bash -x
 
 DC_RELEASE_IMAGE=statisticsnorway/data-collector:latest
 DC_LOCAL_IMAGE=data-collector:dev
+DC_PORT=9990
 
 .PHONY: default
 default: | help
@@ -37,6 +38,10 @@ stop-postgres-clean: ## Stop postgres and remove anonymous volumes
 .PHONY: remove-postgres
 remove-postgres: ## Remove postgres
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-postgres.yml rm
+
+.PHONY: open-postgres-adminer
+open-postgres-adminer: ## Open a web based DB admin tool in your browser
+	open http://localhost:8980/?pgsql=172.17.0.1:15432&username=rdc&db=rdc
 
 #
 # docker-compose kafka
@@ -128,17 +133,17 @@ remove-kafka-dev: ## Remove kafka-dev
 
 .PHONY: collect-freg-playground
 collect-freg-playground: ## Collect freg playground
-	@curl -X PUT localhost:9090/task -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
+	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
 
 .PHONY: collect-sirius-person-utkast
 collect-sirius-person-utkast: ## Collect sirius person utkast
-	@curl -X PUT localhost:9090/task -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json
+	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json
 
 .PHONY: collect-sirius-person-fastsatt
 collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
-	@curl -X PUT localhost:9090/task -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
+	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
 
 .PHONY: collect-tvinn
 collect-tvinn: ## Collect tvinn
-	@curl -X PUT localhost:9090/task -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
+	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
 

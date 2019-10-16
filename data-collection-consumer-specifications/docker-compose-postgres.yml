@@ -5,7 +5,7 @@ services:
   data-collector-postgres:
     image: $DC_IMAGE
     ports:
-    - 9090:9090
+      - 9990:9090
     volumes:
     - $WORKDIR/profile/$PROFILE/conf:/conf
     - $WORKDIR/certs:/certs
@@ -15,7 +15,7 @@ services:
   dc-postgres-db:
     image: postgres:12-alpine
     ports:
-    - 5432:5432
+      - 15432:5432
     environment:
       POSTGRES_PASSWORD: postgres
     healthcheck:
@@ -30,7 +30,7 @@ services:
   dc-adminer:
     image: adminer
     ports:
-    - 8080:8080
+      - 8980:8080
     depends_on:
       - dc-postgres-db
 
