@@ -2,11 +2,11 @@
 
 # Intro
 
-This project uses Makefile to control the docker-compose lifecycle and executing data collector specifications.
+This project provides a convenient way to control the lifecycle for different stream provider configurations and makes it easy to execute data collector specifications.
 
 ## Pre-requisite
 
-Business SSL bundles should be placed under `certs` directory.
+Business SSL bundles are required for service authentication. The bundles must be placed under `certs` directory.
 
 ```
 /certs
@@ -20,7 +20,7 @@ Business SSL bundles should be placed under `certs` directory.
 │   └── testauthcert-public.pem
 ```
 
-> Contact Rune Lind or Kenneth Schulstad for getting Cert-bundles.
+> ⚠️ **Please note**: Cert-bundles can be provided by Team Innsamling.
 
 # Use
 
@@ -36,24 +36,29 @@ make
 make TARGET
 ```
 
+> ⚠️ **Advise**: Tail the running container-log in a separate terminal window.
+
 # Docker Compose Lifecycle
 
 ## Postgres Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
-|pull-postgres                  |Pull images                            |
+|pull-postgres                  |Pull images                                     |
 |start-postgres                 |Start postgres                                  |
+|tail-postgres                  |Tail docker log                                 |
 |stop-postgres                  |Stop postgres                                   |
 |stop-postgres-clean            |Stop postgres and remove anonymous volumes      |
 |remove-postgres                |Remove postgres                                 |
+|open-postgres-adminer          |Open a web based DB admin tool in your browser  |
 
 ## Kafka Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
-|pull-kafka                     |Pull images                               |
+|pull-kafka                     |Pull images                                     |
 |start-kafka                    |Start kafka                                     |
+|tail-kafka                     |Tail docker log                                 |
 |stop-kafka                     |Stop kafka                                      |
 |stop-kafka-clean               |Stop kafka and remove anonymous volumes         |
 |remove-kafka                   |Remove kafka                                    |
@@ -69,6 +74,7 @@ make TARGET
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
 |start-postgres-dev             |Start postgres-dev                              |
+|tail-postgres-dev              |Tail docker log                                 |
 |stop-postgres-dev              |Stop postgres-dev                               |
 |stop-postgres-dev-clean        |Stop postgres-dev and remove anonymous volumes  |
 |remove-postgres-dev            |Remove postgres-dev                             |
@@ -78,11 +84,12 @@ make TARGET
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
 |start-kafka-dev                |Start kafka-dev                                 |
+|tail-kafka-dev                 |Tail docker log                                 |
 |stop-kafka-dev                 |Stop kafka-dev                                  |
 |stop-kafka-dev-clean           |Stop kafka-dev and remove anonymous volumes     |
 |remove-kafka-dev               |Remove kafka-dev                                |
 
-# Run worker (Rawdata Producer)
+# Rawdata Producer (execute task)
 
 ## Execute consumer specification on running data collector container
 
