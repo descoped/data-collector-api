@@ -2,14 +2,13 @@ version: '3.7'
 
 services:
 
-  data-collector:
-    image: statisticsnorway/data-collector:latest
+  data-collector-postgres:
+    image: $DC_IMAGE
     ports:
     - 9090:9090
     volumes:
-    - ./conf:/conf
-    - ./certs:/certs
-    - /tmp/rawdata:/rawdata
+    - $WORKDIR/profile/$PROFILE:/conf
+    - $WORKDIR/certs:/certs
     depends_on:
       - dc-postgres-db
 
@@ -26,7 +25,7 @@ services:
       retries: 5
     volumes:
     - dc-postgres-test:/var/lib/postgresql/data
-    - ./init-db-and-user.sql:/docker-entrypoint-initdb.d/init.sql
+    - $WORKDIR/profile/$PROFILE/init-db-and-user.sql:/docker-entrypoint-initdb.d/init.sql
 
   dc-adminer:
     image: adminer
