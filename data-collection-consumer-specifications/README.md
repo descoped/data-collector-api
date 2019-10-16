@@ -30,13 +30,15 @@ This project uses Makefile to control the docker-compose lifecycle and executing
 make
 ```
 
-# Run target
+## Run target
 
 ```
 make TARGET
 ```
 
-## Docker Compose Postgres Lifecycle
+# Docker Compose Lifecycle
+
+## Postgres Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
@@ -46,7 +48,7 @@ make TARGET
 |stop-postgres-clean            |Stop postgres and remove anonymous volumes      |
 |remove-postgres                |Remove postgres                                 |
 
-## Docker Compose Kafka Lifecycle
+## Kafka Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
@@ -62,7 +64,7 @@ make TARGET
 |:------------------------------|:-----------------------------------------------|
 |build-data-collector-dev-image |Build data collector dev image                  |
 
-## Docker Compose Postgres Dev Lifecycle
+## Postgres Dev Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
@@ -71,7 +73,7 @@ make TARGET
 |stop-postgres-dev-clean        |Stop postgres-dev and remove anonymous volumes  |
 |remove-postgres-dev            |Remove postgres-dev                             |
 
-## Docker Compose Kafka Dev Lifecycle
+## Kafka Dev Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
