@@ -41,7 +41,7 @@ remove-postgres: ## Remove postgres
 
 .PHONY: open-postgres-adminer
 open-postgres-adminer: ## Open a web based DB admin tool in your browser
-	open http://localhost:8980/?pgsql=172.17.0.1:15432&username=rdc&db=rdc
+	@open http://localhost:8980/?pgsql=172.17.0.1:15432&username=rdc&db=rdc
 
 #
 # docker-compose kafka
