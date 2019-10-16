@@ -40,7 +40,7 @@ make TARGET
 
 # Docker Compose Lifecycle
 
-> ⚠️ **Limitation**: only one target provides can be run at once!
+> ⚠️ **Limitation**: only one _target provider_ can be run at a given time!
 
 ## Postgres Stream Provider
 
