@@ -20,7 +20,7 @@ Business SSL bundles are required for service authentication. The bundles must b
 │   └── testauthcert-public.pem
 ```
 
-> :key: **Please note**: Cert-bundles can be provided by Team Innsamling.
+> :key: Cert-bundles can be provided by Team Innsamling.
 
 # Use
 
@@ -36,15 +36,15 @@ make
 make TARGET
 ```
 
-> :bulb: **Advise**: Tail the running container-log in a separate terminal window.
+> :bulb: tail the running container-log in a separate terminal window.
 
 # Docker Compose Lifecycle
 
-> :warning: **Limitation**: only one _target provider_ can be run at a given time!
+> :warning: only one _target provider_ can be run at a given time!
 
 ## Postgres Stream Provider
 
-> :bulb: **Important notice**: Postgres is a recommended provider for test purposes.
+> :bulb: Postgres is a recommended provider for test purposes.
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
@@ -58,7 +58,7 @@ make TARGET
 
 ## Kafka Stream Provider
 
-> :warning: **Important notice**: The Kafka provider IS NOT a deployment target for MOD Sirius.
+> :warning: The Kafka provider IS NOT a deployment target for MOD Sirius.
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
