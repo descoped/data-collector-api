@@ -1,5 +1,6 @@
 package no.ssb.dc.api;
 
+import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.el.ExpressionLanguage;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
@@ -16,7 +17,7 @@ public class ExpressionLanguageTest {
 
         Map<String, Object> variables = new LinkedHashMap<>();
         variables.put("a-b", "foo");
-        ExpressionLanguage el = new ExpressionLanguage(variables);
+        ExpressionLanguage el = new ExpressionLanguage(new ExecutionContext.Builder().variables(variables).build());
         System.out.printf("%s%n", el.evaluateExpression(expr));
     }
 }

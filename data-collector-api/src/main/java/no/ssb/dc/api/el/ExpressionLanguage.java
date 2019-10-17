@@ -1,5 +1,6 @@
 package no.ssb.dc.api.el;
 
+import no.ssb.dc.api.context.ExecutionContext;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -8,9 +9,7 @@ import org.apache.commons.jexl3.MapContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,9 +34,12 @@ public class ExpressionLanguage {
         }
     }
 
-    public ExpressionLanguage(Map<String, Object> variables) {
-        Objects.requireNonNull(variables);
-        this.variables = variables;
+    public ExpressionLanguage(ExecutionContext context) {
+        this.variables = context.variables();
+    }
+
+    void initializeJexlFunctions(JexlContext jexlContext) {
+        jexlContext.set("cast", new Cast());
     }
 
     public boolean isExpression(String expr) {
@@ -56,13 +58,9 @@ public class ExpressionLanguage {
     public Object evaluateExpression(String expr) {
         try {
             final String expression = (isExpression(expr) ? getExpression(expr) : expr);
-            List<String> operators = List.of("+" ,"-", "*", "/");
-//            if (operators.stream().anyMatch(expression::contains)) {
-//                LOG.warn("Arithmetic operators like {} WILL BE evaluated by Jexl!", operators);
-//            }
             JexlExpression e = Jexl.engine().createExpression(expression);
             JexlContext jexlContext = new MapContext(variables);
-            jexlContext.set("cast", new Cast());
+            initializeJexlFunctions(jexlContext);
             return e.evaluate(jexlContext);
         } catch (Exception e) {
             LOG.error("Unable to resolve expr: {}", expr);
