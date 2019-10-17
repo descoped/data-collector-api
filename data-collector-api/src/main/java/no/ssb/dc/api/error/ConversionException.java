@@ -1,6 +1,6 @@
 package no.ssb.dc.api.error;
 
-public class ConversionException extends RuntimeException {
+public class ConversionException extends ExecutionException {
 
     public ConversionException() {
     }
