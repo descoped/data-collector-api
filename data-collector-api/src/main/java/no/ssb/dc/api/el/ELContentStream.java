@@ -9,6 +9,10 @@ public class ELContentStream {
         this.evaluateLastContentStreamPosition = evaluateLastContentStreamPosition;
     }
 
+    public boolean hasLastPosition() {
+        return evaluateLastContentStreamPosition.hasLastPosition();
+    }
+
     public String lastPosition() {
         return evaluateLastContentStreamPosition.getLastPosition();
     }

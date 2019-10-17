@@ -12,6 +12,10 @@ public class EvaluateLastContentStreamPosition {
         this.context = context;
     }
 
+    public boolean hasLastPosition() {
+        return getLastPosition() != null;
+    }
+
     public String getLastPosition() {
         String topic = context.state("global.topic");
         Objects.requireNonNull(topic);
