@@ -14,6 +14,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
+import static no.ssb.dc.api.Builders.status;
+
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class GetBuilder extends OperationBuilder {
 
@@ -67,6 +69,12 @@ public class GetBuilder extends OperationBuilder {
     @Override
     <R extends Base> R build(BuildContext buildContext) {
         List<Validator> validators = new ArrayList<>();
+
+        // add default http status validator if unassigned
+        if (this.validators.isEmpty()) {
+            this.validate(status().success(200));
+        }
+
         for (LeafNodeBuilder validatorBuilder : this.validators) {
             Validator validator = validatorBuilder.build(buildContext);
             validators.add(validator);
