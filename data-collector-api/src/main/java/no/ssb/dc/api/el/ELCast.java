@@ -1,6 +1,6 @@
 package no.ssb.dc.api.el;
 
-public class Cast {
+public class ELCast {
 
     public Float toFloat(String value) {
         return Float.valueOf(value);

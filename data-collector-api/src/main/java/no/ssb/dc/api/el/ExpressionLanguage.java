@@ -1,5 +1,6 @@
 package no.ssb.dc.api.el;
 
+import no.ssb.dc.api.content.EvaluateLastContentStreamPosition;
 import no.ssb.dc.api.context.ExecutionContext;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
@@ -21,6 +22,7 @@ public class ExpressionLanguage {
     static final Pattern MULTI_EXPRESSION_REGEX = Pattern.compile("\\$\\{(.*?)}+");
 
     private final Map<String, Object> variables;
+    private final EvaluateLastContentStreamPosition evaluateLastContentStreamPosition;
 
     private static class Jexl {
         private static final JexlEngine jexlEngine = new JexlBuilder()
@@ -36,10 +38,12 @@ public class ExpressionLanguage {
 
     public ExpressionLanguage(ExecutionContext context) {
         this.variables = context.variables();
+        this.evaluateLastContentStreamPosition = new EvaluateLastContentStreamPosition(context);
     }
 
     void initializeJexlFunctions(JexlContext jexlContext) {
-        jexlContext.set("cast", new Cast());
+        jexlContext.set("cast", new ELCast());
+        jexlContext.set("contentStream", new ELContentStream(evaluateLastContentStreamPosition));
     }
 
     public boolean isExpression(String expr) {

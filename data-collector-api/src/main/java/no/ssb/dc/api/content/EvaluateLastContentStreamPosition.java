@@ -2,17 +2,21 @@ package no.ssb.dc.api.content;
 
 import no.ssb.dc.api.context.ExecutionContext;
 
+import java.util.Objects;
+
 public class EvaluateLastContentStreamPosition {
 
-    private final String lastPosition;
+    private final ExecutionContext context;
 
     public EvaluateLastContentStreamPosition(ExecutionContext context) {
-        String topic = context.state("global.topic");
-        ContentStore contentStore = context.services().get(ContentStore.class);
-        lastPosition = contentStore.lastPosition(topic);
+        this.context = context;
     }
 
     public String getLastPosition() {
-        return lastPosition;
+        String topic = context.state("global.topic");
+        Objects.requireNonNull(topic);
+        ContentStore contentStore = context.services().get(ContentStore.class);
+        Objects.requireNonNull(contentStore);
+        return contentStore.lastPosition(topic);
     }
 }
