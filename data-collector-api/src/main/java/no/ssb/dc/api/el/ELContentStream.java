@@ -1,11 +1,14 @@
 package no.ssb.dc.api.el;
 
 import no.ssb.dc.api.content.EvaluateLastContentStreamPosition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ELContentStream {
+    private static final Logger LOG = LoggerFactory.getLogger(ELContentStream.class);
     private final EvaluateLastContentStreamPosition evaluateLastContentStreamPosition;
 
-    public ELContentStream(EvaluateLastContentStreamPosition evaluateLastContentStreamPosition) {
+    ELContentStream(EvaluateLastContentStreamPosition evaluateLastContentStreamPosition) {
         this.evaluateLastContentStreamPosition = evaluateLastContentStreamPosition;
     }
 
@@ -14,6 +17,8 @@ public class ELContentStream {
     }
 
     public String lastPosition() {
-        return evaluateLastContentStreamPosition.getLastPosition();
+        String lastPosition = evaluateLastContentStreamPosition.getLastPosition();
+        LOG.info("Last-position: {}", lastPosition);
+        return lastPosition;
     }
 }
