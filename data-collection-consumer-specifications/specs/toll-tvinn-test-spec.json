@@ -1,114 +1,94 @@
 {
-  "type": "Flow",
-  "flowName": "Collect Tvinn",
-  "startNodeId": "loop",
-  "configure": [
-    {
-      "type": "FlowContext",
-      "variables": {
-        "TestURL": "https://mp-at.toll.no",
-        "ProduksjonURL": "https://mp-sit.toll.no",
-        "fromMarker": "last"
-      },
-      "globalState": {
-        "global.topic": "tvinn"
-      },
-      "headers": {
-        "accept": [
-          "application/xml"
-        ]
-      }
+  "type" : "Specification",
+  "name" : "Collect Tvinn",
+  "startFunctionId" : "loop",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "TestURL" : "https://mp-at.toll.no",
+      "ProduksjonURL" : "https://mp-sit.toll.no",
+      "nextMarker" : "${contentStream.hasLastPosition() ? contentStream.lastPosition() : \"last\"}"
     },
-    {
-      "type": "Security",
-      "bundleName": "toll-test-certs"
+    "globalState" : {
+      "global.topic" : "tvinn-test"
+    },
+    "headers" : {
+      "accept" : [ "application/xml" ]
     }
-  ],
-  "functions": {
-    "loop": {
-      "type": "Paginate",
-      "id": "loop",
-      "variables": {
-        "fromMarker": "${nextMarker}"
+  }, {
+    "type" : "Security",
+    "bundleName" : "toll-test-certs"
+  } ],
+  "functions" : {
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromMarker" : "${nextMarker}"
       },
-      "threshold": 50,
-      "addPageContent": true,
-      "iterate": [
-        {
-          "type": "Execute",
-          "executeId": "event-list"
-        }
-      ],
-      "until": {
-        "type": "ConditionWhenVariableIsNull",
-        "identifier": "nextMarker"
+      "threshold" : 150,
+      "addPageContent" : true,
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "event-list"
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextMarker"
       }
     },
-    "event-list": {
-      "type": "Get",
-      "id": "event-list",
-      "url": "${TestURL}/atomfeed/toll/deklarasjon-ekstern-feed/?marker=${fromMarker}&limit=25&direction=forward",
-      "returnVariables": [
-        "nextMarker"
-      ],
-      "responseValidators": [
-        {
-          "type": "HttpStatusValidation",
-          "success": [
-            200
-          ]
-        }
-      ],
-      "pipes": [
-        {
-          "type": "Sequence",
-          "splitQuery": {
-            "type": "QueryXPath",
-            "expression": "/feed/entry"
-          },
-          "expectedQuery": {
-            "type": "QueryXPath",
-            "expression": "/entry/id"
-          }
+    "event-list" : {
+      "type" : "Get",
+      "id" : "event-list",
+      "url" : "${TestURL}/atomfeed/toll/deklarasjon-ekstern-feed/?marker=${fromMarker}&limit=25&direction=forward",
+      "returnVariables" : [ "nextMarker" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : [ 200 ]
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
         },
-        {
-          "type": "NextPage",
-          "outputs": {
-            "nextMarker": {
-              "type": "QueryRegEx",
-              "expression": "(?<=[?&]marker=)[^&]*",
-              "query": {
-                "type": "QueryXPath",
-                "expression": "/feed/link[@rel=\"previous\"]/@href"
-              }
+        "expectedQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/entry/id"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextMarker" : {
+            "type" : "QueryRegEx",
+            "expression" : "(?<=[?&]marker=)[^&]*",
+            "query" : {
+              "type" : "QueryXPath",
+              "expression" : "/feed/link[@rel=\"previous\"]/@href"
             }
           }
-        },
-        {
-          "type": "Parallel",
-          "variables": {
-            "position": {
-              "type": "QueryXPath",
-              "expression": "/entry/id"
-            }
-          },
-          "splitQuery": {
-            "type": "QueryXPath",
-            "expression": "/feed/entry"
-          },
-          "pipes": [
-            {
-              "type": "AddContent",
-              "positionVariableExpression": "${position}",
-              "contentKey": "entry"
-            },
-            {
-              "type": "Publish",
-              "positionVariableExpression": "${position}"
-            }
-          ]
         }
-      ]
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryXPath",
+            "expression" : "/entry/id"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
     }
   }
 }

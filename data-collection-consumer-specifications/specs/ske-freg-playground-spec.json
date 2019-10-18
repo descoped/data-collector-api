@@ -1,191 +1,145 @@
 {
-  "type": "Flow",
-  "flowName": "Collect FREG",
-  "startNodeId": "loop",
-  "configure": [
-    {
-      "type": "FlowContext",
-      "variables": {
-        "ProdusentTestURL": "https://folkeregisteret-api-ekstern.sits.no",
-        "KonsumentTestURL": "https://folkeregisteret-api-konsument.sits.no",
-        "ProduksjonURL": "https://folkeregisteret.api.skatteetaten.no",
-        "PlaygroundURL": "https://folkeregisteret-api-konsument-playground.sits.no",
-        "fromSequence": "1"
-      },
-      "globalState": {
-        "global.topic": "freg-playground"
-      },
-      "headers": {
-        "accept": [
-          "application/xml"
-        ]
-      }
+  "type" : "Specification",
+  "name" : "Collect FREG",
+  "startFunctionId" : "loop",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "ProdusentTestURL" : "https://folkeregisteret-api-ekstern.sits.no",
+      "KonsumentTestURL" : "https://folkeregisteret-api-konsument.sits.no",
+      "ProduksjonURL" : "https://folkeregisteret.api.skatteetaten.no",
+      "PlaygroundURL" : "https://folkeregisteret-api-konsument-playground.sits.no",
+      "nextSequence" : "${contentStream.hasLastPosition() ? contentStream.lastPosition() : \"1\"}"
     },
-    {
-      "type": "Security",
-      "bundleName": "ske-test-certs"
+    "globalState" : {
+      "global.topic" : "freg-playground"
+    },
+    "headers" : {
+      "accept" : [ "application/xml" ]
     }
-  ],
-  "functions": {
-    "loop": {
-      "type": "Paginate",
-      "id": "loop",
-      "variables": {
-        "fromSequence": "${nextSequence}"
+  }, {
+    "type" : "Security",
+    "bundleName" : "ske-test-certs"
+  } ],
+  "functions" : {
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromSequence" : "${nextSequence}"
       },
-      "threshold": 1500,
-      "addPageContent": true,
-      "iterate": [
-        {
-          "type": "Execute",
-          "executeId": "event-list"
-        }
-      ],
-      "until": {
-        "type": "ConditionWhenVariableIsNull",
-        "identifier": "nextSequence"
+      "threshold" : 1500,
+      "addPageContent" : true,
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "event-list"
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextSequence"
       }
     },
-    "event-list": {
-      "type": "Get",
-      "id": "event-list",
-      "url": "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/feed/?seq=${fromSequence}",
-      "returnVariables": [
-        "nextSequence"
-      ],
-      "responseValidators": [
-        {
-          "type": "HttpStatusValidation",
-          "success": [
-            200
-          ],
-          "failed": [
-            400,
-            404,
-            500
-          ]
-        }
-      ],
-      "pipes": [
-        {
-          "type": "Sequence",
-          "splitQuery": {
-            "type": "QueryXPath",
-            "expression": "/feed/entry"
-          },
-          "expectedQuery": {
-            "type": "QueryXPath",
-            "expression": "/entry/content/lagretHendelse/sekvensnummer"
-          }
+    "event-list" : {
+      "type" : "Get",
+      "id" : "event-list",
+      "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/feed/?seq=${fromSequence}",
+      "returnVariables" : [ "nextSequence" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : [ 200 ],
+        "failed" : [ 400, 404, 500 ]
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
         },
-        {
-          "type": "NextPage",
-          "outputs": {
-            "nextSequence": {
-              "type": "QueryRegEx",
-              "expression": "(?<=[?&]seq=)[^&]*",
-              "query": {
-                "type": "QueryXPath",
-                "expression": "/feed/link[@rel=\"next\"]/@href"
-              }
+        "expectedQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/entry/content/lagretHendelse/sekvensnummer"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextSequence" : {
+            "type" : "QueryRegEx",
+            "expression" : "(?<=[?&]seq=)[^&]*",
+            "query" : {
+              "type" : "QueryXPath",
+              "expression" : "/feed/link[@rel=\"next\"]/@href"
             }
           }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryXPath",
+            "expression" : "/entry/content/lagretHendelse/sekvensnummer"
+          }
         },
-        {
-          "type": "Parallel",
-          "variables": {
-            "position": {
-              "type": "QueryXPath",
-              "expression": "/entry/content/lagretHendelse/sekvensnummer"
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Execute",
+          "executeId" : "event-document",
+          "inputVariables" : {
+            "eventId" : {
+              "type" : "QueryXPath",
+              "expression" : "/entry/content/lagretHendelse/hendelse/hendelsesdokument"
             }
-          },
-          "splitQuery": {
-            "type": "QueryXPath",
-            "expression": "/feed/entry"
-          },
-          "pipes": [
-            {
-              "type": "AddContent",
-              "positionVariableExpression": "${position}",
-              "contentKey": "entry"
-            },
-            {
-              "type": "Execute",
-              "executeId": "event-document",
-              "inputVariables": {
-                "eventId": {
-                  "type": "QueryXPath",
-                  "expression": "/entry/content/lagretHendelse/hendelse/hendelsesdokument"
-                }
-              }
-            },
-            {
-              "type": "Execute",
-              "executeId": "person-document",
-              "inputVariables": {
-                "personId": {
-                  "type": "QueryXPath",
-                  "expression": "/entry/content/lagretHendelse/hendelse/folkeregisteridentifikator"
-                }
-              }
-            },
-            {
-              "type": "Publish",
-              "positionVariableExpression": "${position}"
+          }
+        }, {
+          "type" : "Execute",
+          "executeId" : "person-document",
+          "inputVariables" : {
+            "personId" : {
+              "type" : "QueryXPath",
+              "expression" : "/entry/content/lagretHendelse/hendelse/folkeregisteridentifikator"
             }
-          ]
-        }
-      ]
+          }
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
     },
-    "event-document": {
-      "type": "Get",
-      "id": "event-document",
-      "url": "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/${eventId}",
-      "responseValidators": [
-        {
-          "type": "HttpStatusValidation",
-          "success": [
-            200
-          ],
-          "failed": [
-            400,
-            404,
-            500
-          ]
-        }
-      ],
-      "pipes": [
-        {
-          "type": "AddContent",
-          "positionVariableExpression": "${position}",
-          "contentKey": "event"
-        }
-      ]
+    "event-document" : {
+      "type" : "Get",
+      "id" : "event-document",
+      "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/${eventId}",
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : [ 200 ],
+        "failed" : [ 400, 404, 500 ]
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "event"
+      } ]
     },
-    "person-document": {
-      "type": "Get",
-      "id": "person-document",
-      "url": "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/personer/${personId}",
-      "responseValidators": [
-        {
-          "type": "HttpStatusValidation",
-          "success": [
-            200
-          ],
-          "failed": [
-            400,
-            404,
-            500
-          ]
-        }
-      ],
-      "pipes": [
-        {
-          "type": "AddContent",
-          "positionVariableExpression": "${position}",
-          "contentKey": "person"
-        }
-      ]
+    "person-document" : {
+      "type" : "Get",
+      "id" : "person-document",
+      "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/personer/${personId}",
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : [ 200 ],
+        "failed" : [ 400, 404, 500 ]
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "person"
+      } ]
     }
   }
 }
