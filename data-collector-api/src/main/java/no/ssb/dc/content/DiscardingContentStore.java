@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class DiscardingContentStore implements ContentStore {
@@ -23,6 +24,7 @@ public class DiscardingContentStore implements ContentStore {
 
     final AtomicReference<String> lastPositionRef = new AtomicReference<>();
     final Map<ContentStateKey, Set<String>> contentBuffers = new ConcurrentHashMap<>();
+    final AtomicBoolean closed = new AtomicBoolean(false);
 
     @Override
     public String lastPosition(String topic) {
@@ -101,6 +103,16 @@ public class DiscardingContentStore implements ContentStore {
         }
     }
 
+    @Override
+    public boolean isClosed() {
+        return closed.get();
+    }
+
+    @Override
+    public void close() throws Exception {
+        closed.set(true);
+    }
+
     MetadataContent getMetadataContent(String topic, String position, String contentKey, byte[] content, MetadataContent.ResourceType resourceType, HttpRequestInfo httpRequestInfo) {
         return new MetadataContent.Builder()
                 .resourceType(resourceType)
@@ -115,10 +127,5 @@ public class DiscardingContentStore implements ContentStore {
                 .requestHeaders(httpRequestInfo.getRequestHeaders())
                 .responseHeaders(httpRequestInfo.getResponseHeaders())
                 .build();
-    }
-
-    @Override
-    public void close() throws Exception {
-
     }
 }
