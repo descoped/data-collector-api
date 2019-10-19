@@ -24,15 +24,15 @@ Business SSL bundles are required for service authentication. The bundles must b
 
 > :key: Cert-bundles can be provided by Team Innsamling.
 
-# Use
+## Use
 
-## Getting available targets
+### Getting available targets
 
 ```
 make
 ```
 
-## Run target
+### Run target
 
 ```
 make TARGET
@@ -40,7 +40,7 @@ make TARGET
 
 > :bulb: tail the running container-log in a separate terminal window.
 
-# Docker Compose Lifecycle
+## Docker Compose Lifecycle
 
 > :warning: only one _target provider_ can be run at a given time!
 
@@ -58,7 +58,7 @@ make TARGET
 |remove-postgres                |Remove postgres                                 |
 |open-postgres-adminer          |Open a web based DB admin tool in your browser  |
 
-## Kafka Stream Provider
+### Kafka Stream Provider
 
 > :warning: The Kafka provider IS NOT a deployment target for MOD Sirius.
 
@@ -71,7 +71,7 @@ make TARGET
 |stop-kafka-clean               |Stop kafka and remove anonymous volumes         |
 |remove-kafka                   |Remove kafka                                    |
 
-## Build Data Collector Dev Image
+### Build Data Collector Dev Image
 
 Dev images requires full checkout of the [data-collector-project](https://github.com/statisticsnorway/data-collector-project) repo.
 
@@ -79,7 +79,7 @@ Dev images requires full checkout of the [data-collector-project](https://github
 |:------------------------------|:-----------------------------------------------|
 |build-data-collector-dev-image |Build data collector dev image                  |
 
-## Postgres Dev Stream Provider
+### Postgres Dev Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
@@ -89,7 +89,7 @@ Dev images requires full checkout of the [data-collector-project](https://github
 |stop-postgres-dev-clean        |Stop postgres-dev and remove anonymous volumes  |
 |remove-postgres-dev            |Remove postgres-dev                             |
 
-## Kafka Dev Stream Provider
+### Kafka Dev Stream Provider
 
 |Target                         |Description                                     |
 |:------------------------------|:-----------------------------------------------|
@@ -99,9 +99,9 @@ Dev images requires full checkout of the [data-collector-project](https://github
 |stop-kafka-dev-clean           |Stop kafka-dev and remove anonymous volumes     |
 |remove-kafka-dev               |Remove kafka-dev                                |
 
-# Rawdata Producer (execute task)
+## Rawdata Producer (execute task)
 
-## Execute consumer specification on running data collector container
+### Execute consumer specification on running data collector container
 
 |Target                         |Supplier     |Description                                     |
 |:------------------------------|:-----------:|:-----------------------------------------------|
@@ -111,11 +111,11 @@ Dev images requires full checkout of the [data-collector-project](https://github
 |collect-tvinn                  |Tolletaten   |Collect tvinn                                   |
 
 
-# Rawdata Consumer
+## Rawdata Consumer
 
 Please refer to the Rawdata Client configuration in `conf/application.properties` for pub/sub details. Also refer to the [Rawdata Client project](https://github.com/statisticsnorway/rawdata-client-project) for technical information.
 
-# References
+## References
 
 * FREG: https://skatteetaten.github.io/folkeregisteret-api-dokumentasjon/oppslag/
 * SIRIUS: https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_skattemelding
