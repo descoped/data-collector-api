@@ -48,67 +48,67 @@ make TARGET
 
 > :bulb: Postgres is a recommended provider for test purposes.
 
-|Target                         |Description                                     |
-|:------------------------------|:-----------------------------------------------|
-|pull-postgres                  |Pull images                                     |
-|start-postgres                 |Start postgres                                  |
-|tail-postgres                  |Tail docker log                                 |
-|stop-postgres                  |Stop postgres                                   |
-|stop-postgres-clean            |Stop postgres and remove anonymous volumes      |
-|remove-postgres                |Remove postgres                                 |
-|open-postgres-adminer          |Open a web based DB admin tool in your browser  |
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| pull-postgres                   | Pull images                                      |
+| start-postgres                  | Start postgres                                   |
+| tail-postgres                   | Tail docker log                                  |
+| stop-postgres                   | Stop postgres                                    |
+| stop-postgres-clean             | Stop postgres and remove anonymous volumes       |
+| remove-postgres                 | Remove postgres                                  |
+| open-postgres-adminer           | Open a web based DB admin tool in your browser   |
 
 ### Kafka Stream Provider
 
 > :warning: The Kafka provider IS NOT a deployment target for MOD Sirius.
 
-|Target                         |Description                                     |
-|:------------------------------|:-----------------------------------------------|
-|pull-kafka                     |Pull images                                     |
-|start-kafka                    |Start kafka                                     |
-|tail-kafka                     |Tail docker log                                 |
-|stop-kafka                     |Stop kafka                                      |
-|stop-kafka-clean               |Stop kafka and remove anonymous volumes         |
-|remove-kafka                   |Remove kafka                                    |
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| pull-kafka                      | Pull images                                      |
+| start-kafka                     | Start kafka                                      |
+| tail-kafka                      | Tail docker log                                  |
+| stop-kafka                      | Stop kafka                                       |
+| stop-kafka-clean                | Stop kafka and remove anonymous volumes          |
+| remove-kafka                    | Remove kafka                                     |
 
 ### Build Data Collector Dev Image
 
 Dev images requires full checkout of the [data-collector-project](https://github.com/statisticsnorway/data-collector-project) repo.
 
-|Target                         |Description                                     |
-|:------------------------------|:-----------------------------------------------|
-|build-data-collector-dev-image |Build data collector dev image                  |
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| build-data-collector-dev-image  | Build data collector dev image                   |
 
 ### Postgres Dev Stream Provider
 
-|Target                         |Description                                     |
-|:------------------------------|:-----------------------------------------------|
-|start-postgres-dev             |Start postgres-dev                              |
-|tail-postgres-dev              |Tail docker log                                 |
-|stop-postgres-dev              |Stop postgres-dev                               |
-|stop-postgres-dev-clean        |Stop postgres-dev and remove anonymous volumes  |
-|remove-postgres-dev            |Remove postgres-dev                             |
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| start-postgres-dev              | Start postgres-dev                               |
+| tail-postgres-dev               | Tail docker log                                  |
+| stop-postgres-dev               | Stop postgres-dev                                |
+| stop-postgres-dev-clean         | Stop postgres-dev and remove anonymous volumes   |
+| remove-postgres-dev             | Remove postgres-dev                              |
 
 ### Kafka Dev Stream Provider
 
-|Target                         |Description                                     |
-|:------------------------------|:-----------------------------------------------|
-|start-kafka-dev                |Start kafka-dev                                 |
-|tail-kafka-dev                 |Tail docker log                                 |
-|stop-kafka-dev                 |Stop kafka-dev                                  |
-|stop-kafka-dev-clean           |Stop kafka-dev and remove anonymous volumes     |
-|remove-kafka-dev               |Remove kafka-dev                                |
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| start-kafka-dev                 | Start kafka-dev                                  |
+| tail-kafka-dev                  | Tail docker log                                  |
+| stop-kafka-dev                  | Stop kafka-dev                                   |
+| stop-kafka-dev-clean            | Stop kafka-dev and remove anonymous volumes      |
+| remove-kafka-dev                | Remove kafka-dev                                 |
 
 ## Rawdata Producer (execute task)
 
 ### Execute consumer specification on running data collector container
 
-|Target                         |Supplier     |Description                                     |
-|:------------------------------|:-----------:|:-----------------------------------------------|
-|collect-freg-playground        |Skatteetaten |Collect freg playground                         |
-|collect-sirius-person-utkast   |Skatteetaten |Collect sirius person utkast                    |
-|collect-sirius-person-fastsatt |Skatteetaten |Collect sirius person fastsatt                  |
-|collect-tvinn                  |Tolletaten   |Collect tvinn                                   |
+| Target                          | Supplier      | Description                                      |
+| :------------------------------ | :-----------: | :----------------------------------------------- |
+| collect-freg-playground         | Skatteetaten  | Collect freg playground                          |
+| collect-sirius-person-utkast    | Skatteetaten  | Collect sirius person utkast                     |
+| collect-sirius-person-fastsatt  | Skatteetaten  | Collect sirius person fastsatt                   |
+| collect-tvinn                   | Tolletaten    | Collect tvinn                                    |
 
 
 ## Rawdata Consumer
