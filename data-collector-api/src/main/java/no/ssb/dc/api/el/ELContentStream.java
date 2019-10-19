@@ -21,4 +21,21 @@ public class ELContentStream {
         LOG.info("Last-position: {}", lastPosition);
         return lastPosition;
     }
+
+    public String lastOrInitialPosition(Long initialPosition) {
+        return lastOrInitialPosition(String.valueOf(initialPosition));
+    }
+
+    public String lastOrInitialPosition(Integer initialPosition) {
+        return lastOrInitialPosition(String.valueOf(initialPosition));
+    }
+
+    public String lastOrInitialPosition(String initialPosition) {
+        if (hasLastPosition()) {
+            return lastPosition();
+        } else {
+            LOG.info("Start-position: {}", initialPosition);
+            return initialPosition;
+        }
+    }
 }
