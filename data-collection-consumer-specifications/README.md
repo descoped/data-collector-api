@@ -1,8 +1,9 @@
 # MOD Data Collection Consumer Specifications
 
-# Intro
 
 This project provides a convenient way to control the lifecycle for different stream provider configurations and makes it easy to execute data collector specifications.
+
+For more information about Data Collector, please refer to the [Data Collector documentation](https://github.com/statisticsnorway/data-collector-project).
 
 ## Pre-requisite
 
