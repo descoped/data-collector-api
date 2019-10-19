@@ -28,13 +28,13 @@ Business SSL bundles are required for service authentication. The bundles must b
 
 ### Getting available targets
 
-```
+```bash
 make
 ```
 
 ### Run target
 
-```
+```bash
 make TARGET
 ```
 
@@ -110,12 +110,11 @@ Dev images requires full checkout of the [data-collector-project](https://github
 | collect-sirius-person-fastsatt  | Skatteetaten  | Collect sirius person fastsatt                   |
 | collect-tvinn                   | Tolletaten    | Collect tvinn                                    |
 
-
 ## Rawdata Consumer
 
 Please refer to the Rawdata Client configuration in `conf/application.properties` for pub/sub details. Also refer to the [Rawdata Client project](https://github.com/statisticsnorway/rawdata-client-project) for technical information.
 
 ## References
 
-* FREG: https://skatteetaten.github.io/folkeregisteret-api-dokumentasjon/oppslag/
-* SIRIUS: https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_skattemelding
+* [FREG documentation](https://skatteetaten.github.io/folkeregisteret-api-dokumentasjon/oppslag/)
+* [SIRIUS documentation](https://skatteetaten.github.io/datasamarbeid-api-dokumentasjon/reference_skattemelding)
