@@ -1,5 +1,6 @@
 # MOD Data Collection Consumer Specifications
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/23e1c75406a744bd919b202f01d9e105)](https://www.codacy.com/manual/oranheim/data-collection-consumer-specifications?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=statisticsnorway/data-collection-consumer-specifications&amp;utm_campaign=Badge_Grade)
 
 This project provides a convenient way to control the lifecycle for different stream provider configurations and makes it easy to execute data collector specifications.
 
