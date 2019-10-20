@@ -28,6 +28,7 @@ module no.ssb.dc.api {
 
     exports no.ssb.dc.api;
     exports no.ssb.dc.api.context;
+    exports no.ssb.dc.api.health;
     exports no.ssb.dc.api.node;
     exports no.ssb.dc.api.node.builder;
     exports no.ssb.dc.api.el;
