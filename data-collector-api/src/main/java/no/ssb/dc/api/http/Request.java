@@ -20,7 +20,8 @@ public interface Request {
         PUT,
         POST,
         GET,
-        DELETE
+        DELETE,
+        OPTIONS;
     }
 
     interface Builder {
