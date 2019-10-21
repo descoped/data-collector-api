@@ -31,6 +31,10 @@ public class SpecificationBuilder extends AbstractBuilder {
         this.startFunctionId = startFunctionId;
     }
 
+    public String name() {
+        return name;
+    }
+
     public SpecificationBuilder configure(ConfigurationBuilder builder) {
         configurationBuilders.add(builder);
         return this;
