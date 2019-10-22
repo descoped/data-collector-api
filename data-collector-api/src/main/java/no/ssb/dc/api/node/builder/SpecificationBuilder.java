@@ -31,7 +31,7 @@ public class SpecificationBuilder extends AbstractBuilder {
         this.startFunctionId = startFunctionId;
     }
 
-    public String name() {
+    public String getName() {
         return name;
     }
 
