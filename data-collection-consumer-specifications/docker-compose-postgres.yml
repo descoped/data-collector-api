@@ -5,7 +5,7 @@ services:
   data-collector-postgres:
     image: $DC_IMAGE
     ports:
-      - 9990:9090
+      - 9990:9990
     volumes:
     - $WORKDIR/profile/$PROFILE/conf:/conf
     - $WORKDIR/certs:/certs
