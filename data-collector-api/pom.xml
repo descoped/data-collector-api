@@ -71,13 +71,13 @@
         <dependency>
             <groupId>no.ssb.spi</groupId>
             <artifactId>service-provider-api</artifactId>
-            <version>0.3</version>
+            <version>0.4</version>
         </dependency>
 
         <dependency>
             <groupId>no.ssb.rawdata</groupId>
             <artifactId>rawdata-client-api</artifactId>
-            <version>0.19</version>
+            <version>0.20</version>
         </dependency>
 
         <dependency>
