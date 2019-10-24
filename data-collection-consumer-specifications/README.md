@@ -109,6 +109,14 @@ Dev images requires full checkout of the [data-collector-project](https://github
 | collect-sirius-person-utkast    | Skatteetaten  | Collect sirius person utkast                     |
 | collect-sirius-person-fastsatt  | Skatteetaten  | Collect sirius person fastsatt                   |
 | collect-tvinn                   | Tolletaten    | Collect tvinn                                    |
+|
+ 
+ ### Management
+
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| list-tasks                      | List tasks                                       |
+| cancel-task                     | Cancel task                                      |
 
 ## Rawdata Consumer
 
