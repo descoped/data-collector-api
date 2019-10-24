@@ -2,8 +2,11 @@ package no.ssb.dc.api.health;
 
 import java.util.Deque;
 import java.util.Map;
+import java.util.Optional;
 
 public interface HealthResource {
+
+    Optional<Boolean> isUp();
 
     String name();
 

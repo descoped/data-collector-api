@@ -5,6 +5,7 @@ import no.ssb.dc.api.content.ContentStore;
 import no.ssb.dc.api.content.ContentStream;
 import no.ssb.dc.api.content.ContentStreamBuffer;
 import no.ssb.dc.api.content.ContentStreamProducer;
+import no.ssb.dc.api.content.HealthContentStreamMonitor;
 import no.ssb.dc.api.content.HttpRequestInfo;
 import no.ssb.dc.api.content.MetadataContent;
 import org.slf4j.Logger;
@@ -101,6 +102,11 @@ public class DiscardingContentStore implements ContentStore {
             lastPositionRef.set(pos);
             contentBuffers.remove(new ContentStateKey(topic, pos));
         }
+    }
+
+    @Override
+    public HealthContentStreamMonitor monitor() {
+        return new HealthContentStreamMonitor(() -> true);
     }
 
     @Override
