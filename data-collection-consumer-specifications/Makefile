@@ -133,32 +133,40 @@ remove-kafka-dev: ## Remove kafka-dev
 
 .PHONY: collect-freg-playground
 collect-freg-playground: ## Collect freg playground
-	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
 
 .PHONY: collect-sirius-person-utkast
 collect-sirius-person-utkast: ## Collect sirius person utkast
-	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json
 
 .PHONY: collect-sirius-person-fastsatt
 collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
-	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
 
 .PHONY: collect-tvinn
 collect-tvinn: ## Collect tvinn
-	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
 
 .PHONY: list-tasks
 list-tasks: ## List running tasks
-	@curl -X GET localhost:${DC_PORT}/task
+	@curl -X GET localhost:${DC_PORT}/task && printf "\n"
 
 .PHONY: cancel-task
 cancel-task: ## Cancel running task 'make cancel-task TASK_ID'
-	@curl -X DELETE localhost:${DC_PORT}/task $1
+	@curl -X DELETE -i localhost:${DC_PORT}/task $1
 
 .PHONY: health
 health: ## Health
 	@curl -X GET localhost:${DC_PORT}/health
 
 .PHONY: health-all
-health-all: ## Health all
+health-all: ## Health show all
 	@curl -X GET localhost:${DC_PORT}/health?all
+
+.PHONY: health-alive
+health-alive: ## Health Alive
+	@curl -X GET -i localhost:${DC_PORT}/health/alive
+
+.PHONY: health-ready
+health-ready: ## Health Ready
+	@curl -X GET -i localhost:${DC_PORT}/health/ready
