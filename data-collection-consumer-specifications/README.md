@@ -117,6 +117,7 @@ Dev images requires full checkout of the [data-collector-project](https://github
 | :------------------------------ | :----------------------------------------------- |
 | list-tasks                      | List tasks                                       |
 | cancel-task                     | Cancel task                                      |
+| health                          | Health task                                      |
 
 ## Rawdata Consumer
 

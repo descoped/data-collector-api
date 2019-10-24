@@ -152,5 +152,13 @@ list-tasks: ## List running tasks
 	@curl -X GET localhost:${DC_PORT}/task
 
 .PHONY: cancel-task
-cancel-task: ## Cabcel running task 'make cancel-task TASK_ID'
+cancel-task: ## Cancel running task 'make cancel-task TASK_ID'
 	@curl -X DELETE localhost:${DC_PORT}/task $1
+
+.PHONY: health
+health: ## Health
+	@curl -X GET localhost:${DC_PORT}/health
+
+.PHONY: health-all
+health-all: ## Health all
+	@curl -X GET localhost:${DC_PORT}/health?all
