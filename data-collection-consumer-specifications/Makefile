@@ -147,3 +147,10 @@ collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
 collect-tvinn: ## Collect tvinn
 	@curl -X PUT localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
 
+.PHONY: list-tasks
+list-tasks: ## List running tasks
+	@curl -X GET localhost:${DC_PORT}/task
+
+.PHONY: cancel-task
+cancel-task: ## Cabcel running task 'make cancel-task TASK_ID'
+	@curl -X DELETE localhost:${DC_PORT}/task $1
