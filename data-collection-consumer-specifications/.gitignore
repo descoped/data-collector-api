@@ -2,6 +2,8 @@
 /*.log
 /*.iml
 
+/target
+
 **/*certs
 **/*certs.tgz
 **/*certs.zip
