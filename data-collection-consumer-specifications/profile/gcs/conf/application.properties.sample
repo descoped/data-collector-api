@@ -1,0 +1,28 @@
+#
+# Data Collector configuration
+#
+
+content.stream.connector=rawdata
+
+data.collector.worker.threads=50
+data.collector.certs.directory=/certs
+
+#
+# Rawdata Client configuration
+#
+
+rawdata.client.provider=gcs
+
+#
+# Rawdata Client GCS configuration
+#
+
+gcs.bucket-name=BUCKET_NAME
+gcs.service-account.key-file=/certs/gcs-secret/gcs_sa_test.json
+gcs.listing.min-interval-seconds=30
+
+local-temp-folder=/tmp/_tmp_avro_
+avro-file.max.seconds=86400
+avro-file.max.bytes=67108864
+avro-file.sync.interval=524288
+

@@ -6,3 +6,4 @@
 **/*certs.tgz
 **/*certs.zip
 
+/profile/gcs/conf/application.properties

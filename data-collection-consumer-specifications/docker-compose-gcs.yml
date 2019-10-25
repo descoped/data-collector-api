@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+
+  data-collector-gcs:
+    image: $DC_IMAGE
+    ports:
+      - 9990:9990
+    volumes:
+    - $WORKDIR/profile/$PROFILE/conf:/conf
+    - $WORKDIR/certs:/certs

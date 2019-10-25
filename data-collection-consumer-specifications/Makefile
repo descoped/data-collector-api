@@ -44,6 +44,39 @@ open-postgres-adminer: ## Open a web based DB admin tool in your browser
 	@open http://localhost:8980/?pgsql=172.17.0.1:15432&username=rdc&db=rdc
 
 #
+# docker-compose gcs
+#
+
+.PHONY: pull-gcs
+pull-gcs: ## Pull images
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-gcs.yml pull
+
+.PHONY: start-gcs
+start-gcs: ## Start gcs
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-gcs.yml up -d
+
+.PHONY: tail-gcs
+tail-gcs: ## Tail gcs
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-gcs.yml logs -f
+
+.PHONY: stop-gcs
+stop-gcs: ## Stop gcs
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-gcs.yml down
+
+.PHONY: stop-gcs-clean
+stop-gcs-clean: ## Stop gcs and remove anonymous volumes
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-gcs.yml down -v
+
+.PHONY: remove-gcs
+remove-gcs: ## Remove gcs
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-gcs.yml rm
+
+.PHONY: open-gcs-adminer
+open-gcs-adminer: ## Open a web based DB admin tool in your browser
+	@open http://localhost:8980/?pgsql=172.17.0.1:15432&username=rdc&db=rdc
+
+
+#
 # docker-compose kafka
 #
 
@@ -102,6 +135,30 @@ stop-postgres-dev-clean: ## Stop postgres-dev and remove anonymous volumes
 .PHONY: remove-postgres-dev
 remove-postgres-dev: ## Remove postgres-dev
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-postgres.yml rm
+
+#
+# docker-compose gcs-dev
+#
+
+.PHONY: start-gcs-dev
+start-gcs-dev: ## Start gcs-dev
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-gcs.yml up -d
+
+.PHONY: tail-gcs-dev
+tail-gcs-dev: ## Tail gcs-dev
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-gcs.yml logs -f
+
+.PHONY: stop-gcs-dev
+stop-gcs-dev: ## Stop gcs-dev
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-gcs.yml down
+
+.PHONY: stop-gcs-dev-clean
+stop-gcs-dev-clean: ## Stop gcs-dev and remove anonymous volumes
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-gcs.yml down -v
+
+.PHONY: remove-gcs-dev
+remove-gcs-dev: ## Remove gcs-dev
+	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-gcs.yml rm
 
 #
 # docker-compose kafka-dev

@@ -58,6 +58,20 @@ make TARGET
 | remove-postgres                 | Remove postgres                                  |
 | open-postgres-adminer           | Open a web based DB admin tool in your browser   |
 
+## GCS Stream Provider
+
+> :bulb: Copy `profile/gcs/conf/application.properties.sample` to `profile/gcs/conf/application.properties` and configure `gcs.bucket-name`. The GCS secret must be placed under `certs/gcs-secret/gcs_sa_test.json`.
+
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| pull-gcs                        | Pull images                                      |
+| start-gcs                       | Start gcs                                        |
+| tail-gcs                        | Tail docker log                                  |
+| stop-gcs                        | Stop gcs                                         |
+| stop-gcs-clean                  | Stop gcs and remove anonymous volumes            |
+| remove-gcs                      | Remove gcs                                       |
+| open-gcs-adminer                | Open a web based DB admin tool in your browser   |
+
 ### Kafka Stream Provider
 
 > :warning: The Kafka provider IS NOT a deployment target for MOD Sirius.
@@ -88,6 +102,18 @@ Dev images requires full checkout of the [data-collector-project](https://github
 | stop-postgres-dev               | Stop postgres-dev                                |
 | stop-postgres-dev-clean         | Stop postgres-dev and remove anonymous volumes   |
 | remove-postgres-dev             | Remove postgres-dev                              |
+
+### GCS Dev Stream Provider
+
+> :bulb: Copy `profile/gcs/conf/application.properties.sample` to `profile/gcs/conf/application.properties` and configure `gcs.bucket-name`. The GCS secret must be placed under `certs/gcs-secret/gcs_sa_test.json`.
+
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| start-gcs-dev                   | Start gcs-dev                                    |
+| tail-gcs-dev                    | Tail docker log                                  |
+| stop-gcs-dev                    | Stop gcs-dev                                     |
+| stop-gcs-dev-clean              | Stop gcs-dev and remove anonymous volumes        |
+| remove-gcs-dev                  | Remove gcs-dev                                   |
 
 ### Kafka Dev Stream Provider
 
