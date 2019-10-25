@@ -9,7 +9,7 @@
       "KonsumentTestURL" : "https://folkeregisteret-api-konsument.sits.no",
       "ProduksjonURL" : "https://folkeregisteret.api.skatteetaten.no",
       "PlaygroundURL" : "https://folkeregisteret-api-konsument-playground.sits.no",
-      "nextSequence" : "${contentStream.hasLastPosition() ? contentStream.lastPosition() : \"1\"}"
+      "nextSequence" : "${cast.toLong(contentStream.lastOrInitialPosition(0)) + 1}"
     },
     "globalState" : {
       "global.topic" : "freg-playground"

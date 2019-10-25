@@ -9,7 +9,7 @@
       "rettighetspakke" : "ssb",
       "hentAntallMeldingerOmGangen" : "100",
       "hendelse" : "fastsatt",
-      "nextSequence" : "${contentStream.hasLastPosition() ? contentStream.lastPosition() : \"1\"}"
+      "nextSequence" : "${cast.toLong(contentStream.lastOrInitialPosition(0)) + 1}"
     },
     "globalState" : {
       "global.topic" : "sirius-person-fastsatt"
