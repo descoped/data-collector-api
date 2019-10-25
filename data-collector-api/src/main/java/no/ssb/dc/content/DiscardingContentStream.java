@@ -27,6 +27,10 @@ public class DiscardingContentStream implements ContentStream {
     }
 
     @Override
+    public void closeAndRemoveProducer(String topic) {
+    }
+
+    @Override
     public void close() throws Exception {
 
     }

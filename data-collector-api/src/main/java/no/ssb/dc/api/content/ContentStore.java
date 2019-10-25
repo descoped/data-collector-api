@@ -22,6 +22,8 @@ public interface ContentStore extends AutoCloseable {
 
     HealthContentStreamMonitor monitor();
 
+    void closeTopic(String topic);
+
     boolean isClosed();
 
 }

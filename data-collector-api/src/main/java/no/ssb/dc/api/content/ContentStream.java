@@ -6,4 +6,5 @@ public interface ContentStream extends AutoCloseable {
 
     ContentStreamProducer producer(String topic);
 
+    void closeAndRemoveProducer(String topic);
 }

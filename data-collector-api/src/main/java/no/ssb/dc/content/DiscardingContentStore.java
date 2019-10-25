@@ -123,6 +123,10 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
+    public void closeTopic(String topic) {
+    }
+
+    @Override
     public void close() throws Exception {
         closed.set(true);
     }
