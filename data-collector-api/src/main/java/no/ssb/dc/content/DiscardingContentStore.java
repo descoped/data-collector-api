@@ -28,6 +28,14 @@ public class DiscardingContentStore implements ContentStore {
     final AtomicBoolean closed = new AtomicBoolean(false);
 
     @Override
+    public void lock(String topic) {
+    }
+
+    @Override
+    public void unlock(String topic) {
+    }
+
+    @Override
     public String lastPosition(String topic) {
         return lastPositionRef.get();
     }

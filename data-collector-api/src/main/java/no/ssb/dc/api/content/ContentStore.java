@@ -4,6 +4,10 @@ import java.util.Set;
 
 public interface ContentStore extends AutoCloseable {
 
+    void lock(String topic);
+
+    void unlock(String topic);
+
     String lastPosition(String topic);
 
     Set<String> contentKeys(String topic, String position);
