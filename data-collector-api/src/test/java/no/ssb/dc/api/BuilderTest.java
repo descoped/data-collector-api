@@ -28,7 +28,7 @@ import static org.testng.Assert.assertNotNull;
 
 public class BuilderTest {
 
-    static final SpecificationBuilder SPECIFICATION_BUILDER = Specification.start("name of flow", "getstartposition")
+    static final SpecificationBuilder SPECIFICATION_BUILDER = Specification.start("test", "name of flow", "getstartposition")
             .configure(context()
                     .variable("foo", "bar")
                     .header("accept", "application/xml")

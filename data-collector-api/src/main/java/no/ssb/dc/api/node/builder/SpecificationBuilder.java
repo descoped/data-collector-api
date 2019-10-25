@@ -19,16 +19,22 @@ public class SpecificationBuilder extends AbstractBuilder {
 
     static final String GLOBAL_CONFIGURATION = "GLOBAL_CONFIGURATION";
 
-    @JsonProperty String name;
-    @JsonProperty String startFunctionId;
+    @JsonProperty("id") final String specificationId;
+    @JsonProperty final String name;
+    @JsonProperty final String startFunctionId;
 
     @JsonProperty("configure") List<ConfigurationBuilder> configurationBuilders = new ArrayList<>();
     @JsonProperty("functions") Map<String, NodeBuilder> nodeBuilderById = new LinkedHashMap<>();
 
-    public SpecificationBuilder(String name, String startFunctionId) {
+    public SpecificationBuilder(String specificationId, String name, String startFunctionId) {
         super(BuilderType.Specification);
+        this.specificationId = specificationId;
         this.name = name;
         this.startFunctionId = startFunctionId;
+    }
+
+    public String id() {
+        return specificationId;
     }
 
     public String getName() {
@@ -66,7 +72,7 @@ public class SpecificationBuilder extends AbstractBuilder {
             buildContext.cacheInstance(nodeBuilderId, nodeInstance);
         }
 
-        return Specification.create(name, configurations, buildContext.getInstance(startFunctionId), buildContext.nodeInstanceById());
+        return Specification.create(specificationId, name, configurations, buildContext.getInstance(startFunctionId), buildContext.nodeInstanceById());
     }
 
     public NodeBuilder get(String nodeId) {
@@ -87,22 +93,24 @@ public class SpecificationBuilder extends AbstractBuilder {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         SpecificationBuilder that = (SpecificationBuilder) o;
-        return name.equals(that.name) &&
+        return specificationId.equals(that.specificationId) &&
+                name.equals(that.name) &&
                 startFunctionId.equals(that.startFunctionId) &&
+                Objects.equals(configurationBuilders, that.configurationBuilders) &&
                 Objects.equals(nodeBuilderById, that.nodeBuilderById);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, startFunctionId, nodeBuilderById);
+        return Objects.hash(super.hashCode(), specificationId, name, startFunctionId, configurationBuilders, nodeBuilderById);
     }
 
     @Override
     public String toString() {
         return "SpecificationBuilder{" +
-                "name='" + name + '\'' +
+                "specificationId='" + specificationId + '\'' +
+                ", name='" + name + '\'' +
                 ", startFunctionId='" + startFunctionId + '\'' +
-                ", nodeBuilderById=" + nodeBuilderById +
                 '}';
     }
 }

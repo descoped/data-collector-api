@@ -58,7 +58,11 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
         Objects.requireNonNull(type);
         switch (type) {
             case Specification: {
-                SpecificationBuilder builder = Specification.start(currentNode.get("name").textValue(), currentNode.get("startFunctionId").textValue());
+                SpecificationBuilder builder = Specification.start(
+                        currentNode.get("id").textValue(),
+                        currentNode.get("name").textValue(),
+                        currentNode.get("startFunctionId").textValue()
+                );
 
                 JsonNode configureNode = currentNode.get("configure");
                 if (configureNode != null) {
