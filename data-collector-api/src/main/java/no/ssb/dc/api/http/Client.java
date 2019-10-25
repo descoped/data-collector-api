@@ -2,6 +2,7 @@ package no.ssb.dc.api.http;
 
 import javax.net.ssl.SSLContext;
 import java.util.ServiceLoader;
+import java.util.concurrent.CompletableFuture;
 
 public interface Client {
 
@@ -14,6 +15,8 @@ public interface Client {
     }
 
     Response send(Request request);
+
+    CompletableFuture<Response> sendAsync(Request request);
 
     Object getDelegate();
 

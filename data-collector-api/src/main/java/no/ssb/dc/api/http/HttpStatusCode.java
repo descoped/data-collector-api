@@ -38,7 +38,7 @@ public enum HttpStatusCode {
     HTTP_BAD_METHOD(405, "Method Not Allowed"),
     HTTP_NOT_ACCEPTABLE(406, "Not Acceptable"),
     HTTP_PROXY_AUTH(407, "Proxy Authentication Required"),
-    HTTP_CLIENT_TIMEOUT(408, "Request Time-Out"),
+    HTTP_CLIENT_TIMEOUT(408, "Request Timeout"),
     HTTP_CONFLICT(409, "Conflict"),
     HTTP_GONE(410, "Gone"),
     HTTP_LENGTH_REQUIRED(411, "Length Required"),
