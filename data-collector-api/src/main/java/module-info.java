@@ -13,12 +13,12 @@ module no.ssb.dc.api {
     requires io.github.classgraph;
     requires de.huxhorn.sulky.ulid;
     requires commons.jexl3;
-    opens no.ssb.dc.api.node.builder to com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.databind;
-    requires com.fasterxml.jackson.core;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires java.xml;
+
+    opens no.ssb.dc.api.node.builder to com.fasterxml.jackson.databind;
 
     uses Client.Builder;
     uses Request.Builder;
