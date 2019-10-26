@@ -2,6 +2,7 @@
   "type" : "Specification",
   "name" : "Collect FREG",
   "startFunctionId" : "loop",
+  "id" : "SKE-FREG",
   "configure" : [ {
     "type" : "SpecificationContext",
     "variables" : {
