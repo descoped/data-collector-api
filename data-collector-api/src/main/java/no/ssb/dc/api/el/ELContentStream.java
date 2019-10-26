@@ -13,12 +13,12 @@ public class ELContentStream {
     }
 
     public boolean hasLastPosition() {
-        return evaluateLastContentStreamPosition.hasLastPosition();
+        return evaluateLastContentStreamPosition.getLastPosition() != null;
     }
 
     public String lastPosition() {
         String lastPosition = evaluateLastContentStreamPosition.getLastPosition();
-        LOG.info("Last-position: {}", lastPosition);
+        if (lastPosition != null) LOG.info("Last-position: {}", lastPosition);
         return lastPosition;
     }
 
@@ -31,7 +31,8 @@ public class ELContentStream {
     }
 
     public String lastOrInitialPosition(String initialPosition) {
-        if (hasLastPosition()) {
+        String lastPosition = lastPosition();
+        if (lastPosition != null) {
             return lastPosition();
         } else {
             LOG.info("Start-position: {}", initialPosition);
