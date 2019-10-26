@@ -1,5 +1,6 @@
 package no.ssb.dc.api.http;
 
+import java.time.Duration;
 import java.util.ServiceLoader;
 
 public interface Request {
@@ -36,6 +37,10 @@ public interface Request {
         Builder DELETE();
 
         Builder header(String name, String value);
+
+        Builder expectContinue(boolean enable);
+
+        Builder timeout(Duration duration);
 
         Request build();
     }
