@@ -47,6 +47,9 @@ public class HealthResourceUtils {
         try {
             Method getServiceMethod = context.services().getClass().getDeclaredMethod("get", Class.class);
             Object monitor = getServiceMethod.invoke(context.services(), Class.forName("no.ssb.dc.core.health.HealthWorkerMonitor"));
+            if (monitor == null) {
+                return;
+            }
             // monitor.contentStream().setLastPosition(String lastPosition)
             Method contentStreamMethod = monitor.getClass().getDeclaredMethod("contentStream");
             Object contentStream = contentStreamMethod.invoke(monitor);
