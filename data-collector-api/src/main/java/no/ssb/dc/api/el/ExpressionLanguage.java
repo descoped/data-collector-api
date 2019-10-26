@@ -2,6 +2,8 @@ package no.ssb.dc.api.el;
 
 import no.ssb.dc.api.content.EvaluateLastContentStreamPosition;
 import no.ssb.dc.api.context.ExecutionContext;
+import no.ssb.dc.api.error.ExecutionException;
+import no.ssb.dc.api.util.CommonUtils;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
 import org.apache.commons.jexl3.JexlEngine;
@@ -66,9 +68,12 @@ public class ExpressionLanguage {
             JexlContext jexlContext = new MapContext(variables);
             initializeJexlFunctions(jexlContext);
             return e.evaluate(jexlContext);
-        } catch (Exception e) {
-            LOG.error("Unable to resolve expr: {}", expr);
+        } catch (RuntimeException | Error e) {
+            LOG.error("Unable to resolve expr: {} in {}\n{}", expr, variables, CommonUtils.captureStackTrace(e));
             throw e;
+        } catch (Exception e) {
+            LOG.error("Unable to resolve expr: {} in {}\n{}", expr, variables, CommonUtils.captureStackTrace(e));
+            throw new ExecutionException(e);
         }
     }
 
