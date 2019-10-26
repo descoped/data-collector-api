@@ -206,11 +206,11 @@ collect-tvinn: ## Collect tvinn
 
 .PHONY: list-tasks
 list-tasks: ## List running tasks
-	@curl -X GET localhost:${DC_PORT}/task && printf "\n"
+	@curl -X GET localhost:${DC_PORT}/tasks && printf "\n"
 
 .PHONY: cancel-task
-cancel-task: ## Cancel running task 'make cancel-task TASK_ID'
-	@curl -X DELETE -i localhost:${DC_PORT}/task $1
+cancel-task: ## Cancel running task 'make cancel-task'
+	@echo "curl -X DELETE -i localhost:${DC_PORT}/task TASK_ID"
 
 .PHONY: health
 health: ## Health
