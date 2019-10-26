@@ -1,5 +1,10 @@
 package no.ssb.dc.api.health;
 
+import no.ssb.dc.api.context.ExecutionContext;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 public class HealthResourceUtils {
 
     public static float divide(long numerator, long denominator) {
@@ -36,5 +41,19 @@ public class HealthResourceUtils {
                 elapsedSeconds,
                 elapsedMillisSeconds
         );
+    }
+
+    public static void updateMonitorLastPosition(ExecutionContext context, String lastPosition) {
+        try {
+            Method getServiceMethod = context.services().getClass().getDeclaredMethod("get", Class.class);
+            Object monitor = getServiceMethod.invoke(context.services(), Class.forName("no.ssb.dc.core.health.HealthWorkerMonitor"));
+            // monitor.contentStream().setLastPosition(String lastPosition)
+            Method contentStreamMethod = monitor.getClass().getDeclaredMethod("contentStream");
+            Object contentStream = contentStreamMethod.invoke(monitor);
+            Method setLastPositionMethod = contentStream.getClass().getDeclaredMethod("setLastPosition", String.class);
+            setLastPositionMethod.invoke(contentStream, lastPosition);
+        } catch (NoSuchMethodException | ClassNotFoundException | IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
