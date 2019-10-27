@@ -210,7 +210,7 @@ list-tasks: ## List running tasks
 
 .PHONY: cancel-task
 cancel-task: ## Cancel running task 'make cancel-task'
-	@echo "curl -X DELETE -i localhost:${DC_PORT}/task TASK_ID"
+	@echo "curl -X DELETE -i localhost:${DC_PORT}/task/TASK_ID"
 
 .PHONY: health
 health: ## Health
