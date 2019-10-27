@@ -33,7 +33,7 @@ public class ELContentStream {
     public String lastOrInitialPosition(String initialPosition) {
         String lastPosition = lastPosition();
         if (lastPosition != null) {
-            return lastPosition();
+            return lastPosition;
         } else {
             LOG.info("Start-position: {}", initialPosition);
             return initialPosition;
