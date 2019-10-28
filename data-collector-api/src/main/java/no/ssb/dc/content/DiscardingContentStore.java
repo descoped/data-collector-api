@@ -114,7 +114,7 @@ public class DiscardingContentStore implements ContentStore {
 
     @Override
     public HealthContentStreamMonitor monitor() {
-        return new HealthContentStreamMonitor(() -> true);
+        return new HealthContentStreamMonitor(() -> true, () -> 0, () -> 0);
     }
 
     @Override

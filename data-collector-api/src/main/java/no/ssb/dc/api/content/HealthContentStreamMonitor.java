@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 public class HealthContentStreamMonitor {
 
     final Supplier<Boolean> contentStreamClosedCallback;
+    private final Supplier<Integer> activePositionCountSupplier;
+    final Supplier<Integer> activeBufferCountSupplier;
 
     final AtomicLong lastSeenTimestampRef = new AtomicLong(0);
 
@@ -36,8 +38,10 @@ public class HealthContentStreamMonitor {
     final AtomicLong lastPublishWriteDurationRef = new AtomicLong(0);
     final AtomicLong aggregatedPublishWriteDurationRef = new AtomicLong(0);
 
-    public HealthContentStreamMonitor(Supplier<Boolean> contentStreamClosedCallback) {
+    public HealthContentStreamMonitor(Supplier<Boolean> contentStreamClosedCallback, Supplier<Integer> activePositionCountSupplier, Supplier<Integer> activeBufferCountSupplier) {
         this.contentStreamClosedCallback = contentStreamClosedCallback;
+        this.activePositionCountSupplier = activePositionCountSupplier;
+        this.activeBufferCountSupplier = activeBufferCountSupplier;
     }
 
     public boolean isUp() {
@@ -120,6 +124,8 @@ public class HealthContentStreamMonitor {
                 Math.round(HealthResourceUtils.divide(documentBufferSizeRef.get(), documentBufferCountRef.get())),
                 lastDocumentBufferWriteDurationRef.get(),
                 Math.round(HealthResourceUtils.divide(aggregatedDocumentBufferWriteDurationRef.get(), documentBufferCountRef.get())),
+                activePositionCountSupplier.get(),
+                activeBufferCountSupplier.get(),
                 publishedBufferCountRef.get(),
                 lastPublishedBufferCountRef.get(),
                 publishedPositionCountRef.get(),
@@ -147,6 +153,8 @@ public class HealthContentStreamMonitor {
         @JsonProperty("last-entry-document-write-duration-millis") public final Long lastDocumentBufferWriteDuration;
         @JsonProperty("avg-entry-document-write-duration-millis") public final Integer averageDocumentBufferWriteDuration;
 
+        @JsonProperty("active-position-count") public final Integer activePositionCount;
+        @JsonProperty("active-buffer-count") public final Integer activeBufferCount;
         @JsonProperty("published-buffer-count") public final Long publishedBufferCount;
         @JsonProperty("last-published-buffer-count") public final Long lastPublishedBufferCount;
         @JsonProperty("published-position-count") public final Long publishedPositionCount;
@@ -166,6 +174,8 @@ public class HealthContentStreamMonitor {
                           Integer averageDocumentBufferSize,
                           Long lastDocumentBufferWriteDuration,
                           Integer averageDocumentBufferWriteDuration,
+                          Integer activePositionCount,
+                          Integer activeBufferCount,
                           Long publishedBufferCount,
                           Long lastPublishedBufferCount,
                           Long publishedPositionCount,
@@ -173,6 +183,8 @@ public class HealthContentStreamMonitor {
                           Integer averagePublishWriteDuration
         ) {
             this.lastSeenTimestamp = lastSeenTimestamp;
+            this.activePositionCount = activePositionCount;
+            this.activeBufferCount = activeBufferCount;
             this.paginationDocumentCount = paginationDocumentCount;
             this.averagePaginationDocumentSize = averagePaginationDocumentSize;
             this.lastPaginationDocumentWriteDuration = lastPaginationDocumentWriteDuration;
