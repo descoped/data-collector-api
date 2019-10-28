@@ -6,6 +6,7 @@ services:
     image: statisticsnorway/data-collector:latest
     ports:
       - 9990:9990
+      - 9992:9992
     volumes:
     - $WORKDIR/profile/$PROFILE/conf:/conf
     - $WORKDIR/certs:/certs
