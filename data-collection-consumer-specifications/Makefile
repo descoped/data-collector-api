@@ -190,26 +190,26 @@ remove-kafka-dev: ## Remove kafka-dev
 
 .PHONY: collect-freg-playground
 collect-freg-playground: ## Collect freg playground
-	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
 
 .PHONY: collect-sirius-person-utkast
 collect-sirius-person-utkast: ## Collect sirius person utkast
-	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json
 
 .PHONY: collect-sirius-person-fastsatt
 collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
-	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
 
 .PHONY: collect-tvinn
 collect-tvinn: ## Collect tvinn
-	@curl -X PUT -i localhost:${DC_PORT}/task -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
 
 .PHONY: list-tasks
 list-tasks: ## List running tasks
 	@curl -X GET localhost:${DC_PORT}/tasks && printf "\n"
 
 .PHONY: cancel-task
-cancel-task: ## Cancel running task 'make cancel-task'
+cancel-task: ## Cancel running tasks 'make cancel-task'
 	@echo "curl -X DELETE -i localhost:${DC_PORT}/task/TASK_ID"
 
 .PHONY: health
