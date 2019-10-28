@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Termination {
 
-    private static final AtomicBoolean terminated = new AtomicBoolean(false);
+    private final AtomicBoolean terminated = new AtomicBoolean(false);
 
     private Termination() {
     }
