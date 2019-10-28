@@ -12,7 +12,9 @@ import org.apache.commons.jexl3.MapContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +41,7 @@ public class ExpressionLanguage {
     }
 
     public ExpressionLanguage(ExecutionContext context) {
-        this.variables = context.variables();
+        this.variables = new LinkedHashMap<>(context.variables());
         this.evaluateLastContentStreamPosition = new EvaluateLastContentStreamPosition(context);
     }
 
@@ -62,17 +64,19 @@ public class ExpressionLanguage {
     }
 
     public Object evaluateExpression(String expr) {
+        AtomicReference<String> expressionRef = new AtomicReference<>();
         try {
             final String expression = (isExpression(expr) ? getExpression(expr) : expr);
+            expressionRef.set(expression);
             JexlExpression e = Jexl.engine().createExpression(expression);
             JexlContext jexlContext = new MapContext(variables);
             initializeJexlFunctions(jexlContext);
             return e.evaluate(jexlContext);
         } catch (RuntimeException | Error e) {
-            LOG.error("Unable to resolve expr: {} in {}\n{}", expr, variables, CommonUtils.captureStackTrace(e));
+            LOG.error("Unable to resolve expr: '{}', exprKey: '{}' in Map: {}\n{}", expr, expressionRef.get(), variables, CommonUtils.captureStackTrace(e));
             throw e;
         } catch (Exception e) {
-            LOG.error("Unable to resolve expr: {} in {}\n{}", expr, variables, CommonUtils.captureStackTrace(e));
+            LOG.error("Unable to resolve expr: '{}', exprKey: '{}' in Map: {}\n{}", expr, expressionRef.get(), variables, CommonUtils.captureStackTrace(e));
             throw new ExecutionException(e);
         }
     }
