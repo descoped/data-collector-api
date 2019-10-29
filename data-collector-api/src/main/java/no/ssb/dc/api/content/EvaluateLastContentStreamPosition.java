@@ -3,7 +3,6 @@ package no.ssb.dc.api.content;
 import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.el.EvaluationException;
 import no.ssb.dc.api.health.HealthResourceUtils;
-import no.ssb.dc.api.util.CommonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +38,8 @@ public class EvaluateLastContentStreamPosition {
             return lastPosition;
 
         } catch (RuntimeException | Error e) {
-            LOG.error("Eval lastPosition error: {}", CommonUtils.captureStackTrace(e));
             throw e;
         } catch (Exception e) {
-            LOG.error("Eval lastPosition error: {}", CommonUtils.captureStackTrace(e));
             throw new EvaluationException(e);
         }
     }

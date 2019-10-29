@@ -2,7 +2,6 @@ package no.ssb.dc.api.el;
 
 import no.ssb.dc.api.content.EvaluateLastContentStreamPosition;
 import no.ssb.dc.api.context.ExecutionContext;
-import no.ssb.dc.api.error.ExecutionException;
 import no.ssb.dc.api.util.CommonUtils;
 import org.apache.commons.jexl3.JexlBuilder;
 import org.apache.commons.jexl3.JexlContext;
@@ -73,11 +72,11 @@ public class ExpressionLanguage {
             initializeJexlFunctions(jexlContext);
             return e.evaluate(jexlContext);
         } catch (RuntimeException | Error e) {
-            LOG.error("Unable to resolve expr: '{}', exprKey: '{}' in Map: {}\n{}", expr, expressionRef.get(), variables, CommonUtils.captureStackTrace(e));
+            LOG.error("Error evaluating expr: '{}', exprKey: '{}' in Map: {}\n{}", expr, expressionRef.get(), variables, CommonUtils.captureStackTrace(e));
             throw e;
         } catch (Exception e) {
-            LOG.error("Unable to resolve expr: '{}', exprKey: '{}' in Map: {}\n{}", expr, expressionRef.get(), variables, CommonUtils.captureStackTrace(e));
-            throw new ExecutionException(e);
+            LOG.error("Error evaluating expr: '{}', exprKey: '{}' in Map: {}\n{}", expr, expressionRef.get(), variables, CommonUtils.captureStackTrace(e));
+            throw new EvaluationException(e);
         }
     }
 
