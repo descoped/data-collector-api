@@ -188,6 +188,12 @@ remove-kafka-dev: ## Remove kafka-dev
 # execute consumer specifications
 #
 
+.PHONY: ping-ske-freg
+ping-ske-freg: ## Ping SKE FREG Playground
+	@ping-ske-freg.sh
+
+#curl --cert $(PWD/certs/ske-test-certs/testauth-public.pem:$(PASSPHRASE) --key `$(PWD/certs/ske-test-certs/testauth-key.pem -kvi -o /dev/null https://folkeregisteret-api-konsument-playground.sits.no/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/feed/?seq=1
+
 .PHONY: collect-freg-playground
 collect-freg-playground: ## Collect freg playground
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
