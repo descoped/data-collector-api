@@ -4,7 +4,7 @@
 
 content.stream.connector=rawdata
 
-data.collector.worker.threads=50
+data.collector.worker.threads=10
 data.collector.certs.directory=/certs
 
 #
