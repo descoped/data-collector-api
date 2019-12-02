@@ -2,6 +2,7 @@
   "type" : "Specification",
   "name" : "Collect Tvinn",
   "startFunctionId" : "loop",
+  "id": "TOLL-TVINN",
   "configure" : [ {
     "type" : "SpecificationContext",
     "variables" : {
