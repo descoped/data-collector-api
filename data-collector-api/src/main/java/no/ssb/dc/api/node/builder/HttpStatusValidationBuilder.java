@@ -31,6 +31,10 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
         return this;
     }
 
+    public HttpStatusValidationBuilder success(Integer statusCode, BodyContainsBuilder bodyContains) {
+        throw new UnsupportedOperationException();
+    }
+
     public HttpStatusValidationBuilder fail(Integer... statusCode) {
         failed.addAll(List.of(statusCode));
         return this;

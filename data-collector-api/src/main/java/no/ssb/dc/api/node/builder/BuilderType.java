@@ -18,7 +18,8 @@ public enum BuilderType {
     AddContent,
     Publish,
     Get,
-    HttpStatusValidation;
+    HttpStatusValidation,
+    HttpResponseBodyContains;
 
     public static BuilderType parse(String name) {
         for (BuilderType builderType : values()) {
