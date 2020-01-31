@@ -5,6 +5,7 @@ import no.ssb.dc.api.node.builder.EvalBuilder;
 import no.ssb.dc.api.node.builder.ExecuteBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
 import no.ssb.dc.api.node.builder.HttpStatusValidationBuilder;
+import no.ssb.dc.api.node.builder.JqPathBuilder;
 import no.ssb.dc.api.node.builder.NextPageBuilder;
 import no.ssb.dc.api.node.builder.PaginateBuilder;
 import no.ssb.dc.api.node.builder.ParallelBuilder;
@@ -80,6 +81,10 @@ public class Builders {
 
     public static XPathBuilder xpath(String expression) {
         return new XPathBuilder(expression);
+    }
+
+    public static JqPathBuilder jqpath(String expression) {
+        return new JqPathBuilder(expression);
     }
 
     public static RegExBuilder regex(QueryBuilder queryBuilder, String expression) {

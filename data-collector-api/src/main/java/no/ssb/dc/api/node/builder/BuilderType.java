@@ -12,6 +12,7 @@ public enum BuilderType {
     Process,
     QueryEval,
     QueryXPath,
+    QueryJqPath,
     QueryRegEx,
     ConditionWhenVariableIsNull,
     AddContent,
