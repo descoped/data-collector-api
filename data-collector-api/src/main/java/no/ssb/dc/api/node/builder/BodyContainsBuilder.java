@@ -5,7 +5,7 @@ import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.BodyContains;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class BodyContainsBuilder extends LeafNodeBuilder {
+public class BodyContainsBuilder extends ResponsePredicateBuilder {
 
     private final QueryBuilder queryBuilder;
     private final String equalToStringLiteral;
