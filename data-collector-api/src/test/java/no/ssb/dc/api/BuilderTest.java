@@ -9,9 +9,11 @@ import no.ssb.dc.api.node.builder.SpecificationBuilder;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
+import static no.ssb.dc.api.Builders.bodyContains;
 import static no.ssb.dc.api.Builders.context;
 import static no.ssb.dc.api.Builders.execute;
 import static no.ssb.dc.api.Builders.get;
+import static no.ssb.dc.api.Builders.jqpath;
 import static no.ssb.dc.api.Builders.nextPage;
 import static no.ssb.dc.api.Builders.paginate;
 import static no.ssb.dc.api.Builders.parallel;
@@ -69,6 +71,9 @@ public class BuilderTest {
                             .pipe(execute("event-doc")
                                     .inputVariable("event-id", xpath("/entry/content/ns2:lagretHendelse/ns2:hendelse/ns2:hendelsesdokument"))
                             )
+                            .pipe(execute("event-doc-404-error")
+                                    .inputVariable("event-id", xpath("/entry/content/ns2:lagretHendelse/ns2:hendelse/ns2:hendelsesdokument"))
+                            )
                             // publish completed position. Sequencing should occur in core
                             .pipe(publish("${position}"))
                     )
@@ -80,6 +85,11 @@ public class BuilderTest {
             )
             .function(get("event-doc")
                     .url("http://com.company/endpoint/event/${event-id}}")
+                    .pipe(process(Processor.class).output("event-id"))
+            )
+            .function(get("event-doc-404-error")
+                    .url("http://com.company/endpoint/event/${event-id}}?404withResponseError")
+                    .validate(status().success(200).success(404, bodyContains(jqpath(".kode"), "SP-002")))
                     .pipe(process(Processor.class).output("event-id"))
             );
 
@@ -99,14 +109,13 @@ public class BuilderTest {
 
         SpecificationBuilder deserialized = Specification.deserialize(serialized, SpecificationBuilder.class);
         assertNotNull(deserialized);
-        System.out.printf("deserialized:%n%s%n", serialized);
+        System.out.printf("deserialized:%n%s%n", deserialized);
 
         assertEquals(actual, deserialized);
 
         Specification end = deserialized.end();
         FlowContext derserializedFlowContext = actual.end().configurations.flowContext();
         assertEquals(actualFlowContext, derserializedFlowContext);
-        ;
     }
 
     @Test
