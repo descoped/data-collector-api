@@ -215,6 +215,10 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return new XPathBuilder(currentNode.get("expression").textValue());
             }
 
+            case QueryJqPath: {
+                return new JqPathBuilder(currentNode.get("expression").textValue());
+            }
+
             case QueryRegEx: {
                 return new RegExBuilder((QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("query")), currentNode.get("expression").textValue());
             }
@@ -263,6 +267,8 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 JsonNode success = currentNode.get("success");
                 if (success != null) {
                     success.forEach(code -> builder.success(code.intValue()));
+                    // TODO {"type":"HttpStatusValidation","success":{"200":[],"404":[{"type":"HttpResponseBodyContains"}]}}
+                    // TODO traverse HttpResponseBodyContains
                 }
 
                 JsonNode failed = currentNode.get("failed");

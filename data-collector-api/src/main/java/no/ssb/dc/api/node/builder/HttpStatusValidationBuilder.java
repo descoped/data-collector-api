@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.http.HttpStatusCode;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.HttpStatusValidation;
+import no.ssb.dc.api.node.ResponsePredicate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,7 +57,13 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
 
     @Override
     public <R extends Base> R build(BuildContext buildContext) {
-        return (R) new HttpStatusValidationNode(success, failed);
+        Map<HttpStatusCode, List<ResponsePredicate>> successMap = new LinkedHashMap<>();
+        for (Map.Entry<Integer, List<ResponsePredicateBuilder>> entry : success.entrySet()) {
+            List<ResponsePredicate> responsePredicateList = entry.getValue().stream()
+                    .map(builder -> (ResponsePredicate) builder.build(buildContext)).collect(Collectors.toList());
+            successMap.computeIfAbsent(HttpStatusCode.valueOf(entry.getKey()), list -> new ArrayList<>()).addAll(responsePredicateList);
+        }
+        return (R) new HttpStatusValidationNode(successMap, failed);
     }
 
     @Override
@@ -76,16 +83,16 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
 
     static class HttpStatusValidationNode extends LeafNode implements HttpStatusValidation {
 
-        final Map<HttpStatusCode, List<ResponsePredicateBuilder>> success;
+        final Map<HttpStatusCode, List<ResponsePredicate>> success;
         final List<HttpStatusCode> failed;
 
-        HttpStatusValidationNode(Map<Integer, List<ResponsePredicateBuilder>> success, List<Integer> failed) {
-            this.success = success.entrySet().stream().collect(Collectors.toMap(e -> HttpStatusCode.valueOf(e.getKey()), Map.Entry::getValue, (x, y) -> y, LinkedHashMap::new));
+        HttpStatusValidationNode(Map<HttpStatusCode, List<ResponsePredicate>> success, List<Integer> failed) {
+            this.success = success;
             this.failed = failed.stream().map(HttpStatusCode::valueOf).collect(Collectors.toList());
         }
 
         @Override
-        public Map<HttpStatusCode, List<ResponsePredicateBuilder>> success() {
+        public Map<HttpStatusCode, List<ResponsePredicate>> success() {
             return success;
         }
 
