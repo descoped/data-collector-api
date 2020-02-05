@@ -8,7 +8,6 @@ import no.ssb.dc.api.node.HttpStatusValidation;
 import no.ssb.dc.api.node.ResponsePredicate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,7 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
 
     public HttpStatusValidationBuilder success(Integer... statusCode) {
         for (int sc : statusCode) {
-            success.put(sc, Collections.emptyList());
+            success.put(sc, new ArrayList<>());
         }
         return this;
     }
@@ -35,13 +34,13 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
     public HttpStatusValidationBuilder success(Integer fromStatusCodeInclusive, Integer toStatusCodeInclusive) {
         List<Integer> statusCodes = HttpStatusCode.range(fromStatusCodeInclusive, toStatusCodeInclusive).stream().map(HttpStatusCode::statusCode).collect(Collectors.toList());
         for (int sc : statusCodes) {
-            success.put(sc, Collections.emptyList());
+            success.put(sc, new ArrayList<>());
         }
         return this;
     }
 
-    public HttpStatusValidationBuilder success(Integer statusCode, BodyContainsBuilder bodyContains) {
-        success.computeIfAbsent(statusCode, list -> new ArrayList<>()).add(bodyContains);
+    public HttpStatusValidationBuilder success(Integer statusCode, ResponsePredicateBuilder responsePredicateBuilder) {
+        success.computeIfAbsent(statusCode, list -> new ArrayList<>()).add(responsePredicateBuilder);
         return this;
     }
 

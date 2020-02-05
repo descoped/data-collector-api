@@ -9,6 +9,6 @@ public abstract class ResponsePredicateBuilder extends LeafNodeBuilder {
         super(type);
     }
 
-    abstract static class ResponsePredicateNode implements ResponsePredicate {
+    abstract static class ResponsePredicateNode extends AbstractBaseNode implements ResponsePredicate {
     }
 }

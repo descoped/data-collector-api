@@ -1,5 +1,6 @@
 package no.ssb.dc.api.node.builder;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.BodyContains;
@@ -10,8 +11,8 @@ import java.util.Objects;
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class BodyContainsBuilder extends ResponsePredicateBuilder {
 
-    private final QueryBuilder queryBuilder;
-    private final String equalToStringLiteral;
+    @JsonProperty QueryBuilder queryBuilder;
+    @JsonProperty String equalToStringLiteral;
 
     public BodyContainsBuilder(QueryBuilder queryBuilder, String equalToStringLiteral) {
         super(BuilderType.HttpResponseBodyContains);

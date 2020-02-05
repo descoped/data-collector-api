@@ -91,7 +91,8 @@ public class BuilderTest {
                     .url("http://com.company/endpoint/event/${event-id}}?404withResponseError")
                     .validate(status().success(200).success(404, bodyContains(jqpath(".kode"), "SP-002")))
                     .pipe(process(Processor.class).output("event-id"))
-            );
+            )
+            ;
 
     @Ignore
     @Test

@@ -264,23 +264,37 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
             case HttpStatusValidation: {
                 HttpStatusValidationBuilder builder = new HttpStatusValidationBuilder();
 
-                JsonNode success = currentNode.get("success");
-                if (success != null) {
-                    success.forEach(code -> builder.success(code.intValue()));
-                    // TODO {"type":"HttpStatusValidation","success":{"200":[],"404":[{"type":"HttpResponseBodyContains"}]}}
-                    // TODO traverse HttpResponseBodyContains
+                JsonNode successNode = currentNode.get("success");
+                // {"type":"HttpStatusValidation","success":{"200":[],"404":[{"type":"HttpResponseBodyContains","queryBuilder":{"type":"QueryJqPath","expression":".kode"},"equalToStringLiteral":"SP-002"}]}}
+                if (successNode != null) {
+                    successNode.forEach(codeNode -> {
+                        builder.success(codeNode.intValue());
+                        codeNode.forEach(statusResponseBodyNode -> {
+                            ResponsePredicateBuilder responsePredicateBuilder = (ResponsePredicateBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, statusResponseBodyNode);
+                            builder.success(codeNode.intValue(), responsePredicateBuilder);
+                        });
+                    });
                 }
 
-                JsonNode failed = currentNode.get("failed");
-                if (failed != null) {
-                    failed.forEach(code -> builder.fail(code.intValue()));
+                JsonNode failedNode = currentNode.get("failed");
+                if (failedNode != null) {
+                    failedNode.forEach(code -> builder.fail(code.intValue()));
                 }
 
                 return builder;
             }
+
+            case HttpResponseBodyContains: {
+                QueryBuilder queryBuilder = (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("queryBuilder"));
+                String equalToStringLiteral = currentNode.get("equalToStringLiteral").asText();
+                return new BodyContainsBuilder(queryBuilder, equalToStringLiteral);
+            }
+
+            default: {
+                throw new UnsupportedOperationException("NodeBuilder type '" + type + "' NOT supported!");
+            }
         }
 
-        throw new UnsupportedOperationException("NodeBuilder type '" + type + "' NOT supported!");
     }
 
 }
