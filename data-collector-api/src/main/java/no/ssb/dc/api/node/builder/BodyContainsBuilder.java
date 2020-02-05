@@ -41,6 +41,14 @@ public class BodyContainsBuilder extends ResponsePredicateBuilder {
         return Objects.hash(super.hashCode(), queryBuilder, equalToStringLiteral);
     }
 
+    @Override
+    public String toString() {
+        return "BodyContainsBuilder{" +
+                "queryBuilder=" + queryBuilder +
+                ", equalToStringLiteral='" + equalToStringLiteral + '\'' +
+                '}';
+    }
+
     class BodyContainsNode extends LeafNode implements BodyContains {
 
         private final Query query;

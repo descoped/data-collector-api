@@ -10,7 +10,9 @@ import no.ssb.dc.api.Specification;
 
 import java.io.IOException;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -266,13 +268,15 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
 
                 JsonNode successNode = currentNode.get("success");
                 // {"type":"HttpStatusValidation","success":{"200":[],"404":[{"type":"HttpResponseBodyContains","queryBuilder":{"type":"QueryJqPath","expression":".kode"},"equalToStringLiteral":"SP-002"}]}}
-                if (successNode != null) {
-                    successNode.forEach(codeNode -> {
-                        builder.success(codeNode.intValue());
-                        codeNode.forEach(statusResponseBodyNode -> {
-                            ResponsePredicateBuilder responsePredicateBuilder = (ResponsePredicateBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, statusResponseBodyNode);
-                            builder.success(codeNode.intValue(), responsePredicateBuilder);
-                        });
+                for (Iterator<Map.Entry<String, JsonNode>> it = successNode.fields(); it.hasNext(); ) {
+                    Map.Entry<String, JsonNode> elementNode = it.next();
+
+                    int statusCode = Integer.parseInt(elementNode.getKey());
+
+                    builder.success(statusCode);
+                    elementNode.getValue().forEach(responsePredicateNode -> {
+                        ResponsePredicateBuilder responsePredicateBuilder = (ResponsePredicateBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, responsePredicateNode);
+                        builder.success(statusCode, responsePredicateBuilder);
                     });
                 }
 

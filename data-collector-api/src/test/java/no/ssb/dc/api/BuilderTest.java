@@ -2,12 +2,20 @@ package no.ssb.dc.api;
 
 import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.node.FlowContext;
+import no.ssb.dc.api.node.builder.BodyContainsBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
+import no.ssb.dc.api.node.builder.JqPathBuilder;
 import no.ssb.dc.api.node.builder.NodeBuilder;
 import no.ssb.dc.api.node.builder.PaginateBuilder;
+import no.ssb.dc.api.node.builder.ResponsePredicateBuilder;
 import no.ssb.dc.api.node.builder.SpecificationBuilder;
 import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import static no.ssb.dc.api.Builders.bodyContains;
 import static no.ssb.dc.api.Builders.context;
@@ -98,6 +106,20 @@ public class BuilderTest {
     @Test
     public void printExecutionPlan() {
         System.out.printf("Execution-plan:%n%n%s%n", SPECIFICATION_BUILDER.end().startFunction().toPrintableExecutionPlan());
+    }
+
+    @Test
+    public void testMapWithListCompare() {
+        Map<Integer, List<ResponsePredicateBuilder>> m1 = new LinkedHashMap<>();
+        Map<Integer, List<ResponsePredicateBuilder>> m2 = new LinkedHashMap<>();
+
+        BodyContainsBuilder bodyContainsBuilder1 = new BodyContainsBuilder(new JqPathBuilder(".kode"), "CODE-01");
+        BodyContainsBuilder bodyContainsBuilder2 = new BodyContainsBuilder(new JqPathBuilder(".kode"), "CODE-01");
+
+        m1.computeIfAbsent(1, list -> new ArrayList<>()).add(bodyContainsBuilder1);
+        m2.computeIfAbsent(1, list -> new ArrayList<>()).add(bodyContainsBuilder2);
+
+        assertEquals(m1, m2);
     }
 
     @Test
