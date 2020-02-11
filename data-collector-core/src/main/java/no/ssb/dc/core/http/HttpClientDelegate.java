@@ -3,9 +3,13 @@ package no.ssb.dc.core.http;
 import no.ssb.dc.api.http.Client;
 import no.ssb.dc.api.http.Request;
 import no.ssb.dc.api.http.Response;
+import no.ssb.dc.api.util.CommonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
+import javax.net.ssl.X509TrustManager;
 import java.io.IOException;
 import java.net.Authenticator;
 import java.net.ProxySelector;
@@ -17,6 +21,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 public class HttpClientDelegate implements Client {
+
+    private static final Logger LOG = LoggerFactory.getLogger(HttpClientDelegate.class);
 
     final HttpClient httpClient;
 
@@ -44,6 +50,9 @@ public class HttpClientDelegate implements Client {
                     Response.Builder responseBuilder = Response.newResponseBuilder();
                     responseBuilder.delegate(httpResponse);
                     return responseBuilder.build();
+                }).exceptionally(throwable -> {
+                    LOG.error("HTTP-CLIENT-ERROR ------------------------------------------------------------------\n%s", CommonUtils.captureStackTrace(throwable));
+                    throw new RuntimeException(throwable);
                 });
     }
 
@@ -59,6 +68,7 @@ public class HttpClientDelegate implements Client {
         private Authenticator authenticator;
         private SSLContext sslContext;
         private SSLParameters sslParameters;
+        private X509TrustManager trustManager; // unused for Java 11 HttpClient
         private Executor executor;
         private Duration duration;
         private Redirect redirectPolicy;
@@ -91,6 +101,12 @@ public class HttpClientDelegate implements Client {
         @Override
         public Builder sslParameters(SSLParameters sslParameters) {
             this.sslParameters = sslParameters;
+            return this;
+        }
+
+        @Override
+        public Builder x509TrustManager(X509TrustManager trustManager) {
+            this.trustManager = trustManager;
             return this;
         }
 
