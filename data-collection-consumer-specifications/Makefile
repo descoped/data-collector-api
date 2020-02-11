@@ -206,9 +206,13 @@ collect-sirius-person-utkast: ## Collect sirius person utkast
 collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
 
-.PHONY: collect-tvinn
-collect-tvinn: ## Collect tvinn
+.PHONY: collect-tvinn-test
+collect-tvinn-test: ## Collect tvinn Test
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/toll-tvinn-test-spec.json
+
+.PHONY: collect-tvinn-api-test
+collect-tvinn-api-test: ## Collect tvinn API-test
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/toll-tvinn-api-test-spec.json
 
 .PHONY: list-tasks
 list-tasks: ## List running tasks

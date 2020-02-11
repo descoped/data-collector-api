@@ -1,0 +1,95 @@
+{
+  "type" : "Specification",
+  "name" : "Collect Tvinn",
+  "startFunctionId" : "loop",
+  "id": "TOLL-TVINN",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "TestURL" : "https://api-test.toll.no",
+      "ProduksjonURL" : "https://mp-sit.toll.no",
+      "nextMarker" : "${contentStream.hasLastPosition() ? contentStream.lastPosition() : \"last\"}"
+    },
+    "globalState" : {
+      "global.topic" : "tvinn-test"
+    },
+    "headers" : {
+      "Content-Type" : [ "application/xml" ]
+    }
+  }, {
+    "type" : "Security",
+    "bundleName" : "toll-test-certs"
+  } ],
+  "functions" : {
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromMarker" : "${nextMarker}"
+      },
+      "threshold" : 150,
+      "addPageContent" : true,
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "event-list"
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextMarker"
+      }
+    },
+    "event-list" : {
+      "type" : "Get",
+      "id" : "event-list",
+      "url" : "${TestURL}/api/declaration/declaration-clearance-feed/atom?marker=${fromMarker}&limit=25&direction=forward",
+      "returnVariables" : [ "nextMarker" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : [ 200 ]
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "expectedQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/entry/id"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextMarker" : {
+            "type" : "QueryRegEx",
+            "expression" : "(?<=[?&]marker=)[^&]*",
+            "query" : {
+              "type" : "QueryXPath",
+              "expression" : "/feed/link[@rel=\"previous\"]/@href"
+            }
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryXPath",
+            "expression" : "/entry/id"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    }
+  }
+}
