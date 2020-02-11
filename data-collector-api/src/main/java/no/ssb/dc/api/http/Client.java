@@ -2,6 +2,7 @@ package no.ssb.dc.api.http;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLParameters;
+import javax.net.ssl.X509TrustManager;
 import java.net.Authenticator;
 import java.net.ProxySelector;
 import java.time.Duration;
@@ -59,6 +60,8 @@ public interface Client {
 
         Builder sslParameters(SSLParameters sslParameters);
 
+        Builder x509TrustManager(X509TrustManager trustManager);
+
         Builder executor(Executor executor);
 
         Builder connectTimeout(Duration duration);
@@ -66,7 +69,6 @@ public interface Client {
         Builder followRedirects(Redirect policy);
 
         Builder proxy(ProxySelector proxySelector);
-
 
         Client build();
     }
