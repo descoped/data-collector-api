@@ -47,7 +47,9 @@
       "returnVariables" : [ "nextSequence" ],
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
-        "success" : [ 200 ],
+        "success" : {
+          "200" : [ ]
+        },
         "failed" : [ 400, 404, 500 ]
       } ],
       "pipes" : [ {
@@ -114,7 +116,9 @@
       "url" : "${baseURL}/api/formueinntekt/skattemelding/${hendelse}/${rettighetspakke}/${year}/${utkastIdentifikator}",
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
-        "success" : [ 200 ],
+        "success" : {
+          "200" : [ ]
+        },
         "failed" : [ 400, 404, 500 ]
       } ],
       "pipes" : [ {

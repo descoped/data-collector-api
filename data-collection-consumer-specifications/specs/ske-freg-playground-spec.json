@@ -47,7 +47,9 @@
       "returnVariables" : [ "nextSequence" ],
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
-        "success" : [ 200 ],
+        "success" : {
+          "200" : [ ]
+        },
         "failed" : [ 400, 404, 500 ]
       } ],
       "pipes" : [ {
@@ -118,7 +120,9 @@
       "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/${eventId}",
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
-        "success" : [ 200 ],
+        "success" : {
+          "200" : [ ]
+        },
         "failed" : [ 400, 404, 500 ]
       } ],
       "pipes" : [ {
@@ -133,7 +137,9 @@
       "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/personer/${personId}",
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
-        "success" : [ 200 ],
+        "success" : {
+          "200" : [ ]
+        },
         "failed" : [ 400, 404, 500 ]
       } ],
       "pipes" : [ {

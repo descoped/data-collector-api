@@ -45,7 +45,9 @@
       "returnVariables" : [ "nextMarker" ],
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
-        "success" : [ 200 ]
+        "success" : {
+          "200" : [ ]
+        }
       } ],
       "pipes" : [ {
         "type" : "Sequence",
