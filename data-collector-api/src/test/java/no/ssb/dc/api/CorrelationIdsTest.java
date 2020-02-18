@@ -1,11 +1,11 @@
 package no.ssb.dc.api;
 
 import no.ssb.dc.api.context.ExecutionContext;
-import org.testng.annotations.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import static org.testng.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class CorrelationIdsTest {
 
