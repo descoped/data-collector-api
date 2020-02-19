@@ -10,6 +10,7 @@ services:
     volumes:
     - $WORKDIR/profile/$PROFILE/conf:/conf
     - $WORKDIR/certs:/certs
+    #- /Volumes/SSB BusinessSSL/certs:/certs
     depends_on:
       - dc-postgres-db
 
