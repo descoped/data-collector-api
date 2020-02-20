@@ -47,12 +47,12 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void addPaginationDocument(String topic, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
+    public void addPaginationDocument(String topic, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
         ContentStream contentStream = new DiscardingContentStream();
         ContentStreamProducer producer = contentStream.producer(topic + "-pages");
         ContentStreamBuffer.Builder bufferBuilder = producer.builder();
 
-        String position = httpRequestInfo.getCorrelationIds().first().toString();
+        //String position = httpRequestInfo.getCorrelationIds().first().toString();
         MetadataContent manifest = getMetadataContent(topic + "-pages", position, contentKey, content, MetadataContent.ResourceType.PAGE, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
             LOG.trace("Buffer Page: {}", manifest.toJSON());

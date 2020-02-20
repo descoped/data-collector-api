@@ -11,6 +11,8 @@ public interface Paginate extends NodeWithId {
 
     boolean addPageContent();
 
+    String positionVariable();
+
     List<Execute> targets();
 
     int threshold();

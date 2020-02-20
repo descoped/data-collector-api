@@ -124,7 +124,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 currentNode.get("variables").fields().forEachRemaining(entry -> builder.variable(entry.getKey(), entry.getValue().textValue()));
 
                 if (currentNode.has("addPageContent") && currentNode.get("addPageContent").asBoolean()) {
-                    builder.addPageContent();
+                    builder.addPageContent(currentNode.get("positionVariable").textValue());
                 }
 
                 currentNode.get("iterate").forEach(child -> builder.iterate((ExecuteBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, child)));

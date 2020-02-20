@@ -12,7 +12,7 @@ public interface ContentStore extends AutoCloseable {
 
     Set<String> contentKeys(String topic, String position);
 
-    void addPaginationDocument(String topic, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo);
+    void addPaginationDocument(String topic, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo);
 
     void bufferPaginationEntryDocument(String topic, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo);
 

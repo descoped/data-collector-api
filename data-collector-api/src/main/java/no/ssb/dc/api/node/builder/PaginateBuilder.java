@@ -25,6 +25,7 @@ public class PaginateBuilder extends NodeWithIdBuilder {
     @JsonProperty int threshold;
     @JsonProperty("until") ConditionBuilder conditionBuilder;
     @JsonProperty boolean addPageContent;
+    @JsonProperty String positionVariable;
 
     PaginateBuilder() {
         super(BuilderType.Paginate);
@@ -55,7 +56,8 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         return this;
     }
 
-    public PaginateBuilder addPageContent() {
+    public PaginateBuilder addPageContent(String positionVariable) {
+        this.positionVariable = positionVariable;
         this.addPageContent = true;
         return this;
     }
@@ -72,7 +74,7 @@ public class PaginateBuilder extends NodeWithIdBuilder {
 
         ConditionBuilder.ConditionNode conditionNode = conditionBuilder.build(buildContext);
 
-        return (R) new PaginateNode(getId(), buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), variables, addPageContent, executeNodeList, threshold, conditionNode);
+        return (R) new PaginateNode(getId(), buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), variables, addPageContent, positionVariable, executeNodeList, threshold, conditionNode);
     }
 
     @Override
@@ -81,27 +83,29 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
         PaginateBuilder that = (PaginateBuilder) o;
-        return Double.compare(that.threshold, threshold) == 0 &&
+        return threshold == that.threshold &&
                 addPageContent == that.addPageContent &&
-                Objects.equals(variables, that.variables) &&
-                Objects.equals(children, that.children) &&
-                Objects.equals(conditionBuilder, that.conditionBuilder);
+                variables.equals(that.variables) &&
+                children.equals(that.children) &&
+                Objects.equals(conditionBuilder, that.conditionBuilder) &&
+                Objects.equals(positionVariable, that.positionVariable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), variables, children, threshold, conditionBuilder, addPageContent);
+        return Objects.hash(super.hashCode(), variables, children, threshold, conditionBuilder, addPageContent, positionVariable);
     }
 
     @Override
     public String toString() {
         return "PaginateBuilder{" +
-                "id='" + id + '\'' +
-                ", variables=" + variables +
+                "variables=" + variables +
                 ", children=" + children +
                 ", threshold=" + threshold +
                 ", conditionBuilder=" + conditionBuilder +
                 ", addPageContent=" + addPageContent +
+                ", positionVariable='" + positionVariable + '\'' +
+                ", id='" + id + '\'' +
                 '}';
     }
 
@@ -109,14 +113,16 @@ public class PaginateBuilder extends NodeWithIdBuilder {
 
         final Map<String, String> variables;
         final boolean addPageContent;
+        final String positionVariable;
         final List<Execute> children;
         final int threshold;
         final ConditionBuilder.ConditionNode conditionNode;
 
-        PaginateNode(String id, Configurations configurations, Map<String, String> variables, boolean addPageContent, List<Execute> children, int threshold, ConditionBuilder.ConditionNode conditionNode) {
+        PaginateNode(String id, Configurations configurations, Map<String, String> variables, boolean addPageContent, String positionVariable, List<Execute> children, int threshold, ConditionBuilder.ConditionNode conditionNode) {
             super(configurations, id);
             this.variables = variables;
             this.addPageContent = addPageContent;
+            this.positionVariable = positionVariable;
             this.children = children;
             this.threshold = threshold;
             this.conditionNode = conditionNode;
@@ -135,6 +141,11 @@ public class PaginateBuilder extends NodeWithIdBuilder {
         @Override
         public boolean addPageContent() {
             return addPageContent;
+        }
+
+        @Override
+        public String positionVariable() {
+            return positionVariable;
         }
 
         @Override
@@ -163,26 +174,28 @@ public class PaginateBuilder extends NodeWithIdBuilder {
             if (o == null || getClass() != o.getClass()) return false;
             PaginateNode that = (PaginateNode) o;
             return addPageContent == that.addPageContent &&
-                    Double.compare(that.threshold, threshold) == 0 &&
-                    Objects.equals(variables, that.variables) &&
-                    Objects.equals(children, that.children) &&
+                    threshold == that.threshold &&
+                    variables.equals(that.variables) &&
+                    Objects.equals(positionVariable, that.positionVariable) &&
+                    children.equals(that.children) &&
                     Objects.equals(conditionNode, that.conditionNode);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(variables, addPageContent, children, threshold, conditionNode);
+            return Objects.hash(variables, addPageContent, positionVariable, children, threshold, conditionNode);
         }
 
         @Override
         public String toString() {
             return "PaginateNode{" +
-                    "id='" + id + '\'' +
-                    ", variables=" + variables +
+                    "variables=" + variables +
                     ", addPageContent=" + addPageContent +
+                    ", positionVariable='" + positionVariable + '\'' +
                     ", children=" + children +
                     ", threshold=" + threshold +
                     ", conditionNode=" + conditionNode +
+                    ", id='" + id + '\'' +
                     '}';
         }
     }
