@@ -31,6 +31,7 @@
       },
       "threshold" : 150,
       "addPageContent" : true,
+      "positionVariable" : "fromSequence",
       "iterate" : [ {
         "type" : "Execute",
         "executeId" : "parts"
@@ -117,7 +118,22 @@
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
         "success" : {
-          "200" : [ ]
+          "200" : [ ],
+          "404" : [ {
+            "type" : "HttpResponseBodyContains",
+            "queryBuilder" : {
+              "type" : "QueryXPath",
+              "expression" : "/feil/kode"
+            },
+            "equalToStringLiteral" : "SM-004"
+          }, {
+            "type" : "HttpResponseBodyContains",
+            "queryBuilder" : {
+              "type" : "QueryXPath",
+              "expression" : "/feil/kode"
+            },
+            "equalToStringLiteral" : "SM-005"
+          } ]
         },
         "failed" : [ 400, 404, 500 ]
       } ],
