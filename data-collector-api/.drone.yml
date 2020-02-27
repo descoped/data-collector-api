@@ -31,12 +31,22 @@ steps:
   - name: build
     image: maven:3-jdk-11
     commands:
-      - mvn clean verify -U -P ssb-bip,coverage -Dmaven.repo.local=/drone/src/.m2/repository --no-transfer-progress --batch-mode --global-settings settings.xml
+      - mvn clean verify -U -P ssb-bip -Dmaven.repo.local=/drone/src/.m2/repository --no-transfer-progress --batch-mode --global-settings settings.xml
     environment:
       MAVEN_OPTS: -Djdk.tls.client.protocols="TLSv1.2"
     depends_on:
       - authenticate
       - restore-cache
+
+  - name: test
+    image: maven:3-jdk-11
+    commands:
+      - mvn verify test -P ssb-bip,coverage -Dmaven.repo.local=/drone/src/.m2/repository --batch-mode --global-settings settings.xml
+    environment:
+      MAVEN_HOME: /drone/src/.m2
+      M2_HOME: /drone/src/.m2
+    depends_on:
+      - build
 
   - name: publish-maven
     image: maven:3-jdk-11-slim
@@ -100,7 +110,7 @@ steps:
       CODECOV_TOKEN:
         from_secret: codecov_token
     depends_on:
-      - build
+      - test
 
   - name: codecov-plugin
     image: plugins/codecov
@@ -108,7 +118,7 @@ steps:
       token:
         from_secret: codecov_token
     depends_on:
-      - build
+      - test
 
   - name: codacy
     image: maven:3-jdk-11
@@ -120,7 +130,7 @@ steps:
       CODACY_PROJECT_TOKEN:
         from_secret: codacy_token
     depends_on:
-      - build
+      - test
 
   - name: code-analysis
     image: aosapps/drone-sonar-plugin
