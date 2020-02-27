@@ -53,6 +53,9 @@ public class Configurations {
             return this;
         }
 
+        /**
+         * TODO: this is a negative side-state-effect induced by Worker.WorkerBuilder -> FlowContext. Counter measurers should not be necessary.
+         */
         void createDefaultConfigurationIfAbsent() {
             if (!configurationMap.containsKey(FlowContext.class)) {
                 SpecificationContextBuilder specificationContextBuilder = new SpecificationContextBuilder();
