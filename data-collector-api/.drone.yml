@@ -37,6 +37,7 @@ steps:
       M2_HOME: /drone/src/.m2
     depends_on:
       - authenticate
+      - restore-cache
 
   - name: test
     image: maven:3-jdk-11
