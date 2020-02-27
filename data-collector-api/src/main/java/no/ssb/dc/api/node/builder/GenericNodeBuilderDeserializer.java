@@ -11,21 +11,23 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 // https://github.com/statisticsnorway/json-stat.java/blob/master/src/main/java/no/ssb/jsonstat/v2/deser/DimensionDeserializer.java
-public class GenericNodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
+public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeBuilderDeserializer.Element.Builder> {
 
     protected GenericNodeBuilderDeserializer() {
         super(AbstractBuilder.class);
     }
 
     @Override
-    public AbstractBuilder deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
+    public Element.Builder deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
+        Element.Builder elementBuilder = new Element.Builder();
+
         StringBuilder builder = new StringBuilder();
 
-        handleNode(0, parser, context, builder);
+        handleNode(0, parser, context, elementBuilder, builder);
 
         System.out.printf("builder:%n%s%n", builder.toString());
 
-        return null;
+        return elementBuilder;
     }
 
     String indent(int depth) {
@@ -36,7 +38,7 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<AbstractBuil
         return builder.append(indent(depth)).append(String.format("(%s)", depth));
     }
 
-    void handleNode(int depth, JsonParser parser, DeserializationContext context, StringBuilder builder) throws IOException {
+    void handleNode(int depth, JsonParser parser, DeserializationContext context, Element.Builder elementBuilder, StringBuilder builder) throws IOException {
 
         builder(depth, builder).append(String.format("%s %s ", parser.currentToken().name(), parser.currentToken().asString())).append("\n");
         JsonToken token;
