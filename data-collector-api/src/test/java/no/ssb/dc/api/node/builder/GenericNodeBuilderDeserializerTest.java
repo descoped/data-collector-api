@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import no.ssb.dc.api.util.CommonUtils;
 import no.ssb.dc.api.util.JsonParser;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,7 @@ class GenericNodeBuilderDeserializerTest {
         }
     }
 
-//    @Disabled
+    @Disabled
     @Test
     void testGenericNodeBuilderDeserializer() {
         Path specPath = CommonUtils.currentPath().getParent().resolve("data-collection-consumer-specifications").resolve("specs");
