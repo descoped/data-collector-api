@@ -100,7 +100,7 @@ steps:
       CODECOV_TOKEN:
         from_secret: codecov_token
     depends_on:
-      - test
+      - build
 
   - name: codecov-plugin
     image: plugins/codecov
@@ -108,7 +108,7 @@ steps:
       token:
         from_secret: codecov_token
     depends_on:
-      - test
+      - build
 
   - name: codacy
     image: maven:3-jdk-11
@@ -120,7 +120,7 @@ steps:
       CODACY_PROJECT_TOKEN:
         from_secret: codacy_token
     depends_on:
-      - test
+      - build
 
   - name: code-analysis
     image: aosapps/drone-sonar-plugin
@@ -130,7 +130,7 @@ steps:
       sonar_token:
         from_secret: sonar_token
     depends_on:
-      - test
+      - build
 
   - name: slack
     image: plugins/slack
