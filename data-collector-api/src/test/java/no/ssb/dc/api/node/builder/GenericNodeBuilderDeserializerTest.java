@@ -27,6 +27,7 @@ class GenericNodeBuilderDeserializerTest {
         }
     }
 
+//    @Disabled
     @Test
     void testGenericNodeBuilderDeserializer() {
         Path specPath = CommonUtils.currentPath().getParent().resolve("data-collection-consumer-specifications").resolve("specs");
