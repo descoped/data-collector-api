@@ -18,7 +18,7 @@ module no.ssb.dc.api {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires java.xml;
 
-//    opens no.ssb.dc.api.node.builder to com.fasterxml.jackson.databind;
+    //opens no.ssb.dc.api.node.builder to com.fasterxml.jackson.databind;
     opens no.ssb.dc.api.node.builder;
 
     uses Client.Builder;

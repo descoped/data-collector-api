@@ -19,7 +19,7 @@ class GenericNodeBuilderDeserializerTest {
         try {
             ObjectMapper mapper = JsonParser.createYamlParser().mapper();
             SimpleModule module = new SimpleModule();
-            module.addDeserializer(AbstractBuilder.class, new GenericNodeBuilderDeserializer());
+            module.addDeserializer(GenericNodeBuilderDeserializer.Element.Builder.class, new GenericNodeBuilderDeserializer());
             mapper.registerModule(module);
             return mapper.readValue(source, builderClass);
         } catch (IOException e) {
