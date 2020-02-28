@@ -23,7 +23,7 @@ steps:
     when:
       status: [ success, failure ]
     depends_on:
-      - data-collector
+      - data-collector-cron-job
 
 ---
 kind: secret
