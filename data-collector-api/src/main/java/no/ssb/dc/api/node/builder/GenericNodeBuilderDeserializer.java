@@ -17,9 +17,17 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
         super(AbstractBuilder.class);
     }
 
+    String indent(int depth) {
+        return Arrays.stream(new String[depth]).map(element -> " ").collect(Collectors.joining());
+    }
+
+    StringBuilder builder(int depth, StringBuilder builder) {
+        return builder.append(indent(depth)).append(String.format("(%s)", depth));
+    }
+
     @Override
     public Element.Builder deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
-        Element.Builder elementBuilder = new Element.Builder();
+        Element.Builder elementBuilder = new Element.Builder(null);
 
         StringBuilder builder = new StringBuilder();
 
@@ -30,45 +38,67 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
         return elementBuilder;
     }
 
-    String indent(int depth) {
-        return Arrays.stream(new String[depth]).map(element -> " ").collect(Collectors.joining());
-    }
-
-    StringBuilder builder(int depth, StringBuilder builder) {
-        return builder.append(indent(depth)).append(String.format("(%s)", depth));
-    }
-
     void handleNode(int depth, JsonParser parser, DeserializationContext context, Element.Builder elementBuilder, StringBuilder builder) throws IOException {
 
-        builder(depth, builder).append(String.format("%s %s ", parser.currentToken().name(), parser.currentToken().asString())).append("\n");
-        JsonToken token;
-        if ((token = parser.nextToken()) == JsonToken.FIELD_NAME) {
+        JsonToken currentToken = parser.currentToken();
+
+        if (currentToken != null) {
+            builder(depth, builder).append(String.format("BEGIN %s %s ", currentToken.name(), currentToken.asString())).append(parser.currentName()).append(" ").append(parser.getValueAsString()).append("\n");
+        }
+
+        JsonToken fieldToken = parser.nextToken();
+        if (fieldToken == JsonToken.START_OBJECT) {
+            builder(depth, builder).append(String.format("--> START_OBJECT: %s %s ", fieldToken.name(), fieldToken.asString())).append(" ").append(parser.currentName()).append(" ").append(parser.getValueAsString()).append("\n");
+
+        } else if (fieldToken == JsonToken.FIELD_NAME) {
+
             Property.Builder propertyBuilder = new Property.Builder();
             propertyBuilder.name(parser.currentName());
             propertyBuilder.value(parser.getValueAsString());
 
-            builder(depth + 1, builder).append(String.format("%s %s ", token.name(), token.asString()))
+            builder(depth + 1, builder).append(String.format("%s %s ", fieldToken.name(), fieldToken.asString()))
                     .append(" => ").append(parser.currentName()).append(": ").append(parser.getValueAsString())
                     .append("\n");
 
-//            if (token == JsonToken.FIELD_NAME) {
                 JsonToken nextValue;
-                while ((nextValue = parser.nextValue()) != null) {
-                    builder(depth, builder).append("fieldValue: ").append(parser.getValueAsString()).append("\n");
+                while ((nextValue = parser.nextValue()) == JsonToken.VALUE_STRING) {
+                    builder(depth, builder).append(" fieldValue: ").append(nextValue.name()).append(" -> ").append(parser.currentName()).append(": ").append(parser.getValueAsString()).append("\n");
                 }
-//            }
+
+                if (nextValue == JsonToken.START_ARRAY) {
+                    builder(depth, builder).append("START array: ").append(nextValue.name()).append(" ").append(nextValue.asString()).append(" ").append(currentToken.asString()).append(" ").append(parser.currentName()).append(" ").append(parser.getValueAsString()).append(" ");
+                    JsonToken nextToken = parser.nextToken();
+                    builder.append(nextToken).append(" ").append(nextToken.asString()).append(" ").append(parser.getValueAsString()).append("\n");
+                    handleNode(depth + 1, parser, context, elementBuilder, builder);
+                }
+
+                builder(depth, builder).append("END fieldValue: ").append(nextValue.name()).append(" -> ").append(parser.currentName()).append(": ").append(parser.getValueAsString()).append("\n");
+
+                handleNode(depth + 1, parser, context, elementBuilder, builder);
+        }
+
+        if (fieldToken != null) {
+            builder(depth, builder).append("end ").append(fieldToken.name()).append(" ").append(fieldToken.asString()).append("\n");
+            handleNode(depth, parser, context, elementBuilder, builder);
         }
     }
 
     static class Element {
+
         static class Builder {
+            private Element parent;
+
+            public Builder(Element parent) {
+                this.parent = parent;
+            }
+
             Element build() {
                 return new Element();
             }
         }
     }
 
-    static class Property {
+    public static class Property {
         public final String name;
         public final String value;
 

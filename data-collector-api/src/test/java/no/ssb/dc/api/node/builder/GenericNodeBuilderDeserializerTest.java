@@ -16,7 +16,7 @@ class GenericNodeBuilderDeserializerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericNodeBuilderDeserializer.class);
 
-    static <R extends AbstractBuilder> R deserialize(String source, Class<R> builderClass) {
+    static <R extends GenericNodeBuilderDeserializer.Element.Builder> R deserialize(String source, Class<R> builderClass) {
         try {
             ObjectMapper mapper = JsonParser.createYamlParser().mapper();
             SimpleModule module = new SimpleModule();
@@ -35,7 +35,7 @@ class GenericNodeBuilderDeserializerTest {
         Path serializedSpec = specPath.resolve("toll-tvinn-test-spec.json");
         String jsonSpec = CommonUtils.readFileOrClasspathResource(serializedSpec.toString());
 
-        AbstractBuilder builder = deserialize(jsonSpec, AbstractBuilder.class);
+        GenericNodeBuilderDeserializer.Element.Builder builder = deserialize(jsonSpec, GenericNodeBuilderDeserializer.Element.Builder.class);
         LOG.trace("Builder: {}", builder);
         LOG.trace("Spec-path: {}\n{}", serializedSpec.toAbsolutePath(), jsonSpec);
     }
