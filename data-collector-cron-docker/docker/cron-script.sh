@@ -25,7 +25,7 @@ PING_HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" $DC_HOST:$DC_PORT/ping
 
 if [ ! "$PING_HTTP_STATUS" == "200" ]
 then
-  echo "'ping $DC_HOST:$DC_PORT' failed with http error: $PING_HTTP_STATUS"
+  echo "'curl $DC_HOST:$DC_PORT/ping' failed with http error: $PING_HTTP_STATUS"
   exit 1
 fi
 
