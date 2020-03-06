@@ -12,7 +12,7 @@ services:
     - $WORKDIR/certs:/certs
     #- /Volumes/SSB BusinessSSL/certs:/certs
     depends_on:
-      - dc-postgres-db
+    - dc-postgres-db
 
   dc-postgres-db:
     image: postgres:12-alpine
@@ -32,9 +32,26 @@ services:
   dc-adminer:
     image: adminer
     ports:
-      - 8980:8080
+    - 8980:8080
     depends_on:
-      - dc-postgres-db
+    - dc-postgres-db
+
+  grafana:
+    image: grafana/grafana:6.6.2
+    ports:
+    - 3000:3000
+    depends_on:
+    - prom
+
+  prom:
+    image: prom/prometheus:v2.16.0
+    volumes:
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+    ports:
+    - 9090:9090
+    depends_on:
+    - data-collector-postgres
 
 volumes:
   dc-postgres-test:
