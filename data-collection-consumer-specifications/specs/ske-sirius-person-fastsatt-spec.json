@@ -100,9 +100,13 @@
               "type" : "QueryXPath",
               "expression" : "/hendelse/identifikator"
             },
-            "year" : {
+            "gjelderPeriode" : {
               "type" : "QueryXPath",
               "expression" : "/hendelse/gjelderPeriode"
+            },
+            "registreringstidspunkt" : {
+              "type" : "QueryXPath",
+              "expression" : "/hendelse/registreringstidspunkt"
             }
           }
         }, {
@@ -114,7 +118,7 @@
     "fastsatt-melding" : {
       "type" : "Get",
       "id" : "fastsatt-melding",
-      "url" : "${baseURL}/api/formueinntekt/skattemelding/${hendelse}/${rettighetspakke}/${year}/${fastsattIdentifikator}",
+      "url" : "${baseURL}/api/formueinntekt/skattemelding/${hendelse}/${rettighetspakke}/${gjelderPeriode}/${fastsattIdentifikator}?gjelderPaaTidspunkt=${registreringstidspunkt}",
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
         "success" : {
@@ -125,14 +129,14 @@
               "type" : "QueryXPath",
               "expression" : "/feil/kode"
             },
-            "equalToStringLiteral" : "SM-004"
+            "equalToStringLiteral" : "SM-001"
           }, {
             "type" : "HttpResponseBodyContains",
             "queryBuilder" : {
               "type" : "QueryXPath",
               "expression" : "/feil/kode"
             },
-            "equalToStringLiteral" : "SM-005"
+            "equalToStringLiteral" : "SM-002"
           } ]
         },
         "failed" : [ 400, 404, 500 ]
