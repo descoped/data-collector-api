@@ -2,13 +2,13 @@
   "type" : "Specification",
   "name" : "Collect Tvinn",
   "startFunctionId" : "loop",
-  "id": "TOLL-TVINN",
+  "id" : "TOLL-TVINN",
   "configure" : [ {
     "type" : "SpecificationContext",
     "variables" : {
       "TestURL" : "https://api-test.toll.no",
       "ProduksjonURL" : "https://mp-sit.toll.no",
-      "nextMarker" : "${contentStream.hasLastPosition() ? contentStream.lastPosition() : \"last\"}"
+      "nextMarker" : "${contentStream.lastOrInitialPosition(\"last\")}"
     },
     "globalState" : {
       "global.topic" : "tvinn-test"
@@ -29,6 +29,7 @@
       },
       "threshold" : 150,
       "addPageContent" : true,
+      "positionVariable" : "fromMarker",
       "iterate" : [ {
         "type" : "Execute",
         "executeId" : "event-list"
