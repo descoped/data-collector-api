@@ -305,7 +305,7 @@ builder:
 (0)END fieldValue: START_ARRAY -> null: null
 (0)end FIELD_NAME null
 
-14:09:00.834 [main] TRACE n.s.d.a.n.b.GenericNodeBuilderDeserializer - Builder: no.ssb.dc.api.node.builder.GenericNodeBuilderDeserializer$Node$Builder@79d94571
+14:09:00.834 [main] TRACE n.s.d.a.n.b.GenericNodeBuilderDeserializer - Builder: no.ssb.dc.api.node.builder.GenericNodeBuilderDeserializer$Node$NodeBuilder@79d94571
 14:09:00.837 [main] TRACE n.s.d.a.n.b.GenericNodeBuilderDeserializer - Spec-path: /Users/oranheim/IdeaProjects/ssb/data-collector-project/data-collection-consumer-specifications/specs/toll-tvinn-test-spec.json
 {
   "type" : "Specification",

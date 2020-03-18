@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 // https://github.com/statisticsnorway/json-stat.java/blob/master/src/main/java/no/ssb/jsonstat/v2/deser/DimensionDeserializer.java
-public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeBuilderDeserializer.Node.Builder> {
+public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeBuilderDeserializer.Node.NodeBuilder> {
 
     protected GenericNodeBuilderDeserializer() {
         super(AbstractBuilder.class);
@@ -30,27 +30,27 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
     }
 
     @Override
-    public Node.Builder deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
-        Node.Builder elementBuilder = new Node.Builder();
+    public Node.NodeBuilder deserialize(JsonParser parser, DeserializationContext context) throws IOException, JsonProcessingException {
+        Node.NodeBuilder elementBuilder = new Node.NodeBuilder();
 
         StringBuilder builder = new StringBuilder();
 
-        handleNode(0, parser, context, elementBuilder, builder);
+        handleNode_(0, parser, context, elementBuilder, builder);
 
         System.out.printf("builder:%n%s%n", builder.toString());
 
         return elementBuilder;
     }
 
-    void handleNode(int depth, JsonParser parser, DeserializationContext context, Node.Builder elementBuilder, StringBuilder builder) throws IOException {
+    void handleNode(int depth, JsonParser parser, DeserializationContext context, Node.NodeBuilder elementBuilder, StringBuilder builder) throws IOException {
 
         JsonToken currentToken = parser.currentToken();
         // check CurrentToken -> START_OBJECT
-        Node.Builder currentElementBuilder;
+        Node.NodeBuilder currentElementBuilder;
 
         // new named property
         if (currentToken == JsonToken.START_OBJECT && parser.currentName() != null) {
-            currentElementBuilder = new Node.Builder();
+            currentElementBuilder = new Node.NodeBuilder();
             currentElementBuilder.name(parser.currentName());
 //            elementBuilder.addChild(currentElementBuilder);
             // already have a named start-object (root is always unnamed)
@@ -68,14 +68,14 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
         } else if (fieldToken == JsonToken.FIELD_NAME) {
             JsonToken nextValue;
             while (FieldType.isValueToken((nextValue = parser.nextValue()))) {
-                Field.Builder propertyBuilder = new Field.Builder();
+                Field.FieldBuilder propertyBuilder = new Field.FieldBuilder();
                 propertyBuilder.name(parser.currentName());
 //                propertyBuilder.value(parser.getCurrentValue(), FieldType.of(nextValue));
 //                currentElementBuilder.addProperty(propertyBuilder);
             }
 
             if (nextValue == JsonToken.START_ARRAY) {
-                Array.Builder arrayBuilder = new Array.Builder();
+                Array.ArrayBuilder arrayBuilder = new Array.ArrayBuilder();
 //                elementBuilder.addChild(arrayBuilder);
             }
 
@@ -90,7 +90,7 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
 
     }
 
-    void handleNode_(int depth, JsonParser parser, DeserializationContext context, Node.Builder elementBuilder, StringBuilder builder) throws IOException {
+    void handleNode_(int depth, JsonParser parser, DeserializationContext context, Node.NodeBuilder elementBuilder, StringBuilder builder) throws IOException {
 
         JsonToken currentToken = parser.currentToken();
 
@@ -111,10 +111,6 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
             JsonToken nextValue;
             int n = 0;
             while ((nextValue = parser.nextValue()) == JsonToken.VALUE_STRING) {
-//                Field.Builder propertyBuilder = new Field.Builder();
-//                propertyBuilder.name(parser.currentName());
-//                propertyBuilder.value(parser.getValueAsString(), FieldType.of(nextValue));
-
                 builder(depth, builder).append(" fieldValue: ").append(nextValue.name()).append(" -> ").append(parser.currentName()).append(": ").append(parser.getValueAsString()).append("\n");
                 n++;
             }
@@ -124,19 +120,19 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
                 builder(depth, builder).append("START array: ").append(nextValue.name()).append(" ").append(nextValue.asString()).append(" ").append(currentToken.asString()).append(" ").append(parser.currentName()).append(" ").append(parser.getValueAsString()).append(" ");
                 JsonToken nextToken = parser.nextToken();
                 builder.append(nextToken).append(" ").append(nextToken.asString()).append(" ").append(parser.getValueAsString()).append("\n");
-                handleNode(depth + 1, parser, context, elementBuilder, builder);
+                handleNode_(depth + 1, parser, context, elementBuilder, builder);
             }
 
             builder(depth, builder).append("END fieldValue: ").append(nextValue.name()).append(" -> ").append(parser.currentName()).append(": ").append(parser.getValueAsString()).append("\n");
 
-            handleNode(depth + 1, parser, context, elementBuilder, builder);
+            handleNode_(depth + 1, parser, context, elementBuilder, builder);
         } else {
             //System.out.printf("-------------> %s%n", fieldToken);
         }
 
         if (fieldToken != null) {
             builder(depth, builder).append("end ").append(fieldToken.name()).append(" ").append(fieldToken.asString()).append("\n");
-            handleNode(depth, parser, context, elementBuilder, builder);
+            handleNode_(depth, parser, context, elementBuilder, builder);
         }
     }
 
@@ -191,88 +187,107 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
         }
     }
 
-    static abstract class Base {
-        static abstract class Builder {
-        }
+
+    abstract static class AbstractBuilder<V> {
+        abstract public V build();
     }
 
-    interface NodeItem {
-        interface Builder {
-
-        }
+    abstract static class Named {
+        abstract public String name();
     }
 
-    interface ArrayItem {
-        interface Builder {
+    abstract static class NamedBuilder<T, V> extends AbstractBuilder<V> {
+        protected String name;
 
+        T name(String name) {
+            this.name = name;
+            return (T) this;
         }
+
+        abstract public Map<String, NamedBuilder> getChildren();
+
     }
 
-    static class Array implements NodeItem {
+    static class Array {
 
-        static class Builder implements NodeItem.Builder {
-            private final List<ArrayItem> nodeList = new ArrayList<>();
 
-            public Builder() {
+
+        static class ArrayBuilder extends AbstractBuilder<Array> {
+            private final List<AbstractBuilder> nodeList = new ArrayList<>();
+
+            public ArrayBuilder() {
             }
 
-            Builder node(ArrayItem node) {
+            ArrayBuilder node(AbstractBuilder node) {
                 nodeList.add(node);
                 return this;
             }
 
-            Array build() {
+            @Override
+            public Array build() {
+                List<Object> nodes = nodeList.stream().map(item -> item.build()).collect(Collectors.toList());
                 return new Array();
             }
         }
     }
 
-    static class Node implements NodeItem, ArrayItem{
+    static class Node extends Named {
         public final String name;
-        public final Map<String, Base> children;
+        public final Map<String, Object> children;
 
-        public Node(String name, Map<String, Base> children) {
+        public Node(String name, Map<String, Object> children) {
             this.name = name;
             this.children = children;
         }
 
         @Override
+        public String name() {
+            return this.name;
+        }
+
+        @Override
         public String toString() {
-            return "Element{" +
+            return "Node{" +
                     "name='" + name + '\'' +
                     ", children=" + children +
                     '}';
         }
 
-        static class Builder implements NodeItem.Builder, ArrayItem.Builder {
-            private String name;
-            private final Map<String, Base.Builder> children = new LinkedHashMap<>();
+        static class NodeBuilder extends NamedBuilder<NodeBuilder, Node> {
+            private final Map<String, AbstractBuilder<Node>> children = new LinkedHashMap<>();
 
-            public Builder() {
-            }
-
-            Builder name(String name) {
-                this.name = name;
+            NodeBuilder addChild(NamedBuilder childBuilder) {
+                children.put(childBuilder.name, childBuilder);
                 return this;
             }
 
-            Builder addChild(Base.Builder childBuilder) {
-                children.put("", childBuilder);
+            NodeBuilder addChild(String name, AbstractBuilder childBuilder) {
+                children.put(name, childBuilder);
                 return this;
             }
 
-            Node build() {
-//                List<Node> nodeList = children.stream().map(Builder::build).collect(Collectors.toList());
-//                List<Property> propertyList = properties.values().stream().map(Property.Builder::build).collect(Collectors.toList());
-//                return new Node(name, nodeList, propertyList);
+            @Override
+            public Map<String, NamedBuilder> getChildren() {
+//                return children;
                 return null;
+            }
+
+            @Override
+            public Node build() {
+                Map<String, Object> nodeList = children.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (k, v) -> ((AbstractBuilder<Node>) v).build(), LinkedHashMap::new));
+                return new Node(name, nodeList);
             }
         }
     }
 
-    public static class Field extends Base {
+    public static class Field {
         public final String name;
         public final Value value;
+
+        public Field(String name, Value value) {
+            this.name = name;
+            this.value = value;
+        }
 
         @Override
         public String toString() {
@@ -282,30 +297,29 @@ public class GenericNodeBuilderDeserializer extends StdDeserializer<GenericNodeB
                     '}';
         }
 
-        public Field(String name, Value value) {
-            this.name = name;
-            this.value = value;
-        }
-
-        static class Builder extends Base.Builder {
-            private String name;
+        static class FieldBuilder extends NamedBuilder<FieldBuilder, Field> {
             private Value value;
 
-            public Builder() {
+            public FieldBuilder() {
             }
 
-            Builder name(String name) {
-                this.name = name;
-                return this;
+            public String name() {
+                return this.name;
             }
 
-            Builder value(Value value) {
+            FieldBuilder value(Value value) {
                 this.value = value;
                 return this;
             }
 
-            Field build() {
+            @Override
+            public Field build() {
                 return new Field(name, value);
+            }
+
+            @Override
+            public Map<String, NamedBuilder> getChildren() {
+                throw new UnsupportedOperationException();
             }
         }
     }

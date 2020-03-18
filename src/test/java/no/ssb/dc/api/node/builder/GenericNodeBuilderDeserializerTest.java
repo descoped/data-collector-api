@@ -11,16 +11,24 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
+
+import static no.ssb.dc.api.node.builder.GenericNodeBuilderDeserializer.Array;
+import static no.ssb.dc.api.node.builder.GenericNodeBuilderDeserializer.Field;
+import static no.ssb.dc.api.node.builder.GenericNodeBuilderDeserializer.NamedBuilder;
+import static no.ssb.dc.api.node.builder.GenericNodeBuilderDeserializer.Node;
 
 class GenericNodeBuilderDeserializerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericNodeBuilderDeserializer.class);
 
-    static <R extends GenericNodeBuilderDeserializer.Node.Builder> R deserialize(String source, Class<R> builderClass) {
+    static <R extends Node.NodeBuilder> R deserialize(String source, Class<R> builderClass) {
         try {
             ObjectMapper mapper = JsonParser.createYamlParser().mapper();
             SimpleModule module = new SimpleModule();
-            module.addDeserializer(GenericNodeBuilderDeserializer.Node.Builder.class, new GenericNodeBuilderDeserializer());
+            module.addDeserializer(Node.NodeBuilder.class, new GenericNodeBuilderDeserializer());
             mapper.registerModule(module);
             return mapper.readValue(source, builderClass);
         } catch (IOException e) {
@@ -35,13 +43,13 @@ class GenericNodeBuilderDeserializerTest {
         Path serializedSpec = specPath.resolve("toll-tvinn-test-spec.json");
         String jsonSpec = CommonUtils.readFileOrClasspathResource(serializedSpec.toString());
 
-        GenericNodeBuilderDeserializer.Node.Builder builder = deserialize(jsonSpec, GenericNodeBuilderDeserializer.Node.Builder.class);
+        Node.NodeBuilder builder = deserialize(jsonSpec, Node.NodeBuilder.class);
         traverse(builder);
         LOG.trace("Builder: {}", builder);
         LOG.trace("Spec-path: {}\n{}", serializedSpec.toAbsolutePath(), jsonSpec);
     }
 
-    private void traverse(GenericNodeBuilderDeserializer.Node.Builder builder) {
+    private void traverse(Node.NodeBuilder builder) {
         GenericNodeBuilderDeserializer.Node rootNode = builder.build();
         LOG.trace("{}", rootNode.name);
     }
@@ -49,44 +57,31 @@ class GenericNodeBuilderDeserializerTest {
     @Disabled
     @Test
     void testModel() {
-        GenericNodeBuilderDeserializer.Node.Builder rootBuilder = new GenericNodeBuilderDeserializer.Node.Builder();
-        rootBuilder.name("root");
+        Node.NodeBuilder rootBuilder = new Node.NodeBuilder().name("root");
 
-//        {
-//            GenericNodeBuilderDeserializer.Node.Builder childBuilder1 = new GenericNodeBuilderDeserializer.Node.Builder();
-//            childBuilder1.name("child1");
-//            childBuilder1.addProperty(new GenericNodeBuilderDeserializer.Property.Builder().name("prop1").value("value1", GenericNodeBuilderDeserializer.PropertyType.STRING));
-//            rootBuilder.addChild(childBuilder1);
+        Field.FieldBuilder child1_FieldBuilder = new Field.FieldBuilder().name("field1");
+        rootBuilder.addChild(child1_FieldBuilder);
 
-//            {
-//                GenericNodeBuilderDeserializer.Node.Builder childBuilder1_1 = new GenericNodeBuilderDeserializer.Node.Builder();
-//                childBuilder1_1.name("child1_1");
-//                childBuilder1_1.addProperty(new GenericNodeBuilderDeserializer.Property.Builder().name("prop1_1").value("value1_1", GenericNodeBuilderDeserializer.PropertyType.STRING));
-//                childBuilder1.addChild(childBuilder1_1);
-//            }
-//        }
+        Node.NodeBuilder child1_NodeBuilder = new Node.NodeBuilder().name("child1");
+        rootBuilder.addChild(child1_NodeBuilder);
 
-//        {
-//            GenericNodeBuilderDeserializer.Node.Builder childBuilder2 = new GenericNodeBuilderDeserializer.Node.Builder();
-//            childBuilder2.name("child2");
-//            childBuilder2.addProperty(new GenericNodeBuilderDeserializer.Property.Builder().name("prop2").value("value2", GenericNodeBuilderDeserializer.PropertyType.STRING));
-//            rootBuilder.addChild(childBuilder2);
-//        }
+        Array.ArrayBuilder child1_ArrayBuilder = new Array.ArrayBuilder();
+        rootBuilder.addChild("array1", child1_ArrayBuilder);
 
-//        StringBuilder stringBuilder = new StringBuilder();
-//        GenericNodeBuilderDeserializer.Node root = rootBuilder.build();
-//        traverse(0, root, stringBuilder);
-//        LOG.trace("\n{}", stringBuilder.toString());
+        traverse(0, new ArrayList<>(), rootBuilder, (ancestors, current) -> {
+
+        });
     }
 
-//    private void traverse(int depth, GenericNodeBuilderDeserializer.Node currentNode, StringBuilder stringBuilder) {
-//        String properties = currentNode.properties.stream().map(property -> property.value.toString()).collect(Collectors.joining(","));
-//        stringBuilder.append(String.format("%s(%s)%s%n%s", GenericNodeBuilderDeserializer.indent(depth), depth, currentNode.name,
-//                properties.isEmpty() ? "" : String.format("\t%s%s%n", GenericNodeBuilderDeserializer.indent(depth), properties)));
-//
-//        for (GenericNodeBuilderDeserializer.Node child : currentNode.children) {
-//            traverse(depth + 1, child, stringBuilder);
-//        }
-//    }
+    void traverse(int depth, List<NamedBuilder> ancestors,
+                  NamedBuilder currentBuilder,
+                  BiConsumer<List<NamedBuilder>, NamedBuilder> visit) {
+
+        visit.accept(ancestors, currentBuilder);
+
+        for (Object childBuilder : currentBuilder.getChildren().values()) {
+
+        }
+    }
 
 }
