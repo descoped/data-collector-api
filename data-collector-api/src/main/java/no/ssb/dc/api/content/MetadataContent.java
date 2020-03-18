@@ -35,6 +35,7 @@ public class MetadataContent {
         private ObjectNode metadataNode = JsonParser.createJsonParser().createObjectNode();
         private ObjectNode requestHeaderNode = JsonParser.createJsonParser().createObjectNode();
         private ObjectNode responseHeaderNode = JsonParser.createJsonParser().createObjectNode();
+        private ObjectNode httpInfoNode = JsonParser.createJsonParser().createObjectNode();
 
         public Builder correlationId(CorrelationIds correlationIds) {
             metadataNode.put("correlation-id", (correlationIds == null ? null : correlationIds.get().stream().map(UUID::toString).collect(Collectors.joining(","))));
@@ -81,6 +82,11 @@ public class MetadataContent {
             return this;
         }
 
+        public Builder statusCode(int statusCode) {
+            httpInfoNode.put("statusCode", statusCode);
+            return this;
+        }
+
         public Builder requestHeaders(Headers requestHeaders) {
             requestHeaders.asMap().forEach((key, value) -> requestHeaderNode.put(key, String.join(",", value)));
             return this;
@@ -95,7 +101,6 @@ public class MetadataContent {
             JsonParser jsonParser = JsonParser.createJsonParser();
             ObjectNode elementNode = jsonParser.createObjectNode();
             elementNode.set("metadata", metadataNode);
-            ObjectNode httpInfoNode = jsonParser.createObjectNode();
             httpInfoNode.set("request-headers", requestHeaderNode);
             httpInfoNode.set("response-headers", responseHeaderNode);
             elementNode.set("http-info", httpInfoNode);

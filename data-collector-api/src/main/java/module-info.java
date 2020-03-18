@@ -1,8 +1,6 @@
-import no.ssb.dc.api.content.ContentStoreInitializer;
 import no.ssb.dc.api.http.Client;
 import no.ssb.dc.api.http.Request;
 import no.ssb.dc.api.http.Response;
-import no.ssb.dc.content.DiscardingContentStoreInitializer;
 
 module no.ssb.dc.api {
     requires no.ssb.config;
@@ -24,8 +22,6 @@ module no.ssb.dc.api {
     uses Client.Builder;
     uses Request.Builder;
     uses Response.Builder;
-
-    provides ContentStoreInitializer with DiscardingContentStoreInitializer;
 
     exports no.ssb.dc.api;
     exports no.ssb.dc.api.context;

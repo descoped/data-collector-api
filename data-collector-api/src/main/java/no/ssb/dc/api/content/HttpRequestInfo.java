@@ -10,10 +10,12 @@ public class HttpRequestInfo {
     private final Headers requestHeaders;
     private final Headers responseHeaders;
     private final long requestDurationNanoSeconds;
+    private int statusCode;
 
-    public HttpRequestInfo(CorrelationIds correlationIds, String url, Headers requestHeaders, Headers responseHeaders, long requestDurationNanoSeconds) {
+    public HttpRequestInfo(CorrelationIds correlationIds, String url, int statusCode, Headers requestHeaders, Headers responseHeaders, long requestDurationNanoSeconds) {
         this.correlationIds = correlationIds;
         this.url = url;
+        this.statusCode = statusCode;
         this.requestHeaders = requestHeaders;
         this.responseHeaders = responseHeaders;
         this.requestDurationNanoSeconds = requestDurationNanoSeconds;
@@ -37,5 +39,9 @@ public class HttpRequestInfo {
 
     public long getRequestDurationNanoSeconds() {
         return requestDurationNanoSeconds;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
     }
 }
