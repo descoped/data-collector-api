@@ -60,7 +60,7 @@ public class BuilderTest {
                             .expected(xpath("/entry/content/ns2:lagretHendelse/ns2:sekvensnummer"))
                     )
                     // propagate next position to paginate
-                    .pipe(nextPage().output("next-position", regex(xpath("/feed/link[@rel=\"next\"]/@href"), "(?<=[?&]seq=)[^&]*")))
+                    .pipe(nextPage().output("next-position", regex(xpath("/feed/link[@rel=\"next\"]/@href"), "(?<=[?&]position=)[^&]*")))
                     // parallel should take the sequence as input
                     .pipe(parallel(xpath("/feed/entry"))
                             .variable("position", xpath("/entry/content/ns2:lagretHendelse/ns2:sekvensnummer"))
