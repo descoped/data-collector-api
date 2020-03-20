@@ -23,6 +23,10 @@ pull-postgres: ## Pull images
 start-postgres: ## Start postgres
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-postgres.yml up -d
 
+.PHONY: start-postgres-with-console
+start-postgres-with-console: ## Start postgres with console
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-postgres.yml up
+
 .PHONY: tail-postgres
 tail-postgres: ## Tail postgres
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-postgres.yml logs -f
