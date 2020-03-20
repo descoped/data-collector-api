@@ -2,7 +2,7 @@
   "type" : "Specification",
   "name" : "Collect Sirius",
   "startFunctionId" : "loop",
-  "id" : "SKE-SIRIUS",
+  "id" : "SKE-SIRIUS-FASTSATT",
   "configure" : [ {
     "type" : "SpecificationContext",
     "variables" : {
