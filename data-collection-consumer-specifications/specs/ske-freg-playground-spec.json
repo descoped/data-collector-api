@@ -2,7 +2,7 @@
   "type" : "Specification",
   "name" : "Collect FREG",
   "startFunctionId" : "loop",
-  "id" : "SKE-FREG",
+  "id" : "SKE-FREG-PLAYGROUND",
   "configure" : [ {
     "type" : "SpecificationContext",
     "variables" : {
@@ -31,7 +31,7 @@
       },
       "threshold" : 1500,
       "addPageContent" : true,
-      "positionVariable": "fromSequence",
+      "positionVariable" : "fromSequence",
       "iterate" : [ {
         "type" : "Execute",
         "executeId" : "event-list"
