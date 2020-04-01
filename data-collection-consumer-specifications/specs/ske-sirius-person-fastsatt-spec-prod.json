@@ -1,0 +1,151 @@
+{
+  "type" : "Specification",
+  "name" : "Collect Sirius",
+  "startFunctionId" : "loop",
+  "id" : "SKE-SIRIUS-FASTSATT",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "baseURL" : "https://api.skatteetaten.no",
+      "rettighetspakke" : "ssb",
+      "hentAntallMeldingerOmGangen" : "100",
+      "hendelse" : "fastsatt",
+      "nextSequence" : "${cast.toLong(contentStream.lastOrInitialPosition(0)) + 1}"
+    },
+    "globalState" : {
+      "global.topic" : "sirius-person-fastsatt"
+    },
+    "headers" : {
+      "accept" : [ "application/xml" ]
+    }
+  }, {
+    "type" : "Security",
+    "bundleName" : "ske-p12-certs"
+  } ],
+  "functions" : {
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromSequence" : "${nextSequence}"
+      },
+      "threshold" : 150,
+      "addPageContent" : true,
+      "positionVariable" : "fromSequence",
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "parts"
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextSequence"
+      }
+    },
+    "parts" : {
+      "type" : "Get",
+      "id" : "parts",
+      "url" : "${baseURL}/api/formueinntekt/skattemelding/${hendelse}/hendelser/?fraSekvensnummer=${fromSequence}&antall=${hentAntallMeldingerOmGangen}",
+      "returnVariables" : [ "nextSequence" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        },
+        "failed" : [ 400, 404, 500 ]
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/hendelser/hendelse"
+        },
+        "expectedQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/hendelse/sekvensnummer"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextSequence" : {
+            "type" : "QueryEval",
+            "query" : {
+              "type" : "QueryXPath",
+              "expression" : "/hendelser/hendelse[last()]/sekvensnummer"
+            },
+            "bindToVariable" : "lastSequence",
+            "expression" : "${cast.toLong(lastSequence) + 1}"
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryXPath",
+            "expression" : "/hendelse/sekvensnummer"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/hendelser/hendelse"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Execute",
+          "executeId" : "fastsatt-melding",
+          "inputVariables" : {
+            "fastsattIdentifikator" : {
+              "type" : "QueryXPath",
+              "expression" : "/hendelse/identifikator"
+            },
+            "gjelderPeriode" : {
+              "type" : "QueryXPath",
+              "expression" : "/hendelse/gjelderPeriode"
+            },
+            "registreringstidspunkt" : {
+              "type" : "QueryXPath",
+              "expression" : "/hendelse/registreringstidspunkt"
+            }
+          }
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    },
+    "fastsatt-melding" : {
+      "type" : "Get",
+      "id" : "fastsatt-melding",
+      "url" : "${baseURL}/api/formueinntekt/skattemelding/${hendelse}/${rettighetspakke}/${gjelderPeriode}/${fastsattIdentifikator}?gjelderPaaTidspunkt=${registreringstidspunkt}",
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ],
+          "404" : [ {
+            "type" : "HttpResponseBodyContains",
+            "queryBuilder" : {
+              "type" : "QueryXPath",
+              "expression" : "/feil/kode"
+            },
+            "equalToStringLiteral" : "SM-001"
+          }, {
+            "type" : "HttpResponseBodyContains",
+            "queryBuilder" : {
+              "type" : "QueryXPath",
+              "expression" : "/feil/kode"
+            },
+            "equalToStringLiteral" : "SM-002"
+          } ]
+        },
+        "failed" : [ 400, 404, 500 ]
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "skattemelding"
+      } ]
+    }
+  }
+}

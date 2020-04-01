@@ -206,13 +206,17 @@ collect-freg-playground: ## Collect freg playground
 collect-sirius-person-utkast: ## Collect sirius person utkast
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json
 
+.PHONY: collect-sirius-person-fastsatt
+collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
+
 .PHONY: collect-sirius-person-utkast-prod
 collect-sirius-person-utkast-prod: ## Collect sirius person utkast prod
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'accept: application/xml' -d @specs/ske-sirius-person-utkast-spec-prod.json
 
-.PHONY: collect-sirius-person-fastsatt
-collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
-	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
+.PHONY: collect-sirius-person-fastsatt-prod
+collect-sirius-person-fastsatt-prod: ## Collect sirius person fastsatt prod
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'accept: application/xml' -d @specs/ske-sirius-person-fastsatt-spec-prod.json
 
 .PHONY: collect-tvinn-test
 collect-tvinn-test: ## Collect tvinn Test
