@@ -20,6 +20,8 @@ public interface Client {
         return ServiceLoader.load(Client.Builder.class).findFirst().orElseThrow();
     }
 
+    Version version();
+
     Response send(Request request);
 
     CompletableFuture<Response> sendAsync(Request request);
