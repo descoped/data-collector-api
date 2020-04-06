@@ -124,6 +124,11 @@ build-data-collector-dev-image: ## Build data collector dev image
 start-postgres-dev: ## Start postgres-dev
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-postgres.yml up -d
 
+.PHONY: start-postgres-dev-with-console
+start-postgres-dev-with-console: ## Start postgres-dev-with-console
+	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-postgres.yml up
+
+
 .PHONY: tail-postgres-dev
 tail-postgres-dev: ## Tail postgres-dev
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-postgres.yml logs -f
