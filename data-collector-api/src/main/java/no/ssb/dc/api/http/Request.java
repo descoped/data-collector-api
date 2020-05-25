@@ -28,9 +28,9 @@ public interface Request {
     interface Builder {
         Builder url(String url);
 
-        Builder PUT();
+        Builder PUT(byte[] bytes);
 
-        Builder POST();
+        Builder POST(byte[] bytes);
 
         Builder GET();
 
