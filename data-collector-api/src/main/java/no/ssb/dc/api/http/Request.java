@@ -1,7 +1,9 @@
 package no.ssb.dc.api.http;
 
+import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.ServiceLoader;
+import java.util.concurrent.Flow;
 
 public interface Request {
 
@@ -30,7 +32,11 @@ public interface Request {
 
         Builder PUT(byte[] bytes);
 
+        Builder PUT(Flow.Publisher<ByteBuffer> bodyPublisher);
+
         Builder POST(byte[] bytes);
+
+        Builder POST(Flow.Publisher<ByteBuffer> bodyPublisher);
 
         Builder GET();
 
