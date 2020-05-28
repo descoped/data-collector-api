@@ -93,7 +93,17 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 JsonNode variableNode = currentNode.get("variables");
                 if (variableNode != null) {
                     variableNode.fields().forEachRemaining(entry -> {
-                        builder.variable(entry.getKey(), entry.getValue().textValue());
+                        Object value;
+                        if (entry.getValue().isInt()) {
+                            value = entry.getValue().intValue();
+                        } else if (entry.getValue().isBoolean()) {
+                            value = entry.getValue().booleanValue();
+                        } else if (entry.getValue().isTextual()) {
+                            value = entry.getValue().textValue();
+                        } else {
+                            throw new IllegalArgumentException("The context variable type is not supoorted: " + entry.getKey());
+                        }
+                        builder.variable(entry.getKey(), value);
                     });
                 }
 
