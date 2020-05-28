@@ -2,7 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import no.ssb.dc.api.http.HttpStatusCode;
+import no.ssb.dc.api.http.HttpStatus;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.HttpStatusValidation;
 import no.ssb.dc.api.node.ResponsePredicate;
@@ -32,7 +32,7 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
     }
 
     public HttpStatusValidationBuilder success(Integer fromStatusCodeInclusive, Integer toStatusCodeInclusive) {
-        List<Integer> statusCodes = HttpStatusCode.range(fromStatusCodeInclusive, toStatusCodeInclusive).stream().map(HttpStatusCode::statusCode).collect(Collectors.toList());
+        List<Integer> statusCodes = HttpStatus.range(fromStatusCodeInclusive, toStatusCodeInclusive).stream().map(HttpStatus::code).collect(Collectors.toList());
         for (int sc : statusCodes) {
             success.put(sc, new ArrayList<>());
         }
@@ -50,17 +50,17 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
     }
 
     public HttpStatusValidationBuilder fail(Integer fromStatusCodeInclusive, Integer toStatusCodeInclusive) {
-        failed.addAll(HttpStatusCode.range(fromStatusCodeInclusive, toStatusCodeInclusive).stream().map(HttpStatusCode::statusCode).collect(Collectors.toList()));
+        failed.addAll(HttpStatus.range(fromStatusCodeInclusive, toStatusCodeInclusive).stream().map(HttpStatus::code).collect(Collectors.toList()));
         return this;
     }
 
     @Override
     public <R extends Base> R build(BuildContext buildContext) {
-        Map<HttpStatusCode, List<ResponsePredicate>> successMap = new LinkedHashMap<>();
+        Map<HttpStatus, List<ResponsePredicate>> successMap = new LinkedHashMap<>();
         for (Map.Entry<Integer, List<ResponsePredicateBuilder>> entry : success.entrySet()) {
             List<ResponsePredicate> responsePredicateList = entry.getValue().stream()
                     .map(builder -> (ResponsePredicate) builder.build(buildContext)).collect(Collectors.toList());
-            successMap.computeIfAbsent(HttpStatusCode.valueOf(entry.getKey()), list -> new ArrayList<>()).addAll(responsePredicateList);
+            successMap.computeIfAbsent(HttpStatus.valueOf(entry.getKey()), list -> new ArrayList<>()).addAll(responsePredicateList);
         }
         return (R) new HttpStatusValidationNode(successMap, failed);
     }
@@ -82,21 +82,21 @@ public class HttpStatusValidationBuilder extends LeafNodeBuilder {
 
     static class HttpStatusValidationNode extends LeafNode implements HttpStatusValidation {
 
-        final Map<HttpStatusCode, List<ResponsePredicate>> success;
-        final List<HttpStatusCode> failed;
+        final Map<HttpStatus, List<ResponsePredicate>> success;
+        final List<HttpStatus> failed;
 
-        HttpStatusValidationNode(Map<HttpStatusCode, List<ResponsePredicate>> success, List<Integer> failed) {
+        HttpStatusValidationNode(Map<HttpStatus, List<ResponsePredicate>> success, List<Integer> failed) {
             this.success = success;
-            this.failed = failed.stream().map(HttpStatusCode::valueOf).collect(Collectors.toList());
+            this.failed = failed.stream().map(HttpStatus::valueOf).collect(Collectors.toList());
         }
 
         @Override
-        public Map<HttpStatusCode, List<ResponsePredicate>> success() {
+        public Map<HttpStatus, List<ResponsePredicate>> success() {
             return success;
         }
 
         @Override
-        public List<HttpStatusCode> failed() {
+        public List<HttpStatus> failed() {
             return failed;
         }
 

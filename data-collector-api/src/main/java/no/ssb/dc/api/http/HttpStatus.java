@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 // TODO https://en.wikipedia.org/wiki/List_of_HTTP_status_codes
-public enum HttpStatusCode {
+public enum HttpStatus {
 
     /* 2XX: generally "OK" */
 
@@ -56,22 +56,22 @@ public enum HttpStatusCode {
     HTTP_GATEWAY_TIMEOUT(504, "Gateway Timeout"),
     HTTP_VERSION(505, "HTTP Version Not Supported");
 
-    private static final Map<Integer, HttpStatusCode> okMap = new LinkedHashMap<>();
-    private static final Map<Integer, HttpStatusCode> redirectionMap = new LinkedHashMap<>();
-    private static final Map<Integer, HttpStatusCode> clientErrorMap = new LinkedHashMap<>();
-    private static final Map<Integer, HttpStatusCode> serverErrorMap = new LinkedHashMap<>();
+    private static final Map<Integer, HttpStatus> okMap = new LinkedHashMap<>();
+    private static final Map<Integer, HttpStatus> redirectionMap = new LinkedHashMap<>();
+    private static final Map<Integer, HttpStatus> clientErrorMap = new LinkedHashMap<>();
+    private static final Map<Integer, HttpStatus> serverErrorMap = new LinkedHashMap<>();
 
     private final int statusCode;
     private final String reason;
 
-    HttpStatusCode(int statusCode, String reason) {
+    HttpStatus(int statusCode, String reason) {
         this.statusCode = statusCode;
         this.reason = reason;
     }
 
-    static Map<Integer, HttpStatusCode> rangeMap(int fromStatusCodeInclusive, int toStatusCodeInclusive) {
-        Map<Integer, HttpStatusCode> rangeMap = new LinkedHashMap<>();
-        for (HttpStatusCode value : values()) {
+    static Map<Integer, HttpStatus> rangeMap(int fromStatusCodeInclusive, int toStatusCodeInclusive) {
+        Map<Integer, HttpStatus> rangeMap = new LinkedHashMap<>();
+        for (HttpStatus value : values()) {
             if (value.statusCode >= fromStatusCodeInclusive && value.statusCode <= toStatusCodeInclusive) {
                 rangeMap.put(value.statusCode, value);
             }
@@ -103,9 +103,9 @@ public enum HttpStatusCode {
         }
     }
 
-    static public List<HttpStatusCode> okCodes() {
+    static public List<HttpStatus> okCodes() {
         buildOkMap();
-        return (List<HttpStatusCode>) okMap.values();
+        return (List<HttpStatus>) okMap.values();
     }
 
     static public boolean isOk(int statusCode) {
@@ -113,9 +113,9 @@ public enum HttpStatusCode {
         return okMap.containsKey(statusCode);
     }
 
-    static public List<HttpStatusCode> redirectionCodes() {
+    static public List<HttpStatus> redirectionCodes() {
         buildRedirectionMap();
-        return (List<HttpStatusCode>) redirectionMap.values();
+        return (List<HttpStatus>) redirectionMap.values();
     }
 
     static public boolean isRedirection(int statusCode) {
@@ -123,9 +123,9 @@ public enum HttpStatusCode {
         return redirectionMap.containsKey(statusCode);
     }
 
-    static public List<HttpStatusCode> clientErrorList() {
+    static public List<HttpStatus> clientErrorList() {
         buildClientErrorMap();
-        return (List<HttpStatusCode>) clientErrorMap.values();
+        return (List<HttpStatus>) clientErrorMap.values();
     }
 
     static public Integer[] clientErrorCodes() {
@@ -137,9 +137,9 @@ public enum HttpStatusCode {
         return clientErrorMap.containsKey(statusCode);
     }
 
-    static public List<HttpStatusCode> serverErrorCodes() {
+    static public List<HttpStatus> serverErrorCodes() {
         buildServerErrorMap();
-        return (List<HttpStatusCode>) serverErrorMap.values();
+        return (List<HttpStatus>) serverErrorMap.values();
     }
 
     static public boolean isServerError(int statusCode) {
@@ -147,12 +147,12 @@ public enum HttpStatusCode {
         return serverErrorMap.containsKey(statusCode);
     }
 
-    static public List<HttpStatusCode> range(int fromStatusCodeInclusive, int toStatusCodeInclusive) {
+    static public List<HttpStatus> range(int fromStatusCodeInclusive, int toStatusCodeInclusive) {
         return new ArrayList<>(rangeMap(fromStatusCodeInclusive, toStatusCodeInclusive).values());
     }
 
-    static public HttpStatusCode valueOf(int statusCode) {
-        for (HttpStatusCode value : values()) {
+    static public HttpStatus valueOf(int statusCode) {
+        for (HttpStatus value : values()) {
             if (value.statusCode == statusCode) {
                 return value;
             }
@@ -160,7 +160,7 @@ public enum HttpStatusCode {
         throw new IllegalStateException("HttpStatusCode is not supported: " + statusCode);
     }
 
-    public int statusCode() {
+    public int code() {
         return statusCode;
     }
 
