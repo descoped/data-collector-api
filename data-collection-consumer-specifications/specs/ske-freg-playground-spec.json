@@ -44,7 +44,7 @@
     "event-list" : {
       "type" : "Get",
       "id" : "event-list",
-      "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/feed/?seq=${fromSequence}",
+      "url" : "${KonsumentTestURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/feed/?seq=${fromSequence}",
       "returnVariables" : [ "nextSequence" ],
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
@@ -118,7 +118,7 @@
     "event-document" : {
       "type" : "Get",
       "id" : "event-document",
-      "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/${eventId}",
+      "url" : "${KonsumentTestURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/${eventId}",
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
         "success" : {
@@ -135,7 +135,7 @@
     "person-document" : {
       "type" : "Get",
       "id" : "person-document",
-      "url" : "${PlaygroundURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/personer/${personId}",
+      "url" : "${KonsumentTestURL}/folkeregisteret/offentlig-med-hjemmel/api/v1/personer/${personId}",
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
         "success" : {
