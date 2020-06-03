@@ -318,6 +318,64 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return builder;
             }
 
+            case Put: {
+                PutBuilder builder = new PutBuilder(currentNode.get("id").textValue());
+
+                builder.url(currentNode.get("url").textValue());
+
+                JsonNode bodyPublisherNode = currentNode.get("bodyPublisher");
+                if (bodyPublisherNode != null) {
+                    BodyPublisherBuilder bodyPublisherBuilder = (BodyPublisherBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, bodyPublisherNode);
+                    builder.data(bodyPublisherBuilder);
+                }
+
+                JsonNode validateResponseNode = currentNode.get("responseValidators");
+                if (validateResponseNode != null) {
+                    validateResponseNode.forEach(validatorNode -> {
+                        LeafNodeBuilder validatorBuilder = (LeafNodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, validatorNode);
+                        builder.validate(validatorBuilder);
+                    });
+                }
+
+                ArrayNode returnVariablesNode = (ArrayNode) currentNode.get("returnVariables");
+                if (returnVariablesNode != null) {
+                    returnVariablesNode.forEach(node -> builder.returnVariables(node.textValue()));
+                }
+
+                JsonNode stepsNode = currentNode.get("pipes");
+                if (stepsNode != null) {
+                    stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                }
+
+                return builder;
+            }
+
+            case Delete: {
+                DeleteBuilder builder = new DeleteBuilder(currentNode.get("id").textValue());
+
+                builder.url(currentNode.get("url").textValue());
+
+                JsonNode validateResponseNode = currentNode.get("responseValidators");
+                if (validateResponseNode != null) {
+                    validateResponseNode.forEach(validatorNode -> {
+                        LeafNodeBuilder validatorBuilder = (LeafNodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, validatorNode);
+                        builder.validate(validatorBuilder);
+                    });
+                }
+
+                ArrayNode returnVariablesNode = (ArrayNode) currentNode.get("returnVariables");
+                if (returnVariablesNode != null) {
+                    returnVariablesNode.forEach(node -> builder.returnVariables(node.textValue()));
+                }
+
+                JsonNode stepsNode = currentNode.get("pipes");
+                if (stepsNode != null) {
+                    stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                }
+
+                return builder;
+            }
+
             case BodyPublisher: {
                 BodyPublisherBuilder builder = new BodyPublisherBuilder();
 

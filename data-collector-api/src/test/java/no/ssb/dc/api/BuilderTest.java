@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import static no.ssb.dc.api.Builders.bodyContains;
 import static no.ssb.dc.api.Builders.bodyPublisher;
 import static no.ssb.dc.api.Builders.context;
+import static no.ssb.dc.api.Builders.delete;
 import static no.ssb.dc.api.Builders.execute;
 import static no.ssb.dc.api.Builders.get;
 import static no.ssb.dc.api.Builders.jqpath;
@@ -21,6 +22,7 @@ import static no.ssb.dc.api.Builders.parallel;
 import static no.ssb.dc.api.Builders.post;
 import static no.ssb.dc.api.Builders.process;
 import static no.ssb.dc.api.Builders.publish;
+import static no.ssb.dc.api.Builders.put;
 import static no.ssb.dc.api.Builders.regex;
 import static no.ssb.dc.api.Builders.security;
 import static no.ssb.dc.api.Builders.sequence;
@@ -64,6 +66,16 @@ public class BuilderTest {
 
                     )
             )
+            .function(put("create-something")
+                    .url("http://com.company/authorize")
+                    .data(bodyPublisher()
+                            .plainText("PLAIN_TEXT")
+                            .urlEncodedData("foo=bar")
+                            .textPart("foo", "bar")
+                            .formPart("foo", "file", "bar")
+
+                    )
+            )
             .function(get("page")
                     .url("http://com.company/endpoint?seq=${from-position}&pageSize=10")
                     // build expected position list
@@ -91,6 +103,9 @@ public class BuilderTest {
                             .pipe(publish("${position}"))
                     )
                     .pipe(process(ItemList.class).output("next-position")) // alternative to sequence() and parallel()
+            )
+            .function(delete("delete-something")
+                    .url("http://com.company/resource/1")
             )
             .function(get("person-doc")
                     .url("http://com.company/endpoint/person/${person-id}}")

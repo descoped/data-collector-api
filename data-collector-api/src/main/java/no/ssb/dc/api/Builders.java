@@ -3,6 +3,7 @@ package no.ssb.dc.api;
 import no.ssb.dc.api.node.builder.AddContentBuilder;
 import no.ssb.dc.api.node.builder.BodyContainsBuilder;
 import no.ssb.dc.api.node.builder.BodyPublisherBuilder;
+import no.ssb.dc.api.node.builder.DeleteBuilder;
 import no.ssb.dc.api.node.builder.EvalBuilder;
 import no.ssb.dc.api.node.builder.ExecuteBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
@@ -14,6 +15,7 @@ import no.ssb.dc.api.node.builder.ParallelBuilder;
 import no.ssb.dc.api.node.builder.PostBuilder;
 import no.ssb.dc.api.node.builder.ProcessBuilder;
 import no.ssb.dc.api.node.builder.PublishBuilder;
+import no.ssb.dc.api.node.builder.PutBuilder;
 import no.ssb.dc.api.node.builder.QueryBuilder;
 import no.ssb.dc.api.node.builder.RegExBuilder;
 import no.ssb.dc.api.node.builder.SecurityBuilder;
@@ -39,6 +41,14 @@ public class Builders {
 
     public static PostBuilder post(String functionId) {
         return new PostBuilder(functionId);
+    }
+
+    public static PutBuilder put(String functionId) {
+        return new PutBuilder(functionId);
+    }
+
+    public static DeleteBuilder delete(String functionId) {
+        return new DeleteBuilder(functionId);
     }
 
     public static HttpStatusValidationBuilder status() {
