@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import static no.ssb.dc.api.Builders.bodyContains;
+import static no.ssb.dc.api.Builders.bodyPublisher;
 import static no.ssb.dc.api.Builders.context;
 import static no.ssb.dc.api.Builders.execute;
 import static no.ssb.dc.api.Builders.get;
@@ -17,6 +18,7 @@ import static no.ssb.dc.api.Builders.jqpath;
 import static no.ssb.dc.api.Builders.nextPage;
 import static no.ssb.dc.api.Builders.paginate;
 import static no.ssb.dc.api.Builders.parallel;
+import static no.ssb.dc.api.Builders.post;
 import static no.ssb.dc.api.Builders.process;
 import static no.ssb.dc.api.Builders.publish;
 import static no.ssb.dc.api.Builders.regex;
@@ -51,6 +53,16 @@ public class BuilderTest {
                     .addPageContent("from-position")
                     .prefetchThreshold(5)
                     .until(whenVariableIsNull("next-position"))
+            )
+            .function(post("authorize")
+                    .url("http://com.company/authorize")
+                    .data(bodyPublisher()
+                            .plainText("PLAIN_TEXT")
+                            .urlEncodedData("username=user&password=pass")
+                            .textPart("foo", "bar")
+                            .formPart("foo", "file", "bar")
+
+                    )
             )
             .function(get("page")
                     .url("http://com.company/endpoint?seq=${from-position}&pageSize=10")

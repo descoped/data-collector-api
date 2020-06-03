@@ -16,12 +16,26 @@ public class EvaluateLastContentStreamPosition {
         this.context = context;
     }
 
+    public String getLastPagePosition() {
+        String topic = context.state("global.topic");
+        checkIfTopicIsNull(topic);
+        return getLastPositionForTopic(topic + "-pages");
+    }
+
     public String getLastPosition() {
+        String topic = context.state("global.topic");
+        checkIfTopicIsNull(topic);
+        return getLastPositionForTopic(topic);
+    }
+
+    private void checkIfTopicIsNull(String topic) {
+        if (topic == null || "".equals(topic)) {
+            throw new EvaluationException("Topic is null!");
+        }
+
+    }
+    private String getLastPositionForTopic(String topic) {
         try {
-            String topic = context.state("global.topic");
-            if (topic == null || "".equals(topic)) {
-                throw new EvaluationException("Topic is null!");
-            }
             ContentStore contentStore = context.services().get(ContentStore.class);
             if (contentStore == null || contentStore.isClosed()) {
                 throw new EvaluationException("ContentStore is null or closed!");

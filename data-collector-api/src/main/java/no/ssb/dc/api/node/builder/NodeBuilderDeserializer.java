@@ -9,11 +9,14 @@ import no.ssb.dc.api.Processor;
 import no.ssb.dc.api.Specification;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -181,7 +184,9 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                         builder.variable(entry.getKey(), (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, entry.getValue())));
 
                 JsonNode stepsNode = currentNode.get("pipes");
-                stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                if (stepsNode != null) {
+                    stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                }
 
                 JsonNode publishJsonNode = currentNode.get("publish");
                 if (publishJsonNode != null) {
@@ -241,6 +246,12 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return builder;
             }
 
+            case ConditionWhenExpressionIsTrue: {
+                WhenExpressionIsTrueBuilder builder = new WhenExpressionIsTrueBuilder();
+                builder.identifier(currentNode.get("identifier").textValue());
+                return builder;
+            }
+
             case AddContent: {
                 return new AddContentBuilder(currentNode.get("positionVariableExpression").textValue(), currentNode.get("contentKey").textValue());
             }
@@ -268,10 +279,87 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 }
 
                 JsonNode stepsNode = currentNode.get("pipes");
-                stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                if (stepsNode != null) {
+                    stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                }
 
                 return builder;
             }
+
+            case Post: {
+                PostBuilder builder = new PostBuilder(currentNode.get("id").textValue());
+
+                builder.url(currentNode.get("url").textValue());
+
+                JsonNode bodyPublisherNode = currentNode.get("bodyPublisher");
+                if (bodyPublisherNode != null) {
+                    BodyPublisherBuilder bodyPublisherBuilder = (BodyPublisherBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, bodyPublisherNode);
+                    builder.data(bodyPublisherBuilder);
+                }
+
+                JsonNode validateResponseNode = currentNode.get("responseValidators");
+                if (validateResponseNode != null) {
+                    validateResponseNode.forEach(validatorNode -> {
+                        LeafNodeBuilder validatorBuilder = (LeafNodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, validatorNode);
+                        builder.validate(validatorBuilder);
+                    });
+                }
+
+                ArrayNode returnVariablesNode = (ArrayNode) currentNode.get("returnVariables");
+                if (returnVariablesNode != null) {
+                    returnVariablesNode.forEach(node -> builder.returnVariables(node.textValue()));
+                }
+
+                JsonNode stepsNode = currentNode.get("pipes");
+                if (stepsNode != null) {
+                    stepsNode.forEach(stepNode -> builder.pipe((NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, stepNode)));
+                }
+
+                return builder;
+            }
+
+            case BodyPublisher: {
+                BodyPublisherBuilder builder = new BodyPublisherBuilder();
+
+                JsonNode plainTextDataNode = currentNode.get("plainTextData");
+                if (plainTextDataNode != null) {
+                    builder.plainText(plainTextDataNode.textValue());
+                }
+
+                JsonNode urlEncodedDataNode = currentNode.get("urlEncodedData");
+                if (urlEncodedDataNode != null) {
+                    builder.urlEncodedData(urlEncodedDataNode.textValue());
+                }
+
+                // TODO add MultiPartFormData
+                JsonNode partsData = currentNode.get("partsData");
+                if (partsData != null) {
+                    partsData.forEach(partNode -> {
+                        String name = partNode.get("name").textValue();
+                        String filename = Optional.ofNullable(partNode.get("filename")).map(JsonNode::textValue).orElse(null);
+                        Charset charset = Optional.ofNullable(partNode.get("charset")).map(node -> Charset.forName(node.textValue())).orElse(StandardCharsets.UTF_8); // TODO add bodypart charset methods
+
+                        JsonNode valueNode = partNode.get("value");
+                        if (filename == null) {
+                            builder.textPart(name, valueNode.textValue());
+                        } else {
+                            if (valueNode.isTextual()) {
+                                builder.formPart(name, filename, valueNode.textValue());
+                            } else {
+                                try {
+                                    byte[] bytes = valueNode.binaryValue();
+                                    builder.formPart(name, filename, bytes);
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+                    });
+                }
+
+                return builder;
+            }
+
 
             case HttpStatusValidation: {
                 HttpStatusValidationBuilder builder = new HttpStatusValidationBuilder();

@@ -1,5 +1,6 @@
 package no.ssb.dc.api.el;
 
+import no.ssb.dc.api.ConfigurationMap;
 import no.ssb.dc.api.content.EvaluateLastContentStreamPosition;
 import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.util.CommonUtils;
@@ -24,6 +25,7 @@ public class ExpressionLanguage {
     static final Pattern EXPRESSION_REGEX = Pattern.compile("\\$\\{([^}]+)}");
     static final Pattern MULTI_EXPRESSION_REGEX = Pattern.compile("\\$\\{(.*?)}+");
 
+    private final ConfigurationMap configuration;
     private final Map<String, Object> variables;
     private final EvaluateLastContentStreamPosition evaluateLastContentStreamPosition;
 
@@ -40,11 +42,16 @@ public class ExpressionLanguage {
     }
 
     public ExpressionLanguage(ExecutionContext context) {
+        this.configuration = context.services().get(ConfigurationMap.class);
         this.variables = new LinkedHashMap<>(context.variables());
         this.evaluateLastContentStreamPosition = new EvaluateLastContentStreamPosition(context);
     }
 
+    // doc: http://commons.apache.org/proper/commons-jexl/reference/examples.html
     void initializeJexlFunctions(JexlContext jexlContext) {
+        if (configuration != null) {
+            jexlContext.set("ENV", new MapContext(new LinkedHashMap<>(configuration.asMap()))); // TODO dotted EL-vars not supported
+        }
         jexlContext.set("cast", new ELCast());
         jexlContext.set("contentStream", new ELContentStream(evaluateLastContentStreamPosition));
     }

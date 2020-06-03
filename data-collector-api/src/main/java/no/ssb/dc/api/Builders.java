@@ -2,6 +2,7 @@ package no.ssb.dc.api;
 
 import no.ssb.dc.api.node.builder.AddContentBuilder;
 import no.ssb.dc.api.node.builder.BodyContainsBuilder;
+import no.ssb.dc.api.node.builder.BodyPublisherBuilder;
 import no.ssb.dc.api.node.builder.EvalBuilder;
 import no.ssb.dc.api.node.builder.ExecuteBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
@@ -10,6 +11,7 @@ import no.ssb.dc.api.node.builder.JqPathBuilder;
 import no.ssb.dc.api.node.builder.NextPageBuilder;
 import no.ssb.dc.api.node.builder.PaginateBuilder;
 import no.ssb.dc.api.node.builder.ParallelBuilder;
+import no.ssb.dc.api.node.builder.PostBuilder;
 import no.ssb.dc.api.node.builder.ProcessBuilder;
 import no.ssb.dc.api.node.builder.PublishBuilder;
 import no.ssb.dc.api.node.builder.QueryBuilder;
@@ -17,6 +19,7 @@ import no.ssb.dc.api.node.builder.RegExBuilder;
 import no.ssb.dc.api.node.builder.SecurityBuilder;
 import no.ssb.dc.api.node.builder.SequenceBuilder;
 import no.ssb.dc.api.node.builder.SpecificationContextBuilder;
+import no.ssb.dc.api.node.builder.WhenExpressionIsTrueBuilder;
 import no.ssb.dc.api.node.builder.WhenVariableIsNullBuilder;
 import no.ssb.dc.api.node.builder.XPathBuilder;
 
@@ -34,8 +37,16 @@ public class Builders {
         return new GetBuilder(functionId);
     }
 
+    public static PostBuilder post(String functionId) {
+        return new PostBuilder(functionId);
+    }
+
     public static HttpStatusValidationBuilder status() {
         return new HttpStatusValidationBuilder();
+    }
+
+    public static BodyPublisherBuilder bodyPublisher() {
+        return new BodyPublisherBuilder();
     }
 
     public static BodyContainsBuilder bodyContains(QueryBuilder queryBuilder, String equalToStringLiteral) {
@@ -98,5 +109,9 @@ public class Builders {
 
     public static WhenVariableIsNullBuilder whenVariableIsNull(String identifier) {
         return new WhenVariableIsNullBuilder().identifier(identifier);
+    }
+
+    public static WhenExpressionIsTrueBuilder whenExpressionIsTrue(String expression) {
+        return new WhenExpressionIsTrueBuilder().identifier(expression);
     }
 }
