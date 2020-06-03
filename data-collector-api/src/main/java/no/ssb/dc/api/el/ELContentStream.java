@@ -12,6 +12,47 @@ public class ELContentStream {
         this.evaluateLastContentStreamPosition = evaluateLastContentStreamPosition;
     }
 
+    /*
+     * Topic page position
+     */
+
+    public boolean hasLastPagePosition() {
+        LOG.debug("Check hasLastPagePosition");
+        return evaluateLastContentStreamPosition.getLastPagePosition() != null;
+    }
+
+    public String lastPagePosition() {
+        LOG.debug("Get lastPagePosition");
+        String lastPagePosition = evaluateLastContentStreamPosition.getLastPagePosition();
+        if (lastPagePosition != null) LOG.info("Last-PagePosition: {}", lastPagePosition);
+        return lastPagePosition;
+    }
+
+    public String lastOrInitialPagePosition(Long initialPagePosition) {
+        LOG.debug("Get lastOrInitialPagePosition (Long): {}", initialPagePosition);
+        return lastOrInitialPagePosition(String.valueOf(initialPagePosition));
+    }
+
+    public String lastOrInitialPagePosition(Integer initialPagePosition) {
+        LOG.debug("Get lastOrInitialPagePosition (Integer): {}", initialPagePosition);
+        return lastOrInitialPagePosition(String.valueOf(initialPagePosition));
+    }
+
+    public String lastOrInitialPagePosition(String initialPagePosition) {
+        LOG.debug("Get lastOrInitialPagePosition (String): {}", initialPagePosition);
+        String lastPagePosition = lastPagePosition();
+        if (lastPagePosition != null) {
+            return lastPagePosition;
+        } else {
+            LOG.info("Start-PagePosition: {}", initialPagePosition);
+            return initialPagePosition;
+        }
+    }
+
+    /*
+     * Topic position
+     */
+
     public boolean hasLastPosition() {
         LOG.debug("Check hasLastPosition");
         return evaluateLastContentStreamPosition.getLastPosition() != null;
