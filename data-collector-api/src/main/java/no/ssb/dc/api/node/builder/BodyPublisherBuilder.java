@@ -38,16 +38,19 @@ public class BodyPublisherBuilder extends OperationPublisherBuilder {
     }
 
     public BodyPublisherBuilder textPart(String name, String value) {
+        this.encoding = FormEncoding.MULTIPART_FORM_DATA;
         this.parts.add(new BodyPart(name, value, StandardCharsets.UTF_8));
         return this;
     }
 
     public BodyPublisherBuilder formPart(String name, String filename, byte[] value) {
+        this.encoding = FormEncoding.MULTIPART_FORM_DATA;
         this.parts.add(new BodyPart(name, filename, value, StandardCharsets.UTF_8));
         return this;
     }
 
     public BodyPublisherBuilder formPart(String name, String filename, String value) {
+        this.encoding = FormEncoding.MULTIPART_FORM_DATA;
         this.parts.add(new BodyPart(name, filename, value, StandardCharsets.UTF_8));
         return this;
     }
