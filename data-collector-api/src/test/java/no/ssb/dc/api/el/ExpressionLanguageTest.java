@@ -32,7 +32,7 @@ public class ExpressionLanguageTest {
         ConfigurationMap config = new ConfigurationMap(map);
         context.services().register(ConfigurationMap.class, config);
         ExpressionLanguage el = new ExpressionLanguage(context);
-        Object result = el.evaluateExpression("ENV.\"foo.bar\"");
+        Object result = el.evaluateExpression("ENV.'foo.bar'");
         System.out.printf("eval: %s", result);
         assertEquals("bar", result);
     }
