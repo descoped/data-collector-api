@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class ExpressionLanguageTest {
 
     @Disabled
@@ -26,11 +28,12 @@ public class ExpressionLanguageTest {
     public void testCustomContext() {
         ExecutionContext context = ExecutionContext.empty();
         Map<String, String> map = new LinkedHashMap<>();
-        map.put("foo", "bar");
+        map.put("foo.bar", "bar");
         ConfigurationMap config = new ConfigurationMap(map);
         context.services().register(ConfigurationMap.class, config);
         ExpressionLanguage el = new ExpressionLanguage(context);
-        Object result = el.evaluateExpression("ENV.foo");
+        Object result = el.evaluateExpression("ENV.\"foo.bar\"");
         System.out.printf("eval: %s", result);
+        assertEquals("bar", result);
     }
 }
