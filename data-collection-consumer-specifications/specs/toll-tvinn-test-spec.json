@@ -2,7 +2,7 @@
   "type" : "Specification",
   "name" : "Collect Tvinn",
   "startFunctionId" : "loop",
-  "id": "TOLL-TVINN",
+  "id": "TOLL-TVINN-TEST",
   "configure" : [ {
     "type" : "SpecificationContext",
     "variables" : {

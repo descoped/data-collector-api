@@ -207,6 +207,10 @@ ping-ske-freg: ## Ping SKE FREG Playground
 collect-freg-playground: ## Collect freg playground
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
 
+.PHONY: collect-freg-konsument-test
+collect-freg-konsument-test: ## Collect konsument test
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-freg-konsument-test-spec.json
+
 .PHONY: collect-sirius-person-utkast
 collect-sirius-person-utkast: ## Collect sirius person utkast
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-utkast-spec.json

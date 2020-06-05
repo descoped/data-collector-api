@@ -137,6 +137,14 @@
               "expression" : "/feil/kode"
             },
             "equalToStringLiteral" : "SM-002"
+          } ],
+          "410" : [ {
+            "type" : "HttpResponseBodyContains",
+            "queryBuilder" : {
+              "type" : "QueryXPath",
+              "expression" : "/feil/kode"
+            },
+            "equalToStringLiteral" : "SM-013"
           } ]
         },
         "failed" : [ 400, 404, 500 ]
