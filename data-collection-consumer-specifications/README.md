@@ -132,10 +132,15 @@ Dev images requires full checkout of the [data-collector-project](https://github
 | Target                          | Supplier      | Description                                      |
 | :------------------------------ | :-----------: | :----------------------------------------------- |
 | collect-freg-playground         | Skatteetaten  | Collect freg playground                          |
+| collect-freg-konsument-test     | Skatteetaten  | Collect freg konsument-test                      |
 | collect-sirius-person-utkast    | Skatteetaten  | Collect sirius person utkast                     |
 | collect-sirius-person-fastsatt  | Skatteetaten  | Collect sirius person fastsatt                   |
-| collect-tvinn                   | Tolletaten    | Collect tvinn                                    |
+| collect-tvinn-test              | Tolletaten    | Collect tvinn test                               |
+| collect-tvinn-test-api          | Tolletaten    | Collect tvinn test api (test backend #2)         |
+| collect-moveit-test             | SSB           | Collect files from MoveIt Automation Server (*)  |
 |
+ 
+ > (*) MoveIt notice: copy and configure `./profile/postgres/conf/application-sample_moveit.properties` to `./profile/postgres/conf/application-override.properties`.  
  
  ### Management
 

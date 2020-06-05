@@ -9,3 +9,4 @@
 **/*certs.zip
 
 /profile/gcs/conf/application.properties
+**/application-override.properties

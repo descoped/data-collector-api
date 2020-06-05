@@ -1,0 +1,190 @@
+{
+  "type" : "Specification",
+  "name" : "MoveIt Test",
+  "startFunctionId" : "authorize",
+  "id" : "MOVEIT-TEST",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "baseURL" : "https://moveitapitest.ssb.no",
+      "rootFolder" : "/Home/moveitapi",
+      "pageSize" : "5",
+      "nextPage" : "${cast.toLong(contentStream.lastOrInitialPagePosition(1))}"
+    },
+    "globalState" : {
+      "global.topic" : "moveit-test"
+    }
+  } ],
+  "functions" : {
+    "authorize" : {
+      "type" : "Post",
+      "id" : "authorize",
+      "url" : "${baseURL}/api/v1/token",
+      "requestHeaders" : { },
+      "bodyPublisher" : {
+        "type" : "BodyPublisher",
+        "plainTextData" : "grant_type=password&username=${ENV.'moveIt.server.username'}&password=${ENV.'moveIt.server.password'}"
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Execute",
+        "executeId" : "find-root-folder",
+        "inputVariables" : {
+          "accessToken" : {
+            "type" : "QueryJqPath",
+            "expression" : ".access_token"
+          }
+        }
+      } ]
+    },
+    "find-root-folder" : {
+      "type" : "Get",
+      "id" : "find-root-folder",
+      "url" : "${baseURL}/api/v1/folders",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Execute",
+        "executeId" : "loop",
+        "requiredInputs" : [ "accessToken" ],
+        "inputVariables" : {
+          "folderId" : {
+            "type" : "QueryJqPath",
+            "expression" : ".items[] | select(.path == \"${rootFolder}\") | .id"
+          }
+        }
+      } ]
+    },
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromPage" : "${nextPage}"
+      },
+      "threshold" : 8,
+      "addPageContent" : true,
+      "positionVariable" : "fromPage",
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "page",
+        "requiredInputs" : [ "accessToken", "folderId" ]
+      } ],
+      "until" : {
+        "type" : "ConditionWhenExpressionIsTrue",
+        "identifier" : "${nextPage > totalPages}"
+      }
+    },
+    "page" : {
+      "type" : "Get",
+      "id" : "page",
+      "url" : "${baseURL}/api/v1/folders/${folderId}/files?page=${nextPage}&perPage=${pageSize}&sortDirection=asc&sortField=uploadStamp",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "returnVariables" : [ "nextPage", "totalPages" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".items[]"
+        },
+        "expectedQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".id"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextPage" : {
+            "type" : "QueryEval",
+            "query" : {
+              "type" : "QueryJqPath",
+              "expression" : ".paging.page"
+            },
+            "bindToVariable" : "lastPage",
+            "expression" : "${cast.toLong(lastPage) + 1}"
+          },
+          "totalPages" : {
+            "type" : "QueryJqPath",
+            "expression" : ".paging.totalPages"
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryJqPath",
+            "expression" : ".id"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".items[]"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Execute",
+          "executeId" : "download-file",
+          "requiredInputs" : [ "folderId" ],
+          "inputVariables" : {
+            "name" : {
+              "type" : "QueryJqPath",
+              "expression" : ".name"
+            },
+            "path" : {
+              "type" : "QueryJqPath",
+              "expression" : ".path"
+            },
+            "uploadStamp" : {
+              "type" : "QueryJqPath",
+              "expression" : ".uploadStamp"
+            }
+          }
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    },
+    "download-file" : {
+      "type" : "Get",
+      "id" : "download-file",
+      "url" : "${baseURL}/api/v1/folders/${folderId}/files/${position}/download",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "file"
+      } ]
+    }
+  }
+}

@@ -235,6 +235,10 @@ collect-tvinn-test: ## Collect tvinn Test
 collect-tvinn-api-test: ## Collect tvinn API-test
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/toll-tvinn-api-test-spec.json
 
+.PHONY: collect-moveit-test
+collect-moveit-test: ## Collect MoveIt Test
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/moveit-test-spec.json
+
 .PHONY: list-tasks
 list-tasks: ## List running tasks
 	@curl -X GET localhost:${DC_PORT}/tasks && printf "\n"
