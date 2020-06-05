@@ -104,7 +104,7 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                         } else if (entry.getValue().isTextual()) {
                             value = entry.getValue().textValue();
                         } else {
-                            throw new IllegalArgumentException("The context variable type is not supoorted: " + entry.getKey());
+                            throw new IllegalArgumentException("The context variable type is not supported: " + entry.getKey());
                         }
                         builder.variable(entry.getKey(), value);
                     });
@@ -264,6 +264,27 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 GetBuilder builder = new GetBuilder(currentNode.get("id").textValue());
 
                 builder.url(currentNode.get("url").textValue());
+
+                JsonNode requestHeaders = currentNode.get("requestHeaders");
+                if (requestHeaders != null) {
+                    requestHeaders.fieldNames().forEachRemaining(headerName -> {
+                        ArrayNode values = (ArrayNode) requestHeaders.get(headerName);
+                        for (int i = 0; i < values.size(); i++) {
+                            JsonNode value = values.get(i);
+                            String headerValue;
+                            if (value.isInt()) {
+                                headerValue = String.valueOf(value.intValue());
+                            } else if (value.isBoolean()) {
+                                headerValue = Boolean.toString(value.booleanValue());
+                            } else if (value.isTextual()) {
+                                headerValue = value.textValue();
+                            } else {
+                                throw new IllegalArgumentException("The context variable type is not supported: " + headerName);
+                            }
+                            builder.header(headerName, headerValue);
+                        }
+                    });
+                }
 
                 JsonNode validateResponseNode = currentNode.get("responseValidators");
                 if (validateResponseNode != null) {

@@ -1,6 +1,7 @@
 package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.BodyPublisher;
@@ -18,7 +19,7 @@ import static no.ssb.dc.api.Builders.status;
 
 public class PostBuilder extends OperationBuilder {
 
-    @JsonProperty Headers requestHeaders = new Headers();
+    @JsonUnwrapped(prefix = "request")  Headers requestHeaders = new Headers();
     @JsonProperty("bodyPublisher") BodyPublisherBuilder bodyPublisherBuilder;
     @JsonProperty("responseValidators") List<LeafNodeBuilder> validators = new ArrayList<>();
     @JsonProperty("pipes") List<NodeBuilder> pipes = new ArrayList<>();

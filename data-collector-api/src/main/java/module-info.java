@@ -18,6 +18,7 @@ module no.ssb.dc.api {
 
     //opens no.ssb.dc.api.node.builder to com.fasterxml.jackson.databind;
     opens no.ssb.dc.api.node.builder;
+    opens no.ssb.dc.api.http to com.fasterxml.jackson.databind;
 
     uses Client.Builder;
     uses Request.Builder;

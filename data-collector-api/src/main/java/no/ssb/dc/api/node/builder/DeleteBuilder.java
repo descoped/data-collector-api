@@ -1,6 +1,7 @@
 package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
@@ -19,7 +20,7 @@ import static no.ssb.dc.api.Builders.status;
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class DeleteBuilder extends OperationBuilder {
 
-    @JsonProperty Headers requestHeaders = new Headers();
+    @JsonUnwrapped(prefix = "request") Headers requestHeaders = new Headers();
     @JsonProperty("responseValidators") List<LeafNodeBuilder> validators = new ArrayList<>();
     @JsonProperty("pipes") List<NodeBuilder> pipes = new ArrayList<>();
     @JsonProperty List<String> returnVariables = new ArrayList<>();

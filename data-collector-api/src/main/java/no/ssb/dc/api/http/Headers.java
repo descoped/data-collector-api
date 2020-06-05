@@ -1,5 +1,7 @@
 package no.ssb.dc.api.http;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -12,7 +14,7 @@ import static java.util.Objects.requireNonNull;
 
 public class Headers {
 
-    Map<String, List<String>> headers = new LinkedHashMap<>();
+    @JsonProperty("Headers") /* use @JsonWrapper(prefix) in serializer */ Map<String, List<String>> headers = new LinkedHashMap<>();
 
     public Headers() {
     }

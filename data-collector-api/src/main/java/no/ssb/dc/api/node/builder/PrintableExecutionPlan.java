@@ -27,6 +27,27 @@ class PrintableExecutionPlan {
                 );
             });
 
+            visitNode.given(PostBuilder.PostNode.class, handled, node -> {
+                builder.append(String.format("%s(%s) post(%s) => %s%n", indent, ancestors.size(),
+                        node.id(),
+                        node.url())
+                );
+            });
+
+            visitNode.given(PutBuilder.PutNode.class, handled, node -> {
+                builder.append(String.format("%s(%s) put(%s) => %s%n", indent, ancestors.size(),
+                        node.id(),
+                        node.url())
+                );
+            });
+
+            visitNode.given(DeleteBuilder.DeleteNode.class, handled, node -> {
+                builder.append(String.format("%s(%s) delete(%s) => %s%n", indent, ancestors.size(),
+                        node.id(),
+                        node.url())
+                );
+            });
+
             visitNode.given(ProcessBuilder.ProcessNode.class, handled, node -> {
                 builder.append(String.format("%s(%s) process(Class<%s>) produces required-variables: %s%n", indent, ancestors.size(),
                         node.processorClass().getSimpleName(),
