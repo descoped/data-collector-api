@@ -129,6 +129,14 @@ public class BuilderTest {
     }
 
     @Test
+    public void validateDeserializer() {
+        SpecificationBuilder actualSpecificationBuilder = SPECIFICATION_BUILDER;
+        String serialized = actualSpecificationBuilder.serialize();
+        SpecificationBuilder expectedSpecificationBuilder = Specification.deserialize(serialized);
+        assertEquals(actualSpecificationBuilder, expectedSpecificationBuilder);
+    }
+
+    @Test
     public void thatFlowBuilderIsSerializedThenDeserialized() {
         SpecificationBuilder actual = SPECIFICATION_BUILDER;
         FlowContext actualFlowContext = actual.end().configurations.flowContext();
