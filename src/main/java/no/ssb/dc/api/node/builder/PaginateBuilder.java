@@ -74,7 +74,9 @@ public class PaginateBuilder extends NodeWithIdBuilder {
 
         ConditionBuilder.ConditionNode conditionNode = conditionBuilder.build(buildContext);
 
-        return (R) new PaginateNode(getId(), buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), variables, addPageContent, positionVariable, executeNodeList, threshold, conditionNode);
+        Configurations configurations = buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION);
+
+        return (R) new PaginateNode(getId(), configurations, variables, addPageContent, positionVariable, executeNodeList, threshold, conditionNode);
     }
 
     @Override

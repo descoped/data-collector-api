@@ -2,6 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import no.ssb.dc.api.SetterMethod;
 import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
@@ -16,8 +17,8 @@ import java.util.Objects;
 public class SpecificationContextBuilder extends ConfigurationBuilder {
 
     Headers headers = new Headers();
-    @JsonProperty Map<String, Object> variables = new LinkedHashMap<>();
-    @JsonProperty Map<Object, Object> globalState = new LinkedHashMap<>();
+    @JsonProperty @SetterMethod("variable") Map<String, Object> variables = new LinkedHashMap<>();
+    @JsonProperty @SetterMethod Map<Object, Object> globalState = new LinkedHashMap<>();
 
     public SpecificationContextBuilder() {
         super(BuilderType.SpecificationContext);
