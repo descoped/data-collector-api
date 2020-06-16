@@ -3,14 +3,18 @@ package no.ssb.dc.api.node.builder;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import no.ssb.dc.api.node.Base;
+import no.ssb.dc.api.node.Identity;
 import no.ssb.dc.api.node.Security;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class SecurityBuilder extends ConfigurationBuilder {
 
     @JsonProperty String bundleName;
+    @JsonProperty("identities") List<IdentityBuilder> identities = new ArrayList<>();
 
     public SecurityBuilder() {
         super(BuilderType.Security);
@@ -21,9 +25,18 @@ public class SecurityBuilder extends ConfigurationBuilder {
         return this;
     }
 
+    public SecurityBuilder identity(IdentityBuilder identityBuilder) {
+        this.identities.add(identityBuilder);
+        return this;
+    }
+
     @Override
     public <R extends Base> R build(BuildContext buildContext) {
-        return (R) new SecurityNode(bundleName);
+        List<Identity> identityList = new ArrayList<>();
+        for(IdentityBuilder identityBuilder : identities) {
+            identityList.add(identityBuilder.build(buildContext));
+        }
+        return (R) new SecurityNode(bundleName, identityList);
     }
 
     @Override
@@ -47,17 +60,24 @@ public class SecurityBuilder extends ConfigurationBuilder {
                 '}';
     }
 
-    static class SecurityNode extends LeafNode implements Security {
+    public static class SecurityNode extends LeafNode implements Security {
 
         private String sslBundleName;
+        private final List<Identity> identities;
 
-        public SecurityNode(String sslBundleName) {
+        public SecurityNode(String sslBundleName, List<Identity> identities) {
             this.sslBundleName = sslBundleName;
+            this.identities = identities;
         }
 
         @Override
         public String sslBundleName() {
             return sslBundleName;
+        }
+
+        @Override
+        public List<Identity> identities() {
+            return identities;
         }
 
         @Override

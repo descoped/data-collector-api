@@ -60,7 +60,6 @@ public class EvalBuilder extends QueryBuilder {
         final String expression;
 
         EvalNode(Query query, String bindToVariable, String expression) {
-
             this.query = query;
             this.bindToVariable = bindToVariable;
             this.expression = expression;

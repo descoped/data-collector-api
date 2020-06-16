@@ -128,6 +128,39 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                     builder.sslBundleName(sslBundleNameNode.textValue());
                 }
 
+                ArrayNode identityNodes = (ArrayNode) currentNode.get("identities");
+                if (identityNodes != null) {
+                    identityNodes.forEach(identityNode -> {
+                        builder.identity((IdentityBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, identityNode));
+                    });
+                }
+
+                return builder;
+            }
+
+            case JwtIdentity: {
+                String id = currentNode.get("id").textValue();
+
+                JwtHeaderClaims headerClaims = new JwtHeaderClaims();
+                JsonNode headerClaimsNode = currentNode.get("headerClaims");
+                if (headerClaimsNode != null) {
+                    headerClaimsNode.fields().forEachRemaining(entry -> {
+                        String value = entry.getValue() == null ? null : entry.getValue().textValue(); // todo only support string values
+                        headerClaims.headerClaims.put(entry.getKey(), value);
+                    });
+                }
+
+                JwtClaims claims = new JwtClaims();
+                JsonNode claimsNode = currentNode.get("claims");
+                if (claimsNode != null) {
+                    claimsNode.fields().forEachRemaining(entry -> {
+                        String value = entry.getValue() == null ? null : entry.getValue().textValue(); // todo only support string values
+                        claims.claims.put(entry.getKey(), value);
+                    });
+                }
+
+                IdentityBuilder builder = new JwtIdentityBuilder(id, headerClaims, claims);
+
                 return builder;
             }
 
@@ -197,6 +230,20 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return builder;
             }
 
+            case ForEach: {
+                JsonNode splitQueryNode = currentNode.get("splitQuery");
+                QueryBuilder splitQueryBuilder = (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, splitQueryNode);
+                ForEachBuilder builder = new ForEachBuilder(splitQueryBuilder);
+                if (currentNode.has("pipes")) {
+                    JsonNode pipeNodes = currentNode.get("pipes");
+                    pipeNodes.forEach(pipeNode -> {
+                        NodeBuilder pipeBuilder = (NodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, pipeNode);
+                        builder.pipe(pipeBuilder);
+                    });
+                }
+                return builder;
+            }
+
             case Execute: {
                 ExecuteBuilder builder = new ExecuteBuilder(currentNode.get("executeId").textValue());
 
@@ -219,6 +266,14 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
                 }
+            }
+
+            case Console: {
+                return new ConsoleBuilder();
+            }
+
+            case QueryBody: {
+                return new BodyBuilder();
             }
 
             case QueryEval: {
@@ -402,12 +457,16 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
 
                 JsonNode plainTextDataNode = currentNode.get("plainTextData");
                 if (plainTextDataNode != null) {
-                    builder.plainText(plainTextDataNode.textValue());
+                    BodyPublisherProducerBuilder bodyPublisherProducerBuilder =
+                            (BodyPublisherProducerBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, plainTextDataNode);
+                    builder.plainText(bodyPublisherProducerBuilder);
                 }
 
                 JsonNode urlEncodedDataNode = currentNode.get("urlEncodedData");
                 if (urlEncodedDataNode != null) {
-                    builder.urlEncodedData(urlEncodedDataNode.textValue());
+                    BodyPublisherProducerBuilder bodyPublisherProducerBuilder =
+                            (BodyPublisherProducerBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, urlEncodedDataNode);
+                    builder.urlEncoded(bodyPublisherProducerBuilder);
                 }
 
                 // TODO add MultiPartFormData
@@ -439,6 +498,23 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return builder;
             }
 
+
+            case StringBodyPublisherProducer: {
+                String data = currentNode.get("data").textValue();
+                StringBodyPublisherProducerBuilder builder = new StringBodyPublisherProducerBuilder(data);
+                return builder;
+            }
+
+            case JwtIdentityTokenBodyPublisherProducer: {
+                String identityId = currentNode.get("identityId").textValue();
+                String bindTo = currentNode.get("bindTo").textValue();
+                String token = currentNode.get("token").textValue();
+                JwtIdentityTokenBodyPublisherProducerBuilder builder = new JwtIdentityTokenBodyPublisherProducerBuilder();
+                builder.identityId(identityId);
+                builder.bindTo(bindTo);
+                builder.token(token);
+                return builder;
+            }
 
             case HttpStatusValidation: {
                 HttpStatusValidationBuilder builder = new HttpStatusValidationBuilder();

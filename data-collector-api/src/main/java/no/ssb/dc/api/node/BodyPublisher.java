@@ -8,9 +8,9 @@ public interface BodyPublisher extends OperationPublisher {
 
     FormEncoding getEncoding();
 
-    String getPlainText();
+    BodyPublisherProducer getPlainText();
 
-    String getUrlEncodedData();
+    BodyPublisherProducer getUrlEncodedData();
 
     List<BodyPart> getParts();
 

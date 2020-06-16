@@ -34,6 +34,10 @@ public class BuildContext {
         return new BuildContext(new LinkedHashMap<>(), new LinkedHashMap<>());
     }
 
+    public static BuildContext of(Map<String, NodeBuilder> nodeBuilderById, Map<String, Object> nodeInstanceById) {
+        return new BuildContext(nodeBuilderById, nodeInstanceById);
+    }
+
     Map<String, NodeBuilder> nodeBuilderById() {
         return nodeBuilderById;
     }

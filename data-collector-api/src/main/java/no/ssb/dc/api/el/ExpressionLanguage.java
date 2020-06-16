@@ -57,6 +57,7 @@ public class ExpressionLanguage {
     }
 
     public boolean isExpression(String expr) {
+        if (expr == null) return false;
         Matcher m = EXPRESSION_REGEX.matcher(expr);
         return m.find();
     }

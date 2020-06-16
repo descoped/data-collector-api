@@ -17,7 +17,7 @@ import java.util.Optional;
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
 public class SpecificationBuilder extends AbstractBuilder {
 
-    static final String GLOBAL_CONFIGURATION = "GLOBAL_CONFIGURATION";
+    public static final String GLOBAL_CONFIGURATION = "GLOBAL_CONFIGURATION";
 
     @JsonProperty("id") final String specificationId;
     @JsonProperty final String name;

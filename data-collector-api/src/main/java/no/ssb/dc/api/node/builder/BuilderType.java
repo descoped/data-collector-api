@@ -4,12 +4,16 @@ public enum BuilderType {
     Specification,
     SpecificationContext,
     Security,
+    JwtIdentity,
+    JwtIdentityTokenBodyPublisherProducer,
     Paginate,
+    ForEach,
     Sequence,
     NextPage,
     Parallel,
     Execute,
     Process,
+    QueryBody,
     QueryEval,
     QueryXPath,
     QueryJqPath,
@@ -24,7 +28,9 @@ public enum BuilderType {
     Delete,
     HttpStatusValidation,
     BodyPublisher,
-    HttpResponseBodyContains;
+    StringBodyPublisherProducer,
+    HttpResponseBodyContains,
+    Console;
 
     public static BuilderType parse(String name) {
         for (BuilderType builderType : values()) {

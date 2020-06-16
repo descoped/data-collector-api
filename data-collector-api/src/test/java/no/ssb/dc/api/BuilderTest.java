@@ -9,13 +9,20 @@ import no.ssb.dc.api.node.builder.SpecificationBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static no.ssb.dc.api.Builders.body;
 import static no.ssb.dc.api.Builders.bodyContains;
 import static no.ssb.dc.api.Builders.bodyPublisher;
+import static no.ssb.dc.api.Builders.claims;
+import static no.ssb.dc.api.Builders.console;
 import static no.ssb.dc.api.Builders.context;
 import static no.ssb.dc.api.Builders.delete;
 import static no.ssb.dc.api.Builders.execute;
+import static no.ssb.dc.api.Builders.forEach;
 import static no.ssb.dc.api.Builders.get;
+import static no.ssb.dc.api.Builders.headerClaims;
 import static no.ssb.dc.api.Builders.jqpath;
+import static no.ssb.dc.api.Builders.jwt;
+import static no.ssb.dc.api.Builders.jwtToken;
 import static no.ssb.dc.api.Builders.nextPage;
 import static no.ssb.dc.api.Builders.paginate;
 import static no.ssb.dc.api.Builders.parallel;
@@ -42,6 +49,7 @@ public class BuilderTest {
             )
             .configure(security()
                     .sslBundleName("ske-test-certs")
+                    .identity(jwt("test-identity", headerClaims().alg("alg").x509CertChain("ske-test-certs"), claims().claim("foo", "bar")))
             )
             .function(get("getstartposition")
                     .url("http://com.company/getstartposition")
@@ -60,20 +68,25 @@ public class BuilderTest {
                     .url("http://com.company/authorize")
                     .data(bodyPublisher()
                             .plainText("PLAIN_TEXT")
-                            .urlEncodedData("username=user&password=pass")
+                            .urlEncoded("username=user&password=pass")
                             .textPart("foo", "bar")
                             .formPart("foo", "file", "bar")
-
                     )
             )
             .function(put("create-something")
                     .url("http://com.company/authorize")
                     .data(bodyPublisher()
                             .plainText("PLAIN_TEXT")
-                            .urlEncodedData("foo=bar")
+                            .urlEncoded("foo=bar")
                             .textPart("foo", "bar")
                             .formPart("foo", "file", "bar")
 
+                    )
+            )
+            .function(post("jwt-token")
+                    .url("http://com.company/auth")
+                    .data(bodyPublisher()
+                            .urlEncoded(jwtToken().identityId("test-identity").bindTo("JWT_GRANT").token("grant=${GRANT_TYPE"))
                     )
             )
             .function(get("page")
@@ -88,6 +101,7 @@ public class BuilderTest {
                     // parallel should take the sequence as input
                     .pipe(parallel(xpath("/feed/entry"))
                             .variable("position", xpath("/entry/content/ns2:lagretHendelse/ns2:sekvensnummer"))
+                            .pipe(console())
                             .pipe(execute("person-doc")
                                     .inputVariable("person-id", xpath("/entry/content/ns2:lagretHendelse/ns2:hendelse/ns2:persondokument"))
                                     .requiredInput("person-id-blash")
@@ -98,6 +112,11 @@ public class BuilderTest {
                             )
                             .pipe(execute("event-doc-404-error")
                                     .inputVariable("event-id", xpath("/entry/content/ns2:lagretHendelse/ns2:hendelse/ns2:hendelsesdokument"))
+                            )
+                            .pipe(forEach(jqpath(".array[]"))
+                                    .pipe(execute("person-doc")
+                                            .inputVariable("rawResponseBody", body())
+                                    )
                             )
                             // publish completed position. Sequencing should occur in core
                             .pipe(publish("${position}"))
@@ -134,12 +153,13 @@ public class BuilderTest {
         FlowContext actualFlowContext = actual.end().configurations.flowContext();
         String serialized = actual.serialize();
         assertNotNull(serialized);
-        System.out.printf("serialized:%n%s%n", serialized);
+        //System.out.printf("serialized:%n%s%n", serialized);
 
         SpecificationBuilder deserialized = Specification.deserialize(serialized, SpecificationBuilder.class);
         assertNotNull(deserialized);
-        System.out.printf("deserialized:%n%s%n", deserialized);
+        //System.out.printf("deserialized:%n%s%n", deserialized.serialize());
 
+        assertEquals(serialized, deserialized.serialize());
         assertEquals(actual, deserialized);
 
         Specification end = deserialized.end();

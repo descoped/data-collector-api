@@ -1,14 +1,21 @@
 package no.ssb.dc.api;
 
 import no.ssb.dc.api.node.builder.AddContentBuilder;
+import no.ssb.dc.api.node.builder.BodyBuilder;
 import no.ssb.dc.api.node.builder.BodyContainsBuilder;
 import no.ssb.dc.api.node.builder.BodyPublisherBuilder;
+import no.ssb.dc.api.node.builder.ConsoleBuilder;
 import no.ssb.dc.api.node.builder.DeleteBuilder;
 import no.ssb.dc.api.node.builder.EvalBuilder;
 import no.ssb.dc.api.node.builder.ExecuteBuilder;
+import no.ssb.dc.api.node.builder.ForEachBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
 import no.ssb.dc.api.node.builder.HttpStatusValidationBuilder;
 import no.ssb.dc.api.node.builder.JqPathBuilder;
+import no.ssb.dc.api.node.builder.JwtClaims;
+import no.ssb.dc.api.node.builder.JwtHeaderClaims;
+import no.ssb.dc.api.node.builder.JwtIdentityBuilder;
+import no.ssb.dc.api.node.builder.JwtIdentityTokenBodyPublisherProducerBuilder;
 import no.ssb.dc.api.node.builder.NextPageBuilder;
 import no.ssb.dc.api.node.builder.PaginateBuilder;
 import no.ssb.dc.api.node.builder.ParallelBuilder;
@@ -33,6 +40,22 @@ public class Builders {
 
     public static SecurityBuilder security() {
         return new SecurityBuilder();
+    }
+
+    public static JwtIdentityBuilder jwt(String id, JwtHeaderClaims headerClaims, JwtClaims claims) {
+        return new JwtIdentityBuilder(id, headerClaims, claims);
+    }
+
+    public static JwtIdentityTokenBodyPublisherProducerBuilder jwtToken() {
+        return new JwtIdentityTokenBodyPublisherProducerBuilder();
+    }
+
+    public static JwtHeaderClaims headerClaims() {
+        return new JwtHeaderClaims();
+    }
+
+    public static JwtClaims claims() {
+        return new JwtClaims();
     }
 
     public static GetBuilder get(String functionId) {
@@ -85,6 +108,10 @@ public class Builders {
         return new ParallelBuilder(builder);
     }
 
+    public static ForEachBuilder forEach(QueryBuilder builder) {
+        return new ForEachBuilder(builder);
+    }
+
     public static ExecuteBuilder execute(String function) {
         return new ExecuteBuilder(function);
     }
@@ -99,6 +126,10 @@ public class Builders {
 
     public static PublishBuilder publish(String positionVariable) {
         return new PublishBuilder(positionVariable);
+    }
+
+    public static BodyBuilder body() {
+        return new BodyBuilder();
     }
 
     public static EvalBuilder eval(QueryBuilder queryBuilder, String bindTo, String elExpression) {
@@ -123,5 +154,9 @@ public class Builders {
 
     public static WhenExpressionIsTrueBuilder whenExpressionIsTrue(String expression) {
         return new WhenExpressionIsTrueBuilder().identifier(expression);
+    }
+
+    public static ConsoleBuilder console() {
+        return new ConsoleBuilder();
     }
 }
