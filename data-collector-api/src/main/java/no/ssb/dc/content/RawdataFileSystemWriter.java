@@ -3,21 +3,30 @@ package no.ssb.dc.content;
 import no.ssb.rawdata.api.RawdataClient;
 import no.ssb.rawdata.api.RawdataConsumer;
 import no.ssb.rawdata.api.RawdataMessage;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.AutoDetectParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 public class RawdataFileSystemWriter {
 
     private static final Logger LOG = LoggerFactory.getLogger(RawdataFileSystemWriter.class);
-    private static final int TIMEOUT = 1 * 1000; // seconds
-    private static final long NAP = 500L; // millis
+    private static final int TIMEOUT = 250; // seconds
+    private static final long NAP = 250L; // millis
 
     private final RawdataConsumer consumer;
     private final Path rootPath;
@@ -40,8 +49,17 @@ public class RawdataFileSystemWriter {
     }
 
     private Runnable worker() {
+        TikaConfig config = TikaConfig.getDefaultConfig();
+//        Detector detector = config.getDetector();
+        List<MediaType> textMediaTypes = List.of("plain/text", "application/json", "application/xml").stream().map(MediaType::parse).collect(Collectors.toList());
+        Metadata metadata = new Metadata();
+
+        AutoDetectParser parser = new AutoDetectParser(config);
+        Detector detector = parser.getDetector();
+
         return () -> {
             running.set(true);
+            LOG.info("Consuming topic {} in {}", consumer.topic(), consumer.getClass());
             RawdataMessage message;
             try {
                 while (!closed.get() || !Thread.currentThread().isInterrupted()) {
@@ -51,9 +69,23 @@ public class RawdataFileSystemWriter {
                             Files.createDirectories(filePath);
                         }
                         for (String key : message.keys()) {
-                            Path contentFilePath = filePath.resolve(filePath.resolve(key));
-                            LOG.trace("Dump file: {}", contentFilePath.toAbsolutePath().toString());
-                            Files.write(contentFilePath, message.get(key));
+                            byte[] data = message.get(key);
+                            String content = new String(data, StandardCharsets.UTF_8);
+                            MediaType mediaType = detector.detect(new ByteArrayInputStream(data), metadata);
+                            String subtype = mediaType.getSubtype();
+                            if ("plain".equals(subtype)) {
+                                if (content.startsWith("{") || content.startsWith("[") && !key.endsWith(".json")) {
+                                    subtype = ".json";
+                                } else if (content.startsWith("<")){
+                                    subtype = ".xml";
+                                } else {
+                                    subtype = "";
+                                }
+                            } else {
+                                subtype = "." + subtype;
+                            }
+                            Path contentFilePath = filePath.resolve(filePath.resolve(key) + subtype);
+                            Files.write(contentFilePath, data);
                         }
                         if (closed.get()) {
                             break;
