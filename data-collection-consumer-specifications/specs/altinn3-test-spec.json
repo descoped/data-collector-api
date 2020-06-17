@@ -1,0 +1,214 @@
+{
+  "type" : "Specification",
+  "name" : "Altinn 3",
+  "startFunctionId" : "maskinporten-jwt-grant",
+  "id" : "ALTINN-TEST",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "nextPage" : null,
+      "appId" : "${ENV.'ssb.altinn.app-id'}",
+      "clientId" : "${ENV.'ssb.altinn.clientId'}",
+      "jwtGrantTimeToLiveInSeconds" : "${ENV.'ssb.jwtGrant.expiration'}"
+    },
+    "globalState" : {
+      "global.topic" : "altinn-test"
+    }
+  }, {
+    "type" : "Security",
+    "identities" : [ {
+      "type" : "JwtIdentity",
+      "id" : "maskinporten",
+      "headerClaims" : {
+        "alg" : "RS256",
+        "sslBundleName" : "ssb-test-certs"
+      },
+      "claims" : {
+        "audience" : "https://ver2.maskinporten.no/",
+        "issuer" : "${clientId}",
+        "resource" : "https://tt02.altinn.no/maskinporten-api/",
+        "scope" : "altinn:instances.read altinn:instances.write",
+        "timeToLiveInSeconds" : "${jwtGrantTimeToLiveInSeconds}"
+      }
+    } ]
+  } ],
+  "functions" : {
+    "maskinporten-jwt-grant" : {
+      "type" : "Post",
+      "id" : "maskinporten-jwt-grant",
+      "url" : "https://ver2.maskinporten.no/token/api/v1/token",
+      "requestHeaders" : { },
+      "bodyPublisher" : {
+        "type" : "BodyPublisher",
+        "urlEncodedData" : {
+          "type" : "JwtIdentityTokenBodyPublisherProducer",
+          "identityId" : "maskinporten",
+          "bindTo" : "JWT_GRANT",
+          "token" : "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${JWT_GRANT}"
+        }
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Execute",
+        "executeId" : "altinn-jwt-replacement-token",
+        "inputVariables" : {
+          "accessToken" : {
+            "type" : "QueryJqPath",
+            "expression" : ".access_token"
+          }
+        }
+      } ]
+    },
+    "altinn-jwt-replacement-token" : {
+      "type" : "Get",
+      "id" : "altinn-jwt-replacement-token",
+      "url" : "https://platform.tt02.altinn.no/authentication/api/v1/exchange/maskinporten",
+      "requestHeaders" : {
+        "Content-Type" : [ "plain/text" ],
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Execute",
+        "executeId" : "loop",
+        "inputVariables" : {
+          "accessToken" : {
+            "type" : "QueryBody"
+          }
+        }
+      } ]
+    },
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromPage" : "${nextPage}"
+      },
+      "threshold" : 0,
+      "addPageContent" : false,
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "page",
+        "requiredInputs" : [ "accessToken" ]
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextPage"
+      }
+    },
+    "page" : {
+      "type" : "Get",
+      "id" : "page",
+      "url" : "https://platform.tt02.altinn.no/storage/api/v1/instances?org=ssb&appId=${appId}",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".instances[]"
+        },
+        "expectedQuery" : {
+          "type" : "QueryRegEx",
+          "expression" : "([^\\/]+$)",
+          "query" : {
+            "type" : "QueryJqPath",
+            "expression" : ".id"
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryRegEx",
+            "expression" : "([^\\/]+$)",
+            "query" : {
+              "type" : "QueryJqPath",
+              "expression" : ".id"
+            }
+          },
+          "ownerPartyId" : {
+            "type" : "QueryJqPath",
+            "expression" : ".instanceOwner.partyId"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".instances[]"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry",
+          "state" : {
+            "ownerPartyId" : "${ownerPartyId}",
+            "instanceGuid" : "${instanceGuid}",
+            "ackURL" : "https://platform.tt02.altinn.no/storage/api/v1/sbl/instances/${ownerPartyId}/${instanceGuid}"
+          }
+        }, {
+          "type" : "ForEach",
+          "splitQuery" : {
+            "type" : "QueryJqPath",
+            "expression" : ".data[]"
+          },
+          "pipes" : [ {
+            "type" : "Execute",
+            "executeId" : "download-file",
+            "requiredInputs" : [ "accessToken" ],
+            "inputVariables" : {
+              "dataId" : {
+                "type" : "QueryJqPath",
+                "expression" : ".id"
+              },
+              "instanceGuid" : {
+                "type" : "QueryJqPath",
+                "expression" : ".instanceGuid"
+              }
+            }
+          } ]
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    },
+    "download-file" : {
+      "type" : "Get",
+      "id" : "download-file",
+      "url" : "https://platform.tt02.altinn.no/storage/api/v1/instances/${ownerPartyId}/${instanceGuid}/data/${dataId}",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ],
+          "500" : [ ],
+          "404" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "file-${dataId}"
+      } ]
+    }
+  }
+}
