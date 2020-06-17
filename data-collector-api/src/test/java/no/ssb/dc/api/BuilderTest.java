@@ -9,6 +9,7 @@ import no.ssb.dc.api.node.builder.SpecificationBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import static no.ssb.dc.api.Builders.addContent;
 import static no.ssb.dc.api.Builders.body;
 import static no.ssb.dc.api.Builders.bodyContains;
 import static no.ssb.dc.api.Builders.bodyPublisher;
@@ -128,6 +129,11 @@ public class BuilderTest {
             )
             .function(get("person-doc")
                     .url("http://com.company/endpoint/person/${person-id}}")
+                    .pipe(addContent("${position}", "entry")
+                            .storeState("stateString", "stateValue")
+                            .storeState("stateInt", 10)
+                            .storeState("stateBoolean", true)
+                    )
                     .pipe(process(Processor.class).output("person-id"))
             )
             .function(get("event-doc")

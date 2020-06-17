@@ -1,10 +1,15 @@
 package no.ssb.dc.api.content;
 
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.fasterxml.jackson.databind.node.ValueNode;
 import no.ssb.dc.api.CorrelationIds;
 import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.util.JsonParser;
 
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -36,6 +41,7 @@ public class MetadataContent {
         private ObjectNode requestHeaderNode = JsonParser.createJsonParser().createObjectNode();
         private ObjectNode responseHeaderNode = JsonParser.createJsonParser().createObjectNode();
         private ObjectNode httpInfoNode = JsonParser.createJsonParser().createObjectNode();
+        private ObjectNode stateNode = JsonParser.createJsonParser().createObjectNode();
 
         public Builder correlationId(CorrelationIds correlationIds) {
             metadataNode.put("correlation-id", (correlationIds == null ? null : correlationIds.get().stream().map(UUID::toString).collect(Collectors.joining(","))));
@@ -97,6 +103,30 @@ public class MetadataContent {
             return this;
         }
 
+        public Builder state(Map<String, Object> stateMap) {
+            if (stateMap == null) {
+                return this;
+            }
+            stateMap.entrySet().forEach(entry -> {
+                Object value = entry.getValue();
+                ValueNode valueNode;
+                if (value instanceof String) {
+                    valueNode = new TextNode((String) value);
+
+                } else if (value instanceof Integer) {
+                    valueNode = new IntNode((Integer) value);
+
+                } else if (value instanceof Boolean) {
+                    valueNode = BooleanNode.valueOf((Boolean) value);
+
+                } else {
+                    throw new IllegalStateException("Unsupported state type!");
+                }
+                stateNode.set(entry.getKey(), valueNode);
+            });
+            return this;
+        }
+
         public MetadataContent build() {
             JsonParser jsonParser = JsonParser.createJsonParser();
             ObjectNode elementNode = jsonParser.createObjectNode();
@@ -104,6 +134,9 @@ public class MetadataContent {
             httpInfoNode.set("request-headers", requestHeaderNode);
             httpInfoNode.set("response-headers", responseHeaderNode);
             elementNode.set("http-info", httpInfoNode);
+            if (!stateNode.isEmpty()) {
+                elementNode.set("state", stateNode);
+            }
             return new MetadataContent(elementNode);
         }
     }

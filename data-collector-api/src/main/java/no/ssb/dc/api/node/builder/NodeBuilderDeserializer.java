@@ -308,7 +308,26 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
             }
 
             case AddContent: {
-                return new AddContentBuilder(currentNode.get("positionVariableExpression").textValue(), currentNode.get("contentKey").textValue());
+                AddContentBuilder builder = new AddContentBuilder(currentNode.get("positionVariableExpression").textValue(), currentNode.get("contentKey").textValue());
+                JsonNode stateNode = currentNode.get("state");
+                if (stateNode != null) {
+
+                    stateNode.fields().forEachRemaining(entry -> {
+                        JsonNode value = entry.getValue();
+                        Object stateValue;
+                        if (value.isInt()) {
+                            stateValue = value.intValue();
+                        } else if (value.isBoolean()) {
+                            stateValue = value.booleanValue();
+                        } else if (value.isTextual()) {
+                            stateValue = value.textValue();
+                        } else {
+                            throw new IllegalArgumentException("The content state type is not supported: " + entry.getKey());
+                        }
+                        builder.storeState(entry.getKey(), stateValue);
+                    });
+                }
+                return builder;
             }
 
             case Publish: {
