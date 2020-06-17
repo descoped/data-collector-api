@@ -103,6 +103,8 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                             value = entry.getValue().booleanValue();
                         } else if (entry.getValue().isTextual()) {
                             value = entry.getValue().textValue();
+                        } else if (entry.getValue().isNull()) {
+                            value = null;
                         } else {
                             throw new IllegalArgumentException("The context variable type is not supported: " + entry.getKey());
                         }
