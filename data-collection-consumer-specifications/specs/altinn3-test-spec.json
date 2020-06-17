@@ -159,8 +159,8 @@
           "contentKey" : "entry",
           "state" : {
             "ownerPartyId" : "${ownerPartyId}",
-            "instanceGuid" : "${instanceGuid}",
-            "ackURL" : "https://platform.tt02.altinn.no/storage/api/v1/sbl/instances/${ownerPartyId}/${instanceGuid}"
+            "instanceGuid" : "${position}",
+            "ackURL" : "https://platform.tt02.altinn.no/storage/api/v1/sbl/instances/${ownerPartyId}/${position}"
           }
         }, {
           "type" : "ForEach",
@@ -194,7 +194,8 @@
       "id" : "download-file",
       "url" : "https://platform.tt02.altinn.no/storage/api/v1/instances/${ownerPartyId}/${instanceGuid}/data/${dataId}",
       "requestHeaders" : {
-        "Authorization" : [ "Bearer ${accessToken}" ]
+        "Authorization" : [ "Bearer ${accessToken}" ],
+        "Accept" : [ "application/xml" ]
       },
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
