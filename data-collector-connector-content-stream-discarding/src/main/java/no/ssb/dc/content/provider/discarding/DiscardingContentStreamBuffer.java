@@ -35,6 +35,11 @@ public class DiscardingContentStreamBuffer implements ContentStreamBuffer {
     }
 
     @Override
+    public byte[] get(String contentKey) {
+        return new byte[0];
+    }
+
+    @Override
     public Map<String, byte[]> data() {
         return null;
     }
