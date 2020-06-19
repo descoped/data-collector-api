@@ -1,8 +1,8 @@
 package no.ssb.dc.content;
 
-import no.ssb.rawdata.api.RawdataClient;
-import no.ssb.rawdata.api.RawdataConsumer;
-import no.ssb.rawdata.api.RawdataMessage;
+import no.ssb.dc.api.content.ContentStream;
+import no.ssb.dc.api.content.ContentStreamBuffer;
+import no.ssb.dc.api.content.ContentStreamConsumer;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.Detector;
 import org.apache.tika.metadata.Metadata;
@@ -28,7 +28,7 @@ public class RawdataFileSystemWriter {
     private static final int TIMEOUT = 250; // seconds
     private static final long NAP = 250L; // millis
 
-    private final RawdataConsumer consumer;
+    private final ContentStreamConsumer consumer;
     private final Path rootPath;
     private final AtomicReference<Thread> workerThread = new AtomicReference<>();
     private final AtomicBoolean running = new AtomicBoolean(false);
@@ -36,8 +36,8 @@ public class RawdataFileSystemWriter {
     private final AtomicBoolean forceShutdown = new AtomicBoolean(false);
     private final Object lock = new Object();
 
-    public RawdataFileSystemWriter(RawdataClient rawdataClient, String topic, Path rootPath) {
-        this.consumer = rawdataClient.consumer(topic);
+    public RawdataFileSystemWriter(ContentStream contentStream, String topic, Path rootPath) {
+        this.consumer = contentStream.consumer(topic);
         this.rootPath = rootPath.resolve(topic);
     }
 
@@ -60,7 +60,7 @@ public class RawdataFileSystemWriter {
         return () -> {
             running.set(true);
             LOG.info("Consuming topic {} in {}", consumer.topic(), consumer.getClass());
-            RawdataMessage message;
+            ContentStreamBuffer message;
             try {
                 while (!closed.get() || !Thread.currentThread().isInterrupted()) {
                     while (!closed.get() && (message = consumer.receive(TIMEOUT, TimeUnit.MILLISECONDS)) != null) {

@@ -18,6 +18,8 @@ public interface ContentStreamBuffer {
 
     Set<String> keys();
 
+    byte[] get(String contentKey);
+
     Map<String, byte[]> data();
 
     List<MetadataContent> manifest();
