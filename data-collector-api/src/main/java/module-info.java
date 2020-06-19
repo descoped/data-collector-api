@@ -16,7 +16,7 @@ module no.ssb.dc.api {
     requires com.fasterxml.jackson.dataformat.yaml;
     requires java.xml;
 
-    requires transitive org.apache.tika.core;
+    requires org.apache.tika.core;
 
     opens no.ssb.dc.content to org.apache.tika.core;
 
