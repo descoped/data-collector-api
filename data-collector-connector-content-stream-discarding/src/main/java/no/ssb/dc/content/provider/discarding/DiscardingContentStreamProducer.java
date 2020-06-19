@@ -5,9 +5,9 @@ import no.ssb.dc.api.content.ContentStreamProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DiscardingContentProducer implements ContentStreamProducer {
+public class DiscardingContentStreamProducer implements ContentStreamProducer {
 
-    private final static Logger LOG = LoggerFactory.getLogger(DiscardingContentProducer.class);
+    private final static Logger LOG = LoggerFactory.getLogger(DiscardingContentStreamProducer.class);
 
     @Override
     public ContentStreamBuffer.Builder builder() {
@@ -15,8 +15,8 @@ public class DiscardingContentProducer implements ContentStreamProducer {
     }
 
     @Override
-    public void produce(ContentStreamBuffer.Builder bufferBuilder) {
-
+    public ContentStreamProducer produce(ContentStreamBuffer.Builder bufferBuilder) {
+        return this;
     }
 
     @Override

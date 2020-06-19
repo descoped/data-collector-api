@@ -2,6 +2,8 @@ package no.ssb.dc.content.provider.discarding;
 
 import no.ssb.dc.api.content.ContentStream;
 import no.ssb.dc.api.content.ContentStreamBuffer;
+import no.ssb.dc.api.content.ContentStreamConsumer;
+import no.ssb.dc.api.content.ContentStreamCursor;
 import no.ssb.dc.api.content.ContentStreamProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,12 @@ public class DiscardingContentStream implements ContentStream {
 
     @Override
     public ContentStreamProducer producer(String topic) {
-        return new DiscardingContentProducer();
+        return new DiscardingContentStreamProducer();
+    }
+
+    @Override
+    public ContentStreamConsumer consumer(String topic, ContentStreamCursor cursor) {
+        return new DiscardingContentStreamConsumer();
     }
 
     @Override

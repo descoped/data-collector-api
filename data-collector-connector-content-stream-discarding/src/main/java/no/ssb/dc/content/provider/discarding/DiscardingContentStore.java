@@ -36,6 +36,11 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
+    public ContentStream contentStream() {
+        return new DiscardingContentStream();
+    }
+
+    @Override
     public String lastPosition(String topic) {
         return lastPositionRef.get();
     }

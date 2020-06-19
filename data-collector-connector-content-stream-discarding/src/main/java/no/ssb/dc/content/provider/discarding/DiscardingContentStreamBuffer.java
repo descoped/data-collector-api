@@ -1,5 +1,6 @@
 package no.ssb.dc.content.provider.discarding;
 
+import de.huxhorn.sulky.ulid.ULID;
 import no.ssb.dc.api.content.ContentStreamBuffer;
 import no.ssb.dc.api.content.MetadataContent;
 import org.slf4j.Logger;
@@ -19,7 +20,17 @@ public class DiscardingContentStreamBuffer implements ContentStreamBuffer {
 
 
     @Override
+    public ULID.Value ulid() {
+        return null;
+    }
+
+    @Override
     public String position() {
+        return null;
+    }
+
+    @Override
+    public Set<String> keys() {
         return null;
     }
 
@@ -35,7 +46,14 @@ public class DiscardingContentStreamBuffer implements ContentStreamBuffer {
 
     static class Builder implements ContentStreamBuffer.Builder {
 
+        private ULID.Value ulid;
         private String position;
+
+        @Override
+        public ContentStreamBuffer.Builder ulid(ULID.Value ulid) {
+            this.ulid = ulid;
+            return this;
+        }
 
         @Override
         public ContentStreamBuffer.Builder position(String position) {
@@ -44,11 +62,26 @@ public class DiscardingContentStreamBuffer implements ContentStreamBuffer {
         }
 
         @Override
+        public String position() {
+            return null;
+        }
+
+        @Override
+        public ContentStreamBuffer.Builder put(String key, byte[] payload) {
+            return null;
+        }
+
+        @Override
         public ContentStreamBuffer.Builder buffer(String contentKey, byte[] content, MetadataContent manifest) {
             if (LOG.isTraceEnabled()) {
                 LOG.trace("{} -> {} => {}", position, contentKey, new String(content));
             }
             return this;
+        }
+
+        @Override
+        public byte[] get(String contentKey) {
+            return new byte[0];
         }
 
         @Override
