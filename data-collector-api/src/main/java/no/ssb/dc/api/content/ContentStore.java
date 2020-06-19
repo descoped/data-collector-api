@@ -8,6 +8,8 @@ public interface ContentStore extends AutoCloseable {
 
     void unlock(String topic);
 
+    ContentStream contentStream();
+
     String lastPosition(String topic);
 
     Set<String> contentKeys(String topic, String position);
