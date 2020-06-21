@@ -10,8 +10,6 @@ public interface ContentStreamProducer extends AutoCloseable {
 
     ContentStreamProducer produce(ContentStreamBuffer.Builder bufferBuilder);
 
-//    ContentStreamProducer buffer(ContentStreamBuffer.Builder builder) throws ClosedContentStreamException;
-
     default void publishBuilders(ContentStreamBuffer.Builder... builders) throws ClosedContentStreamException {
         for (ContentStreamBuffer.Builder builder : builders) {
             produce(builder);
