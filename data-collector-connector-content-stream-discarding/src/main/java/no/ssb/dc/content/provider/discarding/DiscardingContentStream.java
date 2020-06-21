@@ -38,6 +38,11 @@ public class DiscardingContentStream implements ContentStream {
     }
 
     @Override
+    public void closeAndRemoveConsumer(String topic) {
+
+    }
+
+    @Override
     public void close() throws Exception {
 
     }
