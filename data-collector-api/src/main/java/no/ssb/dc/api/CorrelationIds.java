@@ -2,7 +2,6 @@ package no.ssb.dc.api;
 
 import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.ulid.ULIDGenerator;
-import no.ssb.dc.api.ulid.ULIDStateHolder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,8 +14,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class CorrelationIds {
-
-    static final ULIDStateHolder ulidStateHolder = new ULIDStateHolder();
 
     final Deque<UUID> correlationIds = new ConcurrentLinkedDeque<>();
     final Lock lock = new ReentrantLock();
@@ -40,7 +37,7 @@ public class CorrelationIds {
     }
 
     public UUID add() {
-        UUID uuid = ULIDGenerator.toUUID(ULIDGenerator.nextMonotonicUlid(ulidStateHolder));
+        UUID uuid = ULIDGenerator.toUUID(ULIDGenerator.generate());
         correlationIds.add(uuid);
         return uuid;
     }

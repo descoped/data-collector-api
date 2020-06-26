@@ -5,18 +5,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ULIDGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(ULIDGenerator.class);
+    static final AtomicReference<ULID> ulid = new AtomicReference<>(new ULID());
+    static final AtomicReference<ULID.Value> prevUlid = new AtomicReference<>(ulid.get().nextValue());
 
-    public static ULID.Value nextMonotonicUlid(ULIDStateHolder ulidStateHolder) {
+    static ULID.Value nextMonotonicUlid() {
         /*
          * Will spin until time ticks if next value overflows.
          * Although theoretically possible, it is extremely unlikely that the loop will ever spin
          */
         ULID.Value value;
-        ULID.Value previousUlid = ulidStateHolder.prevUlid.get();
+        ULID.Value previousUlid = prevUlid.get();
         do {
             long timestamp = System.currentTimeMillis();
             long diff = timestamp - previousUlid.timestamp();
@@ -33,15 +36,19 @@ public class ULIDGenerator {
             } else if (diff > 0) {
                 // start at lsb 1, to avoid inclusive/exclusive semantics when searching
                 value = new ULID.Value((timestamp << 16) & 0xFFFFFFFFFFFF0000L, 1L);
-                ulidStateHolder.prevUlid.set(value);
+                prevUlid.set(value);
                 return value;
             }
             // diff == 0
-            value = ulidStateHolder.ulid.nextStrictlyMonotonicValue(previousUlid, timestamp).orElse(null);
-            ulidStateHolder.prevUlid.set(value);
+            value = ulid.get().nextStrictlyMonotonicValue(previousUlid, timestamp).orElse(null);
+            prevUlid.set(value);
         } while (value == null);
-        ulidStateHolder.prevUlid.set(value);
+        prevUlid.set(value);
         return value;
+    }
+
+    public static ULID.Value generate() {
+        return nextMonotonicUlid();
     }
 
     public static UUID toUUID(ULID.Value ulid) {
