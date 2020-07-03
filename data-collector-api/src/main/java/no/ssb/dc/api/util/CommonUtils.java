@@ -84,5 +84,19 @@ public class CommonUtils {
         return sw.toString();
     }
 
+    public static void printStackTrace() {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        StackTraceElement[] st = Thread.currentThread().getStackTrace();
+        int skip = 2;
+        for (StackTraceElement ste : st) {
+            if (skip > 0) {
+                skip--;
+                continue;
+            }
+            pw.println("    " + ste.toString());
+        }
+        System.out.printf("StackTrace:%n%s%n", sw.toString());
+    }
 
 }
