@@ -24,6 +24,11 @@ public class DiscardingContentStream implements ContentStream {
     }
 
     @Override
+    public ContentStreamBuffer lastMessage(String topic) {
+        return null;
+    }
+
+    @Override
     public ContentStreamProducer producer(String topic) {
         return new DiscardingContentStreamProducer();
     }
