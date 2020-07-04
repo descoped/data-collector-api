@@ -4,6 +4,8 @@ public interface ContentStream extends AutoCloseable {
 
     String lastPosition(String topic);
 
+    ContentStreamBuffer lastMessage(String topic);
+
     ContentStreamProducer producer(String topic);
 
     default ContentStreamConsumer consumer(String topic) {
