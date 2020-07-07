@@ -15,6 +15,11 @@ public class DiscardingContentStreamProducer implements ContentStreamProducer {
     }
 
     @Override
+    public ContentStreamProducer copy(ContentStreamBuffer buffer) {
+        return this;
+    }
+
+    @Override
     public ContentStreamProducer produce(ContentStreamBuffer.Builder bufferBuilder) {
         return this;
     }
