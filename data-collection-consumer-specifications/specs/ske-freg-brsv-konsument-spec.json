@@ -1,0 +1,179 @@
+{
+  "type" : "Specification",
+  "name" : "Collect FREG Svalbard",
+  "startFunctionId" : "maskinporten-jwt-grant",
+  "id" : "SKE-FREG-BRSV-KONSUMENT",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "clientId" : "${ENV.'ssb.ske.freg.clientId'}",
+      "jwtGrantTimeToLiveInSeconds" : "${ENV.'ssb.jwtGrant.expiration'}",
+      "ProdusentTestURL" : "https://folkeregisteret-api-ekstern.sits.no",
+      "KonsumentTestURL" : "https://folkeregisteret-api-konsument.sits.no",
+      "ProduksjonURL" : "https://folkeregisteret.api.skatteetaten.no",
+      "PlaygroundURL" : "https://folkeregisteret-api-konsument-playground.sits.no",
+      "nextSequence" : "${cast.toLong(contentStream.lastOrInitialPosition(0)) + 1}"
+    },
+    "globalState" : {
+      "global.topic" : "freg-brsv-konsument-test"
+    }
+  }, {
+    "type" : "Security",
+    "identities" : [ {
+      "type" : "JwtIdentity",
+      "id" : "maskinporten",
+      "headerClaims" : {
+        "alg" : "RS256",
+        "sslBundleName" : "ssb-test-certs"
+      },
+      "claims" : {
+        "audience" : "https://ver2.maskinporten.no/",
+        "issuer" : "${clientId}",
+        "scope" : "folkeregister:deling/svalbardregister folkeregister:deling/offentligmedhjemmel",
+        "timeToLiveInSeconds" : "${jwtGrantTimeToLiveInSeconds}"
+      }
+    } ]
+  } ],
+  "functions" : {
+    "maskinporten-jwt-grant" : {
+      "type" : "Post",
+      "id" : "maskinporten-jwt-grant",
+      "url" : "https://ver2.maskinporten.no/token",
+      "requestHeaders" : { },
+      "bodyPublisher" : {
+        "type" : "BodyPublisher",
+        "urlEncodedData" : {
+          "type" : "JwtIdentityTokenBodyPublisherProducer",
+          "identityId" : "maskinporten",
+          "bindTo" : "JWT_GRANT",
+          "token" : "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${JWT_GRANT}"
+        }
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Execute",
+        "executeId" : "loop",
+        "inputVariables" : {
+          "accessToken" : {
+            "type" : "QueryJqPath",
+            "expression" : ".access_token"
+          }
+        }
+      } ]
+    },
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromSequence" : "${nextSequence}"
+      },
+      "threshold" : 1500,
+      "addPageContent" : true,
+      "positionVariable" : "fromSequence",
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "event-list",
+        "requiredInputs" : [ "accessToken" ]
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextSequence"
+      }
+    },
+    "event-list" : {
+      "type" : "Get",
+      "id" : "event-list",
+      "url" : "${KonsumentTestURL}/folkeregisteret/api/brsv/v1/hendelser/feed/?seq=${fromSequence}",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ],
+        "accept" : [ "application/xml" ]
+      },
+      "returnVariables" : [ "nextSequence" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "expectedQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/entry/content/lagretHendelse/sekvensnummer"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextSequence" : {
+            "type" : "QueryRegEx",
+            "expression" : "(?<=[?&]seq=)[^&]*",
+            "query" : {
+              "type" : "QueryXPath",
+              "expression" : "/feed/link[@rel=\"next\"]/@href"
+            }
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryXPath",
+            "expression" : "/entry/content/lagretHendelse/sekvensnummer"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Execute",
+          "executeId" : "person-document",
+          "requiredInputs" : [ "accessToken" ],
+          "inputVariables" : {
+            "personId" : {
+              "type" : "QueryXPath",
+              "expression" : "/entry/content/lagretHendelse/hendelse/folkeregisteridentifikator"
+            }
+          }
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    },
+    "person-document" : {
+      "type" : "Get",
+      "id" : "person-document",
+      "url" : "${KonsumentTestURL}/folkeregisteret/api/brsv/v1/personer/${personId}",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ],
+        "accept" : [ "application/xml" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ],
+          "404" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "person"
+      } ]
+    }
+  }
+}
