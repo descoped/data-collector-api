@@ -38,7 +38,7 @@
     "maskinporten-jwt-grant" : {
       "type" : "Post",
       "id" : "maskinporten-jwt-grant",
-      "url" : "https://ver2.maskinporten.no/token",
+      "url" : "https://ver2.maskinporten.no/token/v1/token",
       "requestHeaders" : { },
       "bodyPublisher" : {
         "type" : "BodyPublisher",
@@ -157,7 +157,7 @@
     "person-document" : {
       "type" : "Get",
       "id" : "person-document",
-      "url" : "${KonsumentTestURL}/folkeregisteret/api/brsv/v1/personer/${personId}",
+      "url" : "${KonsumentTestURL}/folkeregisteret/api/brsv/v1/personer/${personId}?part=historikk",
       "requestHeaders" : {
         "Authorization" : [ "Bearer ${accessToken}" ],
         "accept" : [ "application/xml" ]
@@ -165,14 +165,15 @@
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
         "success" : {
-          "200" : [ ],
-          "404" : [ ]
+          "200" : [ ]
         }
       } ],
       "pipes" : [ {
         "type" : "AddContent",
         "positionVariableExpression" : "${position}",
         "contentKey" : "person"
+      }, {
+        "type" : "Console"
       } ]
     }
   }
