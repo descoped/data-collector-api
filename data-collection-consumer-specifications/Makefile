@@ -9,7 +9,7 @@ default: | help
 
 .PHONY: help
 help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-40s\033[0m %s\n", $$1, $$2}'
 
 #
 # docker-compose postgres
@@ -79,6 +79,33 @@ remove-gcs: ## Remove gcs
 open-gcs-adminer: ## Open a web based DB admin tool in your browser
 	@open http://localhost:8980/?pgsql=172.17.0.1:15432&username=rdc&db=rdc
 
+#
+# docker-compose filesystem
+#
+
+.PHONY: pull-filesystem
+pull-filesystem: ## Pull images
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml pull
+
+.PHONY: start-filesystem
+start-filesystem: ## Start filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml up -d
+
+.PHONY: start-filesystem-with-console
+start-filesystem-with-console: ## Start filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml up
+
+.PHONY: tail-filesystem
+tail-filesystem: ## Tail filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml logs -f
+
+.PHONY: stop-filesystem
+stop-filesystem: ## Stop filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml down -v
+
+.PHONY: remove-filesystem
+remove-filesystem: ## remove filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml rm
 
 #
 # docker-compose kafka
@@ -169,6 +196,35 @@ stop-gcs-dev-clean: ## Stop gcs-dev and remove anonymous volumes
 remove-gcs-dev: ## Remove gcs-dev
 	@WORKDIR=$(PWD) PROFILE=gcs DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-gcs.yml rm
 
+
+#
+# docker-compose filesystem-dev
+#
+
+.PHONY: pull-filesystem-dev
+pull-filesystem-dev: ## Pull images
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml pull
+
+.PHONY: start-filesystem-dev
+start-filesystem-dev: ## Start filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml up -d
+
+.PHONY: start-filesystem-with-console-dev
+start-filesystem-with-console-dev: ## Start filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml up
+
+.PHONY: tail-filesystem-dev
+tail-filesystem-dev: ## Tail filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml logs -f
+
+.PHONY: stop-filesystem-dev
+stop-filesystem-dev: ## Stop filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml down -v
+
+.PHONY: remove-filesystem-dev
+remove-filesystem-dev: ## remove filesystem
+	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml rm
+
 #
 # docker-compose kafka-dev
 #
@@ -238,6 +294,14 @@ collect-tvinn-api-test: ## Collect tvinn API-test
 .PHONY: collect-moveit-test
 collect-moveit-test: ## Collect MoveIt Test
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/moveit-test-spec.json
+
+.PHONY: collect-enheter-test
+collect-enheter-test: ## Collect enheter test
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/enhetsregisteret-test-spec.json
+
+.PHONY: collect-enheter-download
+collect-enheter-download: ## Collect enheter download (huge file)
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/enhetsregisteret-download-spec.json
 
 .PHONY: list-tasks
 list-tasks: ## List running tasks

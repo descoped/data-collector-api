@@ -44,6 +44,19 @@ make TARGET
 
 > :warning: only one _target provider_ can be run at a given time!
 
+## Filesystem Stream Provider
+
+> :bulb: Filesystem is a recommended provider for test purposes.
+
+| Target                          | Description                                      |
+| :------------------------------ | :----------------------------------------------- |
+| pull-filesystem                 | Pull images                                      |
+| start-filesystem                | Start filesystem                                 |
+| stop-filesystem                 | Stop postgres                                    |
+| remove-filesystem               | Remove postgres                                  |
+| collect-enheter-test            | enhetsregister collection test                   |
+
+
 ## Postgres Stream Provider
 
 > :bulb: Postgres is a recommended provider for test purposes.
@@ -138,7 +151,8 @@ Dev images requires full checkout of the [data-collector-project](https://github
 | collect-tvinn-test              | Tolletaten    | Collect tvinn test                               |
 | collect-tvinn-test-api          | Tolletaten    | Collect tvinn test api (test backend #2)         |
 | collect-moveit-test             | SSB           | Collect files from MoveIt Automation Server (*)  |
-|
+| collect-enheter-test            | brreg         | collect enheter from brreg open api              |
+
  
  > (*) MoveIt notice: copy and configure `./profile/postgres/conf/application-sample_moveit.properties` to `./profile/postgres/conf/application-override.properties`.  
  
