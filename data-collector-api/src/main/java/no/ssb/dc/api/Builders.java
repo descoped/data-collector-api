@@ -12,6 +12,7 @@ import no.ssb.dc.api.node.builder.ForEachBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
 import no.ssb.dc.api.node.builder.HttpStatusValidationBuilder;
 import no.ssb.dc.api.node.builder.JqPathBuilder;
+import no.ssb.dc.api.node.builder.JsonTokenBuilder;
 import no.ssb.dc.api.node.builder.JwtClaims;
 import no.ssb.dc.api.node.builder.JwtHeaderClaims;
 import no.ssb.dc.api.node.builder.JwtIdentityBuilder;
@@ -138,6 +139,10 @@ public class Builders {
 
     public static XPathBuilder xpath(String expression) {
         return new XPathBuilder(expression);
+    }
+
+    public static JsonTokenBuilder jsonToken() {
+        return new JsonTokenBuilder();
     }
 
     public static JqPathBuilder jqpath(String expression) {

@@ -2,6 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import no.ssb.dc.api.ConfigSetter;
 import no.ssb.dc.api.context.ExecutionContext;
 import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
@@ -28,21 +29,25 @@ public class SpecificationContextBuilder extends ConfigurationBuilder {
         return headers.asMap();
     }
 
+    @ConfigSetter
     public SpecificationContextBuilder topic(String topicName) {
         globalState("global.topic", topicName);
         return this;
     }
 
+    @ConfigSetter
     public SpecificationContextBuilder header(String name, String value) {
         headers.put(name, value);
         return this;
     }
 
+    @ConfigSetter
     public SpecificationContextBuilder variable(String name, Object value) {
         variables.put(name, value);
         return this;
     }
 
+    @ConfigSetter
     public SpecificationContextBuilder globalState(Object key, Object value) {
         globalState.put(key, value);
         return this;

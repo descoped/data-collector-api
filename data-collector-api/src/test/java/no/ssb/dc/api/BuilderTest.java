@@ -9,34 +9,7 @@ import no.ssb.dc.api.node.builder.SpecificationBuilder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static no.ssb.dc.api.Builders.addContent;
-import static no.ssb.dc.api.Builders.body;
-import static no.ssb.dc.api.Builders.bodyContains;
-import static no.ssb.dc.api.Builders.bodyPublisher;
-import static no.ssb.dc.api.Builders.claims;
-import static no.ssb.dc.api.Builders.console;
-import static no.ssb.dc.api.Builders.context;
-import static no.ssb.dc.api.Builders.delete;
-import static no.ssb.dc.api.Builders.execute;
-import static no.ssb.dc.api.Builders.forEach;
-import static no.ssb.dc.api.Builders.get;
-import static no.ssb.dc.api.Builders.headerClaims;
-import static no.ssb.dc.api.Builders.jqpath;
-import static no.ssb.dc.api.Builders.jwt;
-import static no.ssb.dc.api.Builders.jwtToken;
-import static no.ssb.dc.api.Builders.nextPage;
-import static no.ssb.dc.api.Builders.paginate;
-import static no.ssb.dc.api.Builders.parallel;
-import static no.ssb.dc.api.Builders.post;
-import static no.ssb.dc.api.Builders.process;
-import static no.ssb.dc.api.Builders.publish;
-import static no.ssb.dc.api.Builders.put;
-import static no.ssb.dc.api.Builders.regex;
-import static no.ssb.dc.api.Builders.security;
-import static no.ssb.dc.api.Builders.sequence;
-import static no.ssb.dc.api.Builders.status;
-import static no.ssb.dc.api.Builders.whenVariableIsNull;
-import static no.ssb.dc.api.Builders.xpath;
+import static no.ssb.dc.api.Builders.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -159,7 +132,7 @@ public class BuilderTest {
         FlowContext actualFlowContext = actual.end().configurations.flowContext();
         String serialized = actual.serialize();
         assertNotNull(serialized);
-        //System.out.printf("serialized:%n%s%n", serialized);
+        System.out.printf("serialized:%n%s%n", serialized);
 
         SpecificationBuilder deserialized = Specification.deserialize(serialized, SpecificationBuilder.class);
         assertNotNull(deserialized);

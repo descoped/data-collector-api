@@ -24,7 +24,11 @@ public interface Client {
 
     Response send(Request request);
 
+    <R> Response send(Request request, BodyHandler<R> bodyHandler);
+
     CompletableFuture<Response> sendAsync(Request request);
+
+    <R> CompletableFuture<Response> sendAsync(Request request, BodyHandler<R> bodyHandler);
 
     Object getDelegate();
 

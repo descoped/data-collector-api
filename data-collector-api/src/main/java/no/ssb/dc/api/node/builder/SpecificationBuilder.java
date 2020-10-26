@@ -2,6 +2,7 @@ package no.ssb.dc.api.node.builder;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import no.ssb.dc.api.ConfigSetter;
 import no.ssb.dc.api.Specification;
 import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Node;
@@ -26,6 +27,7 @@ public class SpecificationBuilder extends AbstractBuilder {
     @JsonProperty("configure") List<ConfigurationBuilder> configurationBuilders = new ArrayList<>();
     @JsonProperty("functions") Map<String, NodeBuilder> nodeBuilderById = new LinkedHashMap<>();
 
+    @ConfigSetter
     public SpecificationBuilder(String specificationId, String name, String startFunctionId) {
         super(BuilderType.Specification);
         this.specificationId = specificationId;
@@ -41,11 +43,13 @@ public class SpecificationBuilder extends AbstractBuilder {
         return name;
     }
 
+    @ConfigSetter
     public SpecificationBuilder configure(ConfigurationBuilder builder) {
         configurationBuilders.add(builder);
         return this;
     }
 
+    @ConfigSetter
     public SpecificationBuilder function(NodeWithIdBuilder builder) {
         nodeBuilderById.put(builder.getId(), builder);
         return this;
@@ -57,6 +61,7 @@ public class SpecificationBuilder extends AbstractBuilder {
     public Specification end() {
         BuildContext buildContext = BuildContext.fromNodeBuilderById(nodeBuilderById);
 
+        // add configuration leaf nodes
         Configurations.Builder configurationsBuilder = new Configurations.Builder();
         for (ConfigurationBuilder configurationBuilder : configurationBuilders) {
             configurationsBuilder.add(configurationBuilder.build(buildContext));

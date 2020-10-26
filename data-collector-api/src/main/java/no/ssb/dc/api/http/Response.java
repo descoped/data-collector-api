@@ -17,10 +17,20 @@ public interface Response {
 
     byte[] body();
 
+    /**
+     * Use: Response.<TYPE>bodyHandler()
+     *
+     * @param <R>
+     * @return
+     */
+    <R> Optional<BodyHandler<R>> bodyHandler();
+
     Optional<Response> previousResponse();
 
     interface Builder {
         Builder delegate(Object delegate);
+
+        <R> void bodyHandler(BodyHandler<R> bodyHandler);
 
         Response build();
     }
