@@ -293,6 +293,10 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 return new JsonTokenBuilder();
             }
 
+            case QueryXmlToken: {
+                return new XmlTokenBuilder();
+            }
+
             case QueryJqPath: {
                 return new JqPathBuilder(currentNode.get("expression").textValue());
             }
