@@ -155,7 +155,6 @@ start-postgres-dev: ## Start postgres-dev
 start-postgres-dev-with-console: ## Start postgres-dev-with-console
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-postgres.yml up
 
-
 .PHONY: tail-postgres-dev
 tail-postgres-dev: ## Tail postgres-dev
 	@WORKDIR=$(PWD) PROFILE=postgres DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-postgres.yml logs -f
@@ -266,6 +265,10 @@ collect-freg-playground: ## Collect freg playground
 .PHONY: collect-freg-konsument-test
 collect-freg-konsument-test: ## Collect konsument test
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-freg-konsument-test-spec.json
+
+.PHONY: collect-freg-bulk-uttrekk-prod
+collect-freg-bulk-uttrekk-prod: ## Collect freg bulk uttrekk
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-freg-bulk-uttrekk-spec.json
 
 .PHONY: collect-sirius-person-utkast
 collect-sirius-person-utkast: ## Collect sirius person utkast

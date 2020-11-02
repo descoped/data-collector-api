@@ -2,11 +2,14 @@ version: '3.7'
 
 services:
 
-  data-collector-gcs:
+  data-collector-filesystem:
     image: $DC_IMAGE
     ports:
       - 9990:9990
       - 9992:9992
+    environment:
+      - LOGBACK_CONFIGURATION_FILE=/conf/logback-test.xml
     volumes:
-      - $WORKDIR/profile/$PROFILE/conf:/conf
-      - $WORKDIR/target:/target
+    - $WORKDIR/profile/$PROFILE/conf:/conf
+    - $WORKDIR/certs:/certs
+    - $WORKDIR/target:/target
