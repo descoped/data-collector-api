@@ -10,6 +10,7 @@ import no.ssb.dc.api.node.builder.EvalBuilder;
 import no.ssb.dc.api.node.builder.ExecuteBuilder;
 import no.ssb.dc.api.node.builder.ForEachBuilder;
 import no.ssb.dc.api.node.builder.GetBuilder;
+import no.ssb.dc.api.node.builder.HttpStatusRetryWhileBuilder;
 import no.ssb.dc.api.node.builder.HttpStatusValidationBuilder;
 import no.ssb.dc.api.node.builder.JqPathBuilder;
 import no.ssb.dc.api.node.builder.JsonTokenBuilder;
@@ -75,6 +76,10 @@ public class Builders {
         return new DeleteBuilder(functionId);
     }
 
+    public static HttpStatusRetryWhileBuilder statusCode() {
+        return new HttpStatusRetryWhileBuilder();
+    }
+
     public static HttpStatusValidationBuilder status() {
         return new HttpStatusValidationBuilder();
     }
@@ -131,6 +136,10 @@ public class Builders {
 
     public static BodyBuilder body() {
         return new BodyBuilder();
+    }
+
+    public static EvalBuilder eval(String elExpression) {
+        return new EvalBuilder(elExpression);
     }
 
     public static EvalBuilder eval(QueryBuilder queryBuilder, String bindTo, String elExpression) {

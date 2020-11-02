@@ -15,6 +15,11 @@ public class EvalBuilder extends QueryBuilder {
     @JsonProperty("bindToVariable") String bindToVariable;
     @JsonProperty("expression") String elExpression;
 
+    public EvalBuilder(String elExpression) {
+        super(BuilderType.QueryEval);
+        this.elExpression = elExpression;
+    }
+
     public EvalBuilder(QueryBuilder queryBuilder, String bindToVariable, String elExpression) {
         super(BuilderType.QueryEval);
         this.queryBuilder = queryBuilder;
@@ -24,7 +29,7 @@ public class EvalBuilder extends QueryBuilder {
 
     @Override
     <R extends Base> R build(BuildContext buildContext) {
-        QueryNode queryNode = queryBuilder.build(buildContext);
+        QueryNode queryNode = queryBuilder != null ? queryBuilder.build(buildContext) : null;
         return (R) new EvalNode(queryNode, bindToVariable, elExpression);
     }
 

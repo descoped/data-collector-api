@@ -7,6 +7,7 @@ import no.ssb.dc.api.http.Headers;
 import no.ssb.dc.api.node.Base;
 import no.ssb.dc.api.node.Configurations;
 import no.ssb.dc.api.node.Get;
+import no.ssb.dc.api.node.HttpStatusRetryWhile;
 import no.ssb.dc.api.node.Node;
 import no.ssb.dc.api.node.Validator;
 
@@ -21,6 +22,7 @@ import static no.ssb.dc.api.Builders.status;
 public class GetBuilder extends OperationBuilder {
 
     @JsonUnwrapped(prefix = "request") Headers requestHeaders = new Headers();
+    @JsonProperty("retryWhile") List<LeafNodeBuilder> retryWhileList = new ArrayList<>();
     @JsonProperty("responseValidators") List<LeafNodeBuilder> validators = new ArrayList<>();
     @JsonProperty("pipes") List<NodeBuilder> pipes = new ArrayList<>();
     @JsonProperty List<String> returnVariables = new ArrayList<>();
@@ -49,6 +51,11 @@ public class GetBuilder extends OperationBuilder {
         return this;
     }
 
+    public GetBuilder retryWhile(LeafNodeBuilder retryWhileBuilder) {
+        retryWhileList.add(retryWhileBuilder);
+        return this;
+    }
+
     public GetBuilder validate(LeafNodeBuilder validationBuilder) {
         validators.add(validationBuilder);
         return this;
@@ -69,11 +76,17 @@ public class GetBuilder extends OperationBuilder {
     @SuppressWarnings("unchecked")
     @Override
     <R extends Base> R build(BuildContext buildContext) {
+        List<HttpStatusRetryWhile> retryWhileList = new ArrayList<>();
         List<Validator> validators = new ArrayList<>();
 
         // add default http status validator if unassigned
         if (this.validators.isEmpty()) {
             this.validate(status().success(200));
+        }
+
+        for (LeafNodeBuilder retryWhileBuilder : this.retryWhileList) {
+            Validator retryWhile = retryWhileBuilder.build(buildContext);
+            retryWhileList.add((HttpStatusRetryWhile) retryWhile);
         }
 
         for (LeafNodeBuilder validatorBuilder : this.validators) {
@@ -87,7 +100,7 @@ public class GetBuilder extends OperationBuilder {
             stepNodeList.add(stepNode);
         }
 
-        return (R) new GetNode(getId(), buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), url, requestHeaders, validators, stepNodeList, returnVariables);
+        return (R) new GetNode(getId(), buildContext.getInstance(SpecificationBuilder.GLOBAL_CONFIGURATION), url, requestHeaders, retryWhileList, validators, stepNodeList, returnVariables);
     }
 
     @Override
@@ -97,6 +110,7 @@ public class GetBuilder extends OperationBuilder {
         if (!super.equals(o)) return false;
         GetBuilder that = (GetBuilder) o;
         return Objects.equals(requestHeaders, that.requestHeaders) &&
+                Objects.equals(retryWhileList, that.retryWhileList) &&
                 Objects.equals(validators, that.validators) &&
                 Objects.equals(pipes, that.pipes) &&
                 Objects.equals(returnVariables, that.returnVariables);
@@ -104,7 +118,7 @@ public class GetBuilder extends OperationBuilder {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), requestHeaders, validators, pipes, returnVariables);
+        return Objects.hash(super.hashCode(), requestHeaders, retryWhileList, validators, pipes, returnVariables);
     }
 
     @Override
@@ -113,6 +127,7 @@ public class GetBuilder extends OperationBuilder {
                 "id='" + id + '\'' +
                 ", url='" + url + '\'' +
                 ", requestHeaders=" + requestHeaders +
+                ", retryWhileList=" + retryWhileList +
                 ", validators=" + validators +
                 ", pipes=" + pipes +
                 ", returnVariables=" + returnVariables +
@@ -123,14 +138,16 @@ public class GetBuilder extends OperationBuilder {
 
         final String url;
         final Headers headers;
-        private final List<Validator> validateResponse;
+        final List<HttpStatusRetryWhile> retryWhileList;
+        final List<Validator> validateResponse;
         final List<Node> pipes;
         final List<String> returnVariables;
 
-        GetNode(String id, Configurations configurations, String url, Headers headers, List<Validator> validateResponse, List<Node> pipes, List<String> returnVariables) {
+        GetNode(String id, Configurations configurations, String url, Headers headers, List<HttpStatusRetryWhile> retryWhileList, List<Validator> validateResponse, List<Node> pipes, List<String> returnVariables) {
             super(configurations, id);
             this.url = url;
             this.headers = headers;
+            this.retryWhileList = retryWhileList;
             this.validateResponse = validateResponse;
             this.pipes = pipes;
             this.returnVariables = returnVariables;
@@ -144,6 +161,11 @@ public class GetBuilder extends OperationBuilder {
         @Override
         public Headers headers() {
             return headers;
+        }
+
+        @Override
+        public List<HttpStatusRetryWhile> retryWhile() {
+            return retryWhileList;
         }
 
         @Override

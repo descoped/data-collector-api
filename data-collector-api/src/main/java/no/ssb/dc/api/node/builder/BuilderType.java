@@ -28,6 +28,7 @@ public enum BuilderType {
     Post(PostBuilder.class),
     Put(PutBuilder.class),
     Delete(DeleteBuilder.class),
+    HttpStatusRetryWhile(HttpStatusRetryWhileBuilder.class),
     HttpStatusValidation(HttpStatusValidationBuilder.class),
     BodyPublisher(BodyPublisherBuilder.class),
     StringBodyPublisherProducer(StringBodyPublisherProducerBuilder.class),

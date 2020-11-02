@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -279,8 +280,8 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
             }
 
             case QueryEval: {
-                QueryBuilder queryBuilder = (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("query"));
-                String bindToVariableNode = currentNode.get("bindToVariable").textValue();
+                QueryBuilder queryBuilder = currentNode.has("query") ? (QueryBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, currentNode.get("query")) : null;
+                String bindToVariableNode = currentNode.has("bindToVariable") ? currentNode.get("bindToVariable").textValue() : null;
                 String expression = currentNode.get("expression").textValue();
                 return new EvalBuilder(queryBuilder, bindToVariableNode, expression);
             }
@@ -367,6 +368,14 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                             }
                             builder.header(headerName, headerValue);
                         }
+                    });
+                }
+
+                JsonNode retryWhileNodeArray = currentNode.get("retryWhile");
+                if (retryWhileNodeArray != null) {
+                    retryWhileNodeArray.forEach(retryWhileNode -> {
+                        LeafNodeBuilder retryWhileBuilder = (LeafNodeBuilder) handleNodeBuilder(depth + 1, context, ancestors, currentNode, retryWhileNode);
+                        builder.retryWhile(retryWhileBuilder);
                     });
                 }
 
@@ -542,6 +551,17 @@ public class NodeBuilderDeserializer extends StdDeserializer<AbstractBuilder> {
                 builder.identityId(identityId);
                 builder.bindTo(bindTo);
                 builder.token(token);
+                return builder;
+            }
+
+            case HttpStatusRetryWhile: {
+                HttpStatusRetryWhileBuilder builder = new HttpStatusRetryWhileBuilder();
+
+                Integer statusCode = Integer.parseInt(currentNode.get("statusCode").asText());
+                TimeUnit duration = TimeUnit.valueOf(currentNode.get("duration").asText());
+                int amount = Integer.parseInt(currentNode.get("amount").asText());
+
+                builder.is(statusCode, duration, amount);
                 return builder;
             }
 
