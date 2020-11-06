@@ -143,6 +143,10 @@ remove-kafka: ## Remove kafka
 build-data-collector-dev-image: ## Build data collector dev image
 	@cd .. && mvn clean install -DskipTests && cd data-collector-docker && mvn clean verify dependency:copy-dependencies -DskipTests && docker build -t ${DC_LOCAL_IMAGE} -f Dockerfile-dev .
 
+.PHONY: update-data-collector-dev-image
+update-data-collector-dev-image: ## Update data collector dev image
+	@cd ../data-collector-docker && docker build -t ${DC_LOCAL_IMAGE} -f Dockerfile-dev .
+
 #
 # docker-compose postgres-dev
 #
