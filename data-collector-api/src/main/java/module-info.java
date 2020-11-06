@@ -36,6 +36,7 @@ module no.ssb.dc.api {
     exports no.ssb.dc.api.http;
     exports no.ssb.dc.api.ulid;
     exports no.ssb.dc.api.error;
+    exports no.ssb.dc.api.security;
     exports no.ssb.dc.api.services;
     exports no.ssb.dc.api.util;
 }
