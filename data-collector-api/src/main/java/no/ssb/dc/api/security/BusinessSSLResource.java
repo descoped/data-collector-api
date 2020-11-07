@@ -6,7 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Objects;
 
-public interface ProvidedBusinessSSLResource {
+public interface BusinessSSLResource extends AutoCloseable {
 
     String bundleName();
 
@@ -19,6 +19,9 @@ public interface ProvidedBusinessSSLResource {
     byte[] archiveCertificate();
 
     char[] passphrase();
+
+    @Override
+    void close();
 
     default boolean isPEM() {
         Objects.requireNonNull(getType());
