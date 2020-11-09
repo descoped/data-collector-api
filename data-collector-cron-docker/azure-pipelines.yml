@@ -33,7 +33,6 @@ variables:
 # builds Docker image, pushes this to GCR and checks for any image vulnerabilities
 jobs:
   - job: dockerBuildAndDockerPush
-    dependsOn: buildTestPublishToPipeline
     steps:
     # Build Docker image
       - task: Docker@2
