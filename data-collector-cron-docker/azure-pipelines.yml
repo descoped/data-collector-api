@@ -1,0 +1,100 @@
+name: $(Build.SourceBranch)-$(date:yyyyMMdd)$(rev:.r)
+# Pipeline triggers on any branch and tag
+trigger:
+  branches:
+    include:
+      - '*'
+  tags:
+    include:
+      - '*'
+
+resources:
+  repositories:
+    - repository: templates
+      type: github
+      name: statisticsnorway/azure-pipelines-templates
+      ref: refs/tags/0.0.10
+      endpoint: statisticsnorway (6)
+
+# Pipeline will be run on this base image
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - group: Hemmeligheter
+  - name: fullSha
+    value: '$(Build.SourceVersion)'
+  - name: imageName
+    value: 'eu.gcr.io/prod-bip/data-collector-cron-job'
+  - name: repoName
+    value: 'prod-bip/data-collector-cron-job'
+
+# Job which runs mvn test and verify, Sonar Analysis (if branch is master), mvn install,
+# builds Docker image, pushes this to GCR and checks for any image vulnerabilities
+jobs:
+  - job: dockerBuildAndDockerPush
+    dependsOn: buildTestPublishToPipeline
+    steps:
+    # Build Docker image
+      - task: Docker@2
+        displayName: 'Docker build'
+        inputs:
+          repository: $(imageName)
+          command: 'build'
+          Dockerfile: 'Dockerfile'
+          tags: |
+            imagescan-$(Build.SourceBranchName)-$(fullSha)
+
+    # Authenticate Docker to GCR using predefined service connection
+      - task: Docker@2
+        displayName: 'Login to GCR'
+        inputs:
+          command: login
+          containerRegistry: gcrServiceConnection
+
+    # Push Docker Image to GCR
+      - task: Docker@2
+        displayName: 'Push image'
+        inputs:
+          ContainerRegistry: |
+            gcrServiceConnection
+          repository: $(repoName)
+          command: 'push'
+          tags: |
+            imagescan-$(Build.SourceBranchName)-$(fullSha)
+
+    # Download file with json-key to GCR as a later task needs to
+    # authenticate in a different way than using service connection
+    # File is stored in Pipelines->Library->Secure Files
+      - task: DownloadSecureFile@1
+        name: gcrJsonKey
+        displayName: 'Download gcr creds'
+        inputs:
+          secureFile: 'gcr-key.json'
+
+    # Set env variable pointing to the file downloaded in previous task
+    # as a library in next task needs this env variable
+      - script: |
+          echo "Setting env variable GOOGLE_APPLICATION_CREDENTIALS"
+          echo "##vso[task.setvariable variable=GOOGLE_APPLICATION_CREDENTIALS]$(gcrJsonKey.secureFilePath)"
+        displayName: 'Setting GOOGLE_APPLICATION_CREDENTIALS env variable'
+
+    # Wait for scan on image in GCR to complete and check for any vulnerabilities
+    # with effective severity HIGH or CRITICAL
+      - task: gcr-vulneralbility-check@0
+        displayName: 'Image vulnerability check'
+        inputs:
+          projectId: 'prod-bip'
+          imageHost: 'https://eu.gcr.io/'
+          image: 'prod-bip/data-collector'
+          imageTag: 'imagescan-$(Build.SourceBranchName)-$(fullSha)'
+
+      - script: |
+          TAG=`git describe --tags`
+          echo $TAG
+          cat $(gcrJsonKey.secureFilePath) | docker login -u _json_key --password-stdin 'https://eu.gcr.io/'
+          docker pull $(imageName):imagescan-$(Build.SourceBranchName)-$(fullSha)
+          docker tag $(imageName):imagescan-$(Build.SourceBranchName)-$(fullSha) $(imageName):$(Build.SourceBranchName)-$(fullSha)
+          docker push $(imageName):$(Build.SourceBranchName)-$(fullSha)
+        displayName: "Retagging docker image if successful vulnerability scan"
+        condition: succeeded()
