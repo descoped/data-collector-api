@@ -15,6 +15,7 @@ module no.ssb.dc.api {
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires java.xml;
+    requires dapla.secrets.client.api;
 
     //opens no.ssb.dc.api.node.builder to com.fasterxml.jackson.databind;
     opens no.ssb.dc.api.node.builder;
