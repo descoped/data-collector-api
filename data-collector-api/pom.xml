@@ -15,6 +15,7 @@
 
     <properties>
         <java.version>15</java.version>
+        <java.target.version>14</java.target.version>
         <module.build.sourceEncoding>UTF-8</module.build.sourceEncoding>
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
@@ -261,7 +262,7 @@
             <id>coverage</id>
             <properties>
                 <sonar.coverage.jacoco.xmlReportPaths>
-                    ${project.build.outputDirectory}/../site/jacoco/jacoco.xml
+                    target/site/jacoco/jacoco.xml
                 </sonar.coverage.jacoco.xmlReportPaths>
                 <sonar.java.source>14</sonar.java.source>
             </properties>
@@ -315,8 +316,8 @@
                 <version>3.8.1</version>
                 <configuration>
                     <source>${java.version}</source>
-                    <target>${java.version}</target>
-                    <release>${java.version}</release>
+                    <target>${java.target.version}</target>
+                    <release>${java.target.version}</release>
                     <encoding>${module.build.sourceEncoding}</encoding>
                     <meminitial>64m</meminitial>
                     <maxmem>512m</maxmem>
