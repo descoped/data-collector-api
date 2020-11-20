@@ -53,11 +53,6 @@ jobs:
       # (Project Settings->Pipelines->Service Connections)
       - template: maven/task-authenticate.yml@templates
 
-      - script:  |
-          POM_HASH=`sha1sum -b -z pom.xml | cut -f 1 -d ' '`
-          echo "##vso[task.setvariable variable=POM_HASH]$($POM_HASH)"
-        displayName: 'Computing hash of pom.xml'
-
       #Maven caching to speed up pipeline build time
       - template: maven/task-cache.yml@templates
 
