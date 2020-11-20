@@ -95,6 +95,10 @@ start-filesystem: ## Start filesystem
 start-filesystem-with-console: ## Start filesystem
 	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml up
 
+.PHONY: start-filesystem-using-secrets-with-console
+start-filesystem-using-secrets-with-console: ## Start filesystem using secret manager
+	@WORKDIR=$(PWD) PROFILE=filesystem-secrets DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem-secrets.yml up
+
 .PHONY: tail-filesystem
 tail-filesystem: ## Tail filesystem
 	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_RELEASE_IMAGE} docker-compose -f docker-compose-filesystem.yml logs -f
@@ -216,6 +220,10 @@ start-filesystem-dev: ## Start filesystem
 start-filesystem-with-console-dev: ## Start filesystem
 	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml up
 
+.PHONY: start-filesystem-using-secrets-with-console-dev
+start-filesystem-using-secrets-with-console-dev: ## Start filesystem using secret manager dev
+	@WORKDIR=$(PWD) PROFILE=filesystem-secrets DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem-secrets.yml up
+
 .PHONY: tail-filesystem-dev
 tail-filesystem-dev: ## Tail filesystem
 	@WORKDIR=$(PWD) PROFILE=filesystem DC_IMAGE=${DC_LOCAL_IMAGE} docker-compose -f docker-compose-filesystem.yml logs -f
@@ -297,6 +305,10 @@ collect-tvinn-test: ## Collect tvinn Test
 .PHONY: collect-tvinn-api-test
 collect-tvinn-api-test: ## Collect tvinn API-test
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/toll-tvinn-api-test-spec.json
+
+.PHONY: collect-altinn-test
+collect-altinn-test: ## Collect Altinn 3 Test
+	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/altinn3-test-spec.json
 
 .PHONY: collect-moveit-test
 collect-moveit-test: ## Collect MoveIt Test

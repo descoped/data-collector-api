@@ -7,9 +7,9 @@
     "type" : "SpecificationContext",
     "variables" : {
       "nextPage" : null,
-      "appId" : "${ENV.'ssb.altinn.app-id'}",
-      "clientId" : "${ENV.'ssb.altinn.clientId'}",
-      "jwtGrantTimeToLiveInSeconds" : "${ENV.'ssb.jwtGrant.expiration'}"
+      "appId" : "${ENV.'ssb.altinn.appId'}",
+      "clientId" : "${ENV.'maskinporten.clientId'}",
+      "jwtGrantTimeToLiveInSeconds" : "${ENV.'maskinporten.jwtGrant.expiration'}"
     },
     "globalState" : {
       "global.topic" : "altinn-test"
@@ -27,7 +27,7 @@
         "audience" : "https://ver2.maskinporten.no/",
         "issuer" : "${clientId}",
         "resource" : "https://tt02.altinn.no/maskinporten-api/",
-        "scope" : "altinn:instances.read altinn:instances.write",
+        "scope" : "altinn:serviceowner/instances.read altinn:serviceowner/instances.write",
         "timeToLiveInSeconds" : "${jwtGrantTimeToLiveInSeconds}"
       }
     } ]

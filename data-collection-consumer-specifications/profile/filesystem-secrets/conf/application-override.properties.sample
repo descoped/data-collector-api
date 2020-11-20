@@ -1,0 +1,26 @@
+#
+# Service configuration
+#
+maskinporten.clientId=
+maskinporten.jwtGrant.expiration=30
+ssb.altinn.appId=
+
+#
+# BusinessSSL Google Secret Configuration
+#
+data.collector.sslBundle.provider=google-secret-manager
+data.collector.sslBundle.gcp.serviceAccountKeyPath=/certs/SA_KEY.json
+data.collector.sslBundle.gcp.projectId=ssb-team-dapla
+data.collector.sslBundle.type=p12
+data.collector.sslBundle.name=ssb-test-certs
+data.collector.sslBundle.archiveCertificate=ssb-test-p12-certificate
+data.collector.sslBundle.passphrase=ssb-test-p12-passphrase
+
+#
+# Rawdata Encryption Google Secret Credentials
+#
+rawdata.encryption.provider=google-secret-manager
+rawdata.encryption.gcp.serviceAccountKeyPath=/certs/SA_KEY.json
+rawdata.encryption.gcp.projectId=ssb-team-dapla
+rawdata.encryption.key=
+rawdata.encryption.salt=
