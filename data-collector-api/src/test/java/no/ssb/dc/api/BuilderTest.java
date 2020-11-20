@@ -120,6 +120,7 @@ public class BuilderTest {
             )
             ;
 
+
     @Disabled
     @Test
     public void printExecutionPlan() {
