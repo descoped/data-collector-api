@@ -70,7 +70,7 @@ public class DiscardingContentStore implements ContentStore {
     }
 
     @Override
-    public void bufferPaginationEntryDocument(String topic, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo) {
+    public void bufferPaginationEntryDocument(String topic, String position, String contentKey, byte[] content, HttpRequestInfo httpRequestInfo, Map<String, Object> state) {
         MetadataContent manifest = getMetadataContent(topic, position, contentKey, content, MetadataContent.ResourceType.ENTRY, httpRequestInfo);
         if (LOG.isTraceEnabled()) {
             System.out.printf("%n");
