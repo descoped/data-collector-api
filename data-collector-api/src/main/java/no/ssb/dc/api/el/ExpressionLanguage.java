@@ -53,6 +53,7 @@ public class ExpressionLanguage {
             jexlContext.set("ENV", new MapContext(new LinkedHashMap<>(configuration.asMap()))); // TODO dotted EL-vars not supported
         }
         jexlContext.set("cast", new ELCast());
+        jexlContext.set("convert", new ELConvert());
         jexlContext.set("contentStream", new ELContentStream(evaluateLastContentStreamPosition));
     }
 

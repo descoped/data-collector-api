@@ -5,6 +5,13 @@ import no.ssb.dc.api.context.ExecutionContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -35,5 +42,21 @@ public class ExpressionLanguageTest {
         Object result = el.evaluateExpression("ENV.'foo.bar'");
         System.out.printf("eval: %s", result);
         assertEquals("bar", result);
+    }
+
+    @Test
+    void testConvertDateToEpoc() {
+        TemporalAccessor ta = DateTimeFormatter.ISO_DATE_TIME.parse("2020-10-05T00:00:00.000Z");
+        long epochSecond = LocalDateTime.from(ta).toEpochSecond(ZoneOffset.UTC);
+
+        ExecutionContext context = ExecutionContext.empty();
+        Map<String, String> map = new LinkedHashMap<>();
+        map.put("datePosition", "2020-10-05T00:00:00.000Z");
+        ConfigurationMap config = new ConfigurationMap(map);
+        context.services().register(ConfigurationMap.class, config);
+        ExpressionLanguage el = new ExpressionLanguage(context);
+        Object result = el.evaluateExpression("${convert.utcDateToEpoc(ENV.datePosition)}");
+        System.out.printf("eval: %s", result);
+        assertEquals(Long.valueOf(epochSecond), result);
     }
 }
