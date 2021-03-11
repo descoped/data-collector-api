@@ -43,7 +43,7 @@ public class ExecuteBuilder extends NodeBuilder {
     @Override
     <R extends Base> R build(BuildContext buildContext) {
         Map<String, QueryBuilder.QueryNode> inputVariableMap = inputVariables.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> (QueryBuilder.QueryNode) e.getValue().build(buildContext)));
+                .collect(Collectors.toMap(Map.Entry::getKey, e -> (QueryBuilder.QueryNode) e.getValue().build(buildContext), (x,y) -> y, LinkedHashMap::new));
 
         if (!buildContext.containsBuilder(executeId)) {
             throw new RuntimeException("Builder" + this.getClass() + " points to an undefined node: " + this.executeId);
