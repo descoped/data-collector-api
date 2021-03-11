@@ -5,11 +5,8 @@ import no.ssb.dc.api.context.ExecutionContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.LinkedHashMap;
@@ -45,7 +42,7 @@ public class ExpressionLanguageTest {
     }
 
     @Test
-    void testConvertDateToEpoc() {
+    public void testConvertDateToEpoc() {
         TemporalAccessor ta = DateTimeFormatter.ISO_DATE_TIME.parse("2020-10-05T00:00:00.000Z");
         long epochSecond = LocalDateTime.from(ta).toEpochSecond(ZoneOffset.UTC);
 
