@@ -1,10 +1,17 @@
 package no.ssb.dc.api.el;
 
 import no.ssb.dc.api.util.CommonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ELCast {
 
+    private final static Logger LOG = LoggerFactory.getLogger(ELCast.class);
+
     public Float toFloat(String value) {
+        if (value == null) {
+            return null;
+        }
         try {
             return Float.valueOf(value);
         } catch (RuntimeException | Error e) {
@@ -15,6 +22,9 @@ public class ELCast {
     }
 
     public Double toDouble(String value) {
+        if (value == null) {
+            return null;
+        }
         try {
             return Double.valueOf(value);
         } catch (RuntimeException | Error e) {
@@ -25,6 +35,9 @@ public class ELCast {
     }
 
     public Integer toInteger(String value) {
+        if (value == null) {
+            return null;
+        }
         try {
             return Integer.valueOf(value);
         } catch (RuntimeException | Error e) {
@@ -35,6 +48,9 @@ public class ELCast {
     }
 
     public Long toLong(String value) {
+        if (value == null) {
+            return null;
+        }
         try {
             return Long.valueOf(value);
         } catch (RuntimeException | Error e) {
