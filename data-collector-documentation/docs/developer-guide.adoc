@@ -31,9 +31,6 @@ image::diagrams/specification-builder-class-diagram.svg[alt="Http Builder Class 
 == Http Builder Class diagram
 image::diagrams/http-builder-class-diagram.svg[alt="Http Builder Class Diagram", max-width=1024, link="diagrams/http-builder-class-diagram.svg"]
 
-== HttpClient Class diagram
-image::diagrams/http-client-class-diagram.svg[alt="HttpClient Class Diagram", max-width=1024, link="diagrams/http-client-class-diagram.svg"]
-
 endif::[]
 
 ifndef::env-github[]
@@ -54,8 +51,5 @@ plantuml::puml/specification-builder-class-diagram.puml[format=svg, alt="Http Bu
 
 == Http Builder Class diagram
 plantuml::puml/http-builder-class-diagram.puml[format=svg, alt="Http Builder Class Diagram", max-width=1024, link="http-builder-class-diagram.svg"]
-
-== HttpClient Class diagram
-plantuml::puml/http-client-class-diagram.puml[format=svg, alt="HttpClient Class Diagram", max-width=1024, link="http-client-class-diagram.svg"]
 
 endif::[]
