@@ -49,11 +49,19 @@ public class AltinnStagingWorkerTest {
     static final Supplier<StoreBasedDynamicConfiguration.Builder> configurationBuilder = () -> new StoreBasedDynamicConfiguration.Builder()
             .propertiesResource("application-override.properties") // gitignored
             .values("content.stream.connector", "rawdata")
-            .values("rawdata.client.provider", "memory")
+            .values("rawdata.client.provider", "filesystem")
+
             .values("data.collector.worker.threads", "20")
             .values("data.collector.rawdata.dump.enabled", "true")
             .values("data.collector.rawdata.dump.location", "")
             .values("data.collector.rawdata.dump.topic", "altinn-test")
+
+            .values("local-temp-folder", "target/avro/temp")
+            .values("filesystem.storage-folder", "target/avro/rawdata-store")
+            .values("avro-file.max.seconds", "60")
+            .values("avro-file.max.bytes", Long.toString(64 * 1024 * 1024)) // 512 MiB
+            .values("avro-file.sync.interval", Long.toString(200))
+            .values("listing.min-interval-seconds", "0")
 
             .values("data.collector.sslBundle.provider", "google-secret-manager")
             .values("data.collector.sslBundle.gcp.projectId", "ssb-team-dapla")
@@ -62,11 +70,13 @@ public class AltinnStagingWorkerTest {
             .values("data.collector.sslBundle.name", "ssb-test-certs")
             .values("data.collector.sslBundle.archiveCertificate", "ssb-test-p12-certificate")
             .values("data.collector.sslBundle.passphrase", "ssb-test-p12-passphrase")
-            .values("rawdata.encryption.provider", "google-secret-manager")
-            .values("rawdata.encryption.gcp.serviceAccountKeyPath", getServiceAccountFile(securityConfiguration.build()))
-            .values("rawdata.encryption.gcp.projectId", "ssb-team-dapla")
-            .values("rawdata.encryption.key", "rawdata-staging-altinn3-encryption-key")
-            .values("rawdata.encryption.salt", "rawdata-staging-altinn3-encryption-salt");
+
+//            .values("rawdata.encryption.provider", "google-secret-manager")
+//            .values("rawdata.encryption.gcp.serviceAccountKeyPath", getServiceAccountFile(securityConfiguration.build()))
+//            .values("rawdata.encryption.gcp.projectId", "ssb-team-dapla")
+//            .values("rawdata.encryption.key", "rawdata-staging-altinn3-encryption-key")
+//            .values("rawdata.encryption.salt", "rawdata-staging-altinn3-encryption-salt")
+            ;
 
     static final SpecificationBuilder specificationBuilder = Specification.start("ALTINN-TEST", "Altinn 3", "maskinporten-jwt-grant")
             .configure(context()
