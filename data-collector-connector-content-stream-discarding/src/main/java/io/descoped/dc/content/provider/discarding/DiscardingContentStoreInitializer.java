@@ -1,8 +1,8 @@
-package no.ssb.dc.content.provider.discarding;
+package io.descoped.dc.content.provider.discarding;
 
-import no.ssb.dc.api.content.ContentStore;
-import no.ssb.dc.api.content.ContentStoreInitializer;
-import no.ssb.service.provider.api.ProviderName;
+import io.descoped.dc.api.content.ContentStore;
+import io.descoped.dc.api.content.ContentStoreInitializer;
+import io.descoped.service.provider.api.ProviderName;
 
 import java.util.HashSet;
 import java.util.Map;

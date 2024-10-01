@@ -1,18 +1,14 @@
-import no.ssb.dc.api.content.ContentStoreInitializer;
-import no.ssb.dc.content.provider.discarding.DiscardingContentStoreInitializer;
+module io.descoped.dc.content.discarding {
 
-module no.ssb.dc.content.discarding {
-
-    requires no.ssb.service.provider.api;
-    requires no.ssb.dc.api;
+    requires io.descoped.service.provider.api;
+    requires io.descoped.dc.api;
 
     requires org.slf4j;
     requires de.huxhorn.sulky.ulid;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
 
-    provides ContentStoreInitializer with DiscardingContentStoreInitializer;
+    provides io.descoped.dc.api.content.ContentStoreInitializer with io.descoped.dc.content.provider.discarding.DiscardingContentStoreInitializer;
 
-    exports no.ssb.dc.content.provider.discarding;
-
+    exports io.descoped.dc.content.provider.discarding;
 }

@@ -1,10 +1,10 @@
-package no.ssb.dc.content.provider.discarding;
+package io.descoped.dc.content.provider.discarding;
 
-import no.ssb.dc.api.content.ContentStream;
-import no.ssb.dc.api.content.ContentStreamBuffer;
-import no.ssb.dc.api.content.ContentStreamConsumer;
-import no.ssb.dc.api.content.ContentStreamCursor;
-import no.ssb.dc.api.content.ContentStreamProducer;
+import io.descoped.dc.api.content.ContentStream;
+import io.descoped.dc.api.content.ContentStreamBuffer;
+import io.descoped.dc.api.content.ContentStreamConsumer;
+import io.descoped.dc.api.content.ContentStreamCursor;
+import io.descoped.dc.api.content.ContentStreamProducer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

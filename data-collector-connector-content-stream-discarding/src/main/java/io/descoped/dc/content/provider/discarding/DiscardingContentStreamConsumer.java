@@ -1,8 +1,8 @@
-package no.ssb.dc.content.provider.discarding;
+package io.descoped.dc.content.provider.discarding;
 
-import no.ssb.dc.api.content.ClosedContentStreamException;
-import no.ssb.dc.api.content.ContentStreamBuffer;
-import no.ssb.dc.api.content.ContentStreamConsumer;
+import io.descoped.dc.api.content.ClosedContentStreamException;
+import io.descoped.dc.api.content.ContentStreamBuffer;
+import io.descoped.dc.api.content.ContentStreamConsumer;
 
 import java.util.concurrent.TimeUnit;
 
