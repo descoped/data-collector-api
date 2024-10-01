@@ -17,9 +17,9 @@ module io.descoped.dc.api {
     opens io.descoped.dc.api.node.builder;
     opens io.descoped.dc.api.http to com.fasterxml.jackson.databind;
 
-    uses Client.Builder;
-    uses Request.Builder;
-    uses Response.Builder;
+    uses io.descoped.dc.api.http.Client.Builder;
+    uses io.descoped.dc.api.http.Request.Builder;
+    uses io.descoped.dc.api.http.Response.Builder;
 
     exports io.descoped.dc.api;
     exports io.descoped.dc.api.context;
