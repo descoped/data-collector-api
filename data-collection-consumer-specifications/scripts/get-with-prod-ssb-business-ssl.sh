@@ -51,8 +51,8 @@ done
 
 getCertificateSecrets() {
   P12_FILE="/tmp/ssb.p12"
-  gcloud secrets versions access latest --secret=ssb-prod-p12-certificate --project=ssb-team-dapla --format='get(payload.data)' | base64 -d >$P12_FILE
-  PASS="$(gcloud secrets versions access latest --secret=ssb-prod-p12-passphrase --project=ssb-team-dapla --format='get(payload.data)' | tr '_-' '/+' | base64 -d)"
+  gcloud secrets versions access latest --secret=ssb-prod-p12-certificate --project=descoped-team --format='get(payload.data)' | base64 -d >$P12_FILE
+  PASS="$(gcloud secrets versions access latest --secret=ssb-prod-p12-passphrase --project=descoped-team --format='get(payload.data)' | tr '_-' '/+' | base64 -d)"
 }
 
 generatePemCertificates() {

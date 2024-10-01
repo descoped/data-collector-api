@@ -1,10 +1,11 @@
 # MOD Data Collection Consumer Specifications
 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/23e1c75406a744bd919b202f01d9e105)](https://www.codacy.com/manual/oranheim/data-collection-consumer-specifications?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=statisticsnorway/data-collection-consumer-specifications&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/23e1c75406a744bd919b202f01d9e105)](https://www.codacy.com/manual/oranheim/data-collection-consumer-specifications?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=descoped/data-collection-consumer-specifications&amp;utm_campaign=Badge_Grade)
 
 This project provides a convenient way to control the lifecycle for different stream provider configurations and makes it easy to execute data collector specifications.
 
-For more information about Data Collector, please refer to the [Data Collector documentation](https://github.com/statisticsnorway/data-collector-project).
+For more information about Data Collector, please refer to
+the [Data Collector documentation](https://github.com/descoped/data-collector-project).
 
 ## Pre-requisite
 
@@ -100,7 +101,8 @@ make TARGET
 
 ### Build Data Collector Dev Image
 
-Dev images requires full checkout of the [data-collector-project](https://github.com/statisticsnorway/data-collector-project) repo.
+Dev images requires full checkout of the [data-collector-project](https://github.com/descoped/data-collector-project)
+repo.
 
 | Target                          | Description                                      |
 | :------------------------------ | :----------------------------------------------- |
@@ -169,7 +171,8 @@ Dev images requires full checkout of the [data-collector-project](https://github
 
 ## Rawdata Consumer
 
-Please refer to the Rawdata Client configuration in `conf/application.properties` for pub/sub details. Also refer to the [Rawdata Client project](https://github.com/statisticsnorway/rawdata-client-project) for technical information.
+Please refer to the Rawdata Client configuration in `conf/application.properties` for pub/sub details. Also refer to
+the [Rawdata Client project](https://github.com/descoped/rawdata-client-project) for technical information.
 
 ## References
 
