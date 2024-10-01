@@ -46,7 +46,7 @@
     <scm>
         <connection>scm:git:git://github.com/descoped/data-collector-api.git</connection>
         <developerConnection>scm:git:git@github.com:descoped/data-collector-api.git</developerConnection>
-        <url>https://github.com/descoped/data-collector-api.git/tree/master</url>
+        <url>https://github.com/descoped/data-collector-api/tree/master</url>
         <tag>HEAD</tag>
     </scm>
 
