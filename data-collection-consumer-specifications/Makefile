@@ -1,6 +1,6 @@
 SHELL=/bin/bash -x
 
-DC_RELEASE_IMAGE=statisticsnorway/data-collector:latest
+DC_RELEASE_IMAGE=descoped/data-collector:latest
 DC_LOCAL_IMAGE=data-collector:dev
 DC_PORT=9990
 
