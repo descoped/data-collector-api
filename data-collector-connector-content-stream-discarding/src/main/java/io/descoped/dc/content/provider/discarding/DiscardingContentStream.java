@@ -17,7 +17,6 @@ public class DiscardingContentStream implements ContentStream {
 
     final Map<String, ContentStreamBuffer> buffersByName = new ConcurrentHashMap<>();
 
-
     @Override
     public String lastPosition(String topic) {
         return null;
