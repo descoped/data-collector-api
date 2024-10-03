@@ -11,7 +11,7 @@ module io.descoped.dc.api {
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.dataformat.yaml;
     requires java.xml;
-    requires secrets.client.api;
+    requires io.descoped.secrets.client.api;
 
     //opens io.descoped.dc.api.node.builder to com.fasterxml.jackson.databind;
     opens io.descoped.dc.api.node.builder;
