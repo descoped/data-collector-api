@@ -6,7 +6,7 @@ module io.descoped.dc.api {
     requires org.slf4j;
     requires io.github.classgraph;
     requires de.huxhorn.sulky.ulid;
-    requires commons.jexl3;
+    requires org.apache.commons.jexl3;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.dataformat.yaml;
