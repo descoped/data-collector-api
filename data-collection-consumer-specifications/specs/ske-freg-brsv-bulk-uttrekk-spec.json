@@ -1,0 +1,203 @@
+{
+  "type" : "Specification",
+  "name" : "Collect FREG BRSV Bulk Uttrekk",
+  "startFunctionId" : "maskinporten-jwt-grant",
+  "id" : "SKE-FREG-BRSV-UTTREKK-BATCH",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "clientId" : "${ENV.'ssb.ske.freg.prod.clientId'}",
+      "jwtGrantTimeToLiveInSeconds" : "${ENV.'ssb.jwtGrant.expiration'}",
+      "ProduksjonURL" : "https://folkeregisteret.api.skatteetaten.no/folkeregisteret",
+      "fromFeedSequence" : "0",
+      "nextBatch" : "0"
+    },
+    "globalState" : {
+      "global.topic" : "freg-brsv-uttrekk-komplett"
+    }
+  }, {
+    "type" : "Security",
+    "identities" : [ {
+      "type" : "JwtIdentity",
+      "id" : "maskinporten",
+      "headerClaims" : {
+        "alg" : "RS256",
+        "sslBundleName" : "ske-p12-certs"
+      },
+      "claims" : {
+        "audience" : "https://maskinporten.no/",
+        "issuer" : "${clientId}",
+        "scope" : "folkeregister:deling/svalbardregister folkeregister:deling/offentligmedhjemmel",
+        "timeToLiveInSeconds" : "${jwtGrantTimeToLiveInSeconds}"
+      }
+    } ]
+  } ],
+  "functions" : {
+    "maskinporten-jwt-grant" : {
+      "type" : "Post",
+      "id" : "maskinporten-jwt-grant",
+      "url" : "https://maskinporten.no/token/v1/token",
+      "requestHeaders" : { },
+      "bodyPublisher" : {
+        "type" : "BodyPublisher",
+        "urlEncodedData" : {
+          "type" : "JwtIdentityTokenBodyPublisherProducer",
+          "identityId" : "maskinporten",
+          "bindTo" : "JWT_GRANT",
+          "token" : "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${JWT_GRANT}"
+        }
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Execute",
+        "executeId" : "create-job",
+        "inputVariables" : {
+          "accessToken" : {
+            "type" : "QueryJqPath",
+            "expression" : ".access_token"
+          }
+        }
+      } ]
+    },
+    "create-job" : {
+      "type" : "Get",
+      "id" : "create-job",
+      "url" : "${ProduksjonURL}/api/brsv/v1/uttrekk/komplett?feedsekvensnr=${fromFeedSequence}",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Console"
+      }, {
+        "type" : "Execute",
+        "executeId" : "loop",
+        "requiredInputs" : [ "accessToken", "jobId" ],
+        "inputVariables" : {
+          "jobId" : {
+            "type" : "QueryJqPath",
+            "expression" : ".jobbId"
+          }
+        }
+      } ]
+    },
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromBatch" : "${nextBatch}"
+      },
+      "threshold" : 100000,
+      "addPageContent" : false,
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "batch-list",
+        "requiredInputs" : [ "accessToken", "jobId", "fromBatch" ]
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextBatch"
+      }
+    },
+    "batch-list" : {
+      "type" : "Get",
+      "id" : "batch-list",
+      "url" : "${ProduksjonURL}/api/brsv/v1/uttrekk/${jobId}/batch/${fromBatch}",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "returnVariables" : [ "nextBatch" ],
+      "retryWhile" : [ {
+        "type" : "HttpStatusRetryWhile",
+        "statusCode" : 404,
+        "duration" : "SECONDS",
+        "amount" : 15
+      } ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".dokumentidentifikator[]"
+        },
+        "expectedQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : "."
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextBatch" : {
+            "type" : "QueryEval",
+            "expression" : "${cast.toLong(fromBatch) + 1}"
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryJqPath",
+            "expression" : "."
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".dokumentidentifikator[]"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Execute",
+          "executeId" : "person-document",
+          "requiredInputs" : [ "accessToken" ],
+          "inputVariables" : {
+            "personDocumentId" : {
+              "type" : "QueryJqPath",
+              "expression" : "."
+            }
+          }
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    },
+    "person-document" : {
+      "type" : "Get",
+      "id" : "person-document",
+      "url" : "${ProduksjonURL}/api/brsv/v1/personer/arkiv/${personDocumentId}?part=historikk",
+      "requestHeaders" : {
+        "Authorization" : [ "Bearer ${accessToken}" ],
+        "Accept" : [ "application/xml" ]
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "person"
+      } ]
+    }
+  }
+}
