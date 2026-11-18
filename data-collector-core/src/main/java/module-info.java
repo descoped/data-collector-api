@@ -6,33 +6,29 @@ module io.descoped.dc.core {
     requires io.descoped.dynamic.config;
     requires io.descoped.service.provider.api;
     requires io.descoped.rawdata.api;
-    requires io.descoped.dc.api;
+    requires transitive io.descoped.dc.api;
     requires io.descoped.secrets.client.api;
     requires io.descoped.secrets.provider.safe.configuration;
     requires io.descoped.secrets.provider.dynamic.configuration;
 
     requires java.logging;
-    requires java.instrument;
+    requires transitive java.instrument;
     requires java.net.http;
 
     requires methanol;
-    requires kotlin.stdlib;
-    requires okhttp3;
 
     requires org.slf4j;
     requires jul.to.slf4j;
 
-    requires net.bytebuddy;
+    requires transitive net.bytebuddy;
     requires net.bytebuddy.agent;
 
-    requires org.reactivestreams;
-    requires io.reactivex.rxjava3;
     requires de.huxhorn.sulky.ulid;
     requires commons.jexl3;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
 
-    requires java.xml;
+    requires transitive java.xml;
 
     requires io.github.classgraph;
     requires org.bouncycastle.pkix;

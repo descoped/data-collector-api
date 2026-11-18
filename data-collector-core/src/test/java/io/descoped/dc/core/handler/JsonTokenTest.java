@@ -103,7 +103,7 @@ public class JsonTokenTest {
                                 )
                         )
                 )
-                .configuration(Map.of("content.stream.connector", "discarding"))
+                .configuration(Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "discard"))
                 .header("Accept", "application/json")
                 .variable("fromPosition", 1)
                 .build()
@@ -130,7 +130,7 @@ public class JsonTokenTest {
                         )
                 )
                 .configuration(Map.of(
-                                "content.stream.connector", "discarding",
+                                "content.stream.connector", "rawdata", "rawdata.client.provider", "discard",
                                 "data.collector.http.client.timeout.seconds", "3600",
                                 "data.collector.http.request.timeout.seconds", "3600"
                         )

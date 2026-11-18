@@ -1,15 +1,15 @@
 module io.descoped.dc.application {
 
     requires io.descoped.service.provider.api;
-    requires io.descoped.dynamic.config;
-    requires io.descoped.dc.api;
+    requires transitive io.descoped.dynamic.config;
+    requires transitive io.descoped.dc.api;
     requires io.descoped.secrets.client.api;
 
     requires org.slf4j;
     requires io.github.classgraph;
     requires com.fasterxml.jackson.databind;
 
-    requires undertow.core;
+    requires transitive undertow.core;
     requires simpleclient.common;
     requires simpleclient;
     requires simpleclient.hotspot;

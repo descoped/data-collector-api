@@ -308,11 +308,14 @@ public class ValidateSiriusDataTest {
         assertTrue(repository.createTaxReturn(taxReturn), "Transaction failed");
 
         {
+            // The identity change is registered after the original identity. Equal registration dates (two
+            // new Date() in the same millisecond) would leave the first/last order undefined.
+            long registered = System.currentTimeMillis();
             IdentityHistory identityHistory = new IdentityHistory.Builder()
                     .fid("001")
                     .identity("A")
                     .incomeYear(2018)
-                    .registrationDate(new Date())
+                    .registrationDate(new Date(registered))
                     .eventType("NY")
                     .build();
             assertTrue(repository.createIdentity(identityHistory), "Transaction failed");
@@ -321,7 +324,7 @@ public class ValidateSiriusDataTest {
                     .fid("001")
                     .identity("B")
                     .incomeYear(2018)
-                    .registrationDate(new Date())
+                    .registrationDate(new Date(registered + 1000))
                     .eventType("INDENTITETSENDRING")
                     .build();
             assertTrue(repository.createIdentity(identityHistory2), "Transaction failed");

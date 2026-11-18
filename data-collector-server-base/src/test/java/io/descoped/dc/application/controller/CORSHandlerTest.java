@@ -4,15 +4,16 @@ import io.undertow.Undertow;
 import io.undertow.server.HttpHandler;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.util.Headers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -23,9 +24,9 @@ public class CORSHandlerTest {
 
     volatile private HttpServerExchange httpServerExchange;
     volatile private HttpHandler customHandler;
-    private OkHttpClient client;
+    private HttpClient client;
     private Undertow server;
-    private Request.Builder requestBuilder;
+    private URI uri;
 
     /**
      * Find a free port for the undertow server.
@@ -76,85 +77,79 @@ public class CORSHandlerTest {
 
         int port = findFree();
         server = Undertow.builder().addHttpListener(port, "localhost").setHandler(corsHandler).build();
-        client = new OkHttpClient();
+        client = HttpClient.newHttpClient();
         server.start();
 
-        requestBuilder = new Request.Builder().url("http://localhost:" + port)
-                .addHeader("Origin", "http://foo");
+        uri = URI.create("http://localhost:" + port);
+    }
+
+    private HttpResponse<Void> send(String method, String origin, String... headers) throws IOException {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri)
+                .method(method, HttpRequest.BodyPublishers.noBody())
+                .header("Origin", origin);
+        if (headers.length > 0) {
+            builder.headers(headers);
+        }
+        try {
+            return client.send(builder.build(), HttpResponse.BodyHandlers.discarding());
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new IOException(e);
+        }
+    }
+
+    private static String header(HttpResponse<?> response, Object name) {
+        return response.headers().firstValue(name.toString()).orElse(null);
     }
 
     @Test
     public void testThatExchangeIsForwarded() throws IOException {
-        Request request = requestBuilder.get().build();
-        try (Response response = client.newCall(request).execute()) {
-            assertThat(response.code()).isEqualTo(222);
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN.toString())).isEqualTo("http://foo");
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_EXPOSE_HEADERS.toString()))
-                    .contains("y-bar").contains("x-foo").contains(",");
-            assertThat(httpServerExchange).isNotNull();
-        }
+        HttpResponse<Void> response = send("GET", "http://foo");
+        assertThat(response.statusCode()).isEqualTo(222);
+        assertThat(header(response, CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://foo");
+        assertThat(header(response, CORSHandler.ACCESS_CONTROL_EXPOSE_HEADERS))
+                .contains("y-bar").contains("x-foo").contains(",");
+        assertThat(httpServerExchange).isNotNull();
     }
 
     @Test
     public void testThatPreflightShortCircuitsHandler() throws IOException {
-        Request request = requestBuilder.method("OPTIONS", null)
-                .addHeader("Access-Control-Request-Method", "PUT")
-                .build();
-        try (Response response = client.newCall(request).execute()) {
-            assertThat(response.code()).isEqualTo(444);
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_ALLOW_METHODS.toString()))
-                    .contains("PUT").contains("GET").contains(",");
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN.toString())).isEqualTo("http://foo");
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_ALLOW_HEADERS.toString()))
-                    .contains("y-bar").contains("x-foo").contains(",");
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_ALLOW_CREDENTIALS.toString()))
-                    .isEqualTo("true");
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_MAX_AGE.toString()))
-                    .isEqualTo("123456");
-            assertThat(httpServerExchange).isNull();
-        }
+        HttpResponse<Void> response = send("OPTIONS", "http://foo", "Access-Control-Request-Method", "PUT");
+        assertThat(response.statusCode()).isEqualTo(444);
+        assertThat(header(response, CORSHandler.ACCESS_CONTROL_ALLOW_METHODS))
+                .contains("PUT").contains("GET").contains(",");
+        assertThat(header(response, CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://foo");
+        assertThat(header(response, CORSHandler.ACCESS_CONTROL_ALLOW_HEADERS))
+                .contains("y-bar").contains("x-foo").contains(",");
+        assertThat(header(response, CORSHandler.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
+        assertThat(header(response, CORSHandler.ACCESS_CONTROL_MAX_AGE)).isEqualTo("123456");
+        assertThat(httpServerExchange).isNull();
     }
 
     @Test
     public void testThatItIncludesVary() throws IOException {
-        Request request = requestBuilder.get().build();
-        try (Response response = client.newCall(request).execute()) {
-            assertThat(response.header(Headers.VARY_STRING)).isEqualTo("Origin");
-            assertThat(httpServerExchange).isNotNull();
-        }
+        HttpResponse<Void> response = send("GET", "http://foo");
+        assertThat(header(response, Headers.VARY_STRING)).isEqualTo("Origin");
+        assertThat(httpServerExchange).isNotNull();
     }
 
     @Test
     public void testThatItAppendsVary() throws IOException {
-        Request request = requestBuilder.get().build();
         customHandler = exchange -> exchange.getResponseHeaders().add(Headers.VARY, "Foo");
-        try (Response response = client.newCall(request).execute()) {
-            assertThat(response.headers(Headers.VARY_STRING))
-                    .containsExactlyInAnyOrder("Origin", "Foo");
-            assertThat(httpServerExchange).isNotNull();
-        }
+        HttpResponse<Void> response = send("GET", "http://foo");
+        assertThat(response.headers().allValues(Headers.VARY_STRING)).containsExactlyInAnyOrder("Origin", "Foo");
+        assertThat(httpServerExchange).isNotNull();
     }
 
     @Test
     public void testMatchesRegex() throws IOException {
-        Request request1 = requestBuilder.get()
-                .removeHeader("Origin")
-                .addHeader("Origin", "http://regexp")
-                .build();
-        try (Response response = client.newCall(request1).execute()) {
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN.toString()))
-                    .isEqualTo("http://regexp");
-            assertThat(httpServerExchange).isNotNull();
-        }
-        Request request2 = requestBuilder.get()
-                .removeHeader("Origin")
-                .addHeader("Origin", "https://pxeger")
-                .build();
-        try (Response response = client.newCall(request2).execute()) {
-            assertThat(response.header(CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN.toString()))
-                    .isEqualTo("https://pxeger");
-            assertThat(httpServerExchange).isNotNull();
-        }
+        HttpResponse<Void> response1 = send("GET", "http://regexp");
+        assertThat(header(response1, CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://regexp");
+        assertThat(httpServerExchange).isNotNull();
+
+        HttpResponse<Void> response2 = send("GET", "https://pxeger");
+        assertThat(header(response2, CORSHandler.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("https://pxeger");
+        assertThat(httpServerExchange).isNotNull();
     }
 
 }

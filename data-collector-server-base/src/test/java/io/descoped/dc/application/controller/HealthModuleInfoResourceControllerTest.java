@@ -17,15 +17,23 @@ import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HealthModuleInfoResourceControllerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HealthModuleInfoResourceControllerTest.class);
 
     @Test
-    public void thatModuleListIsEmptyUntilModuleSystemCanBeInitializedInTests() {
+    public void thatModuleListHasTheDescopedModulesOfTheBootLayer() {
         HealthModuleInfoResource healthModuleInfoResource = new HealthModuleInfoResource();
-        assertEquals(((List) healthModuleInfoResource.resource()).size(), 6);
+        @SuppressWarnings("unchecked")
+        List<HealthModuleInfoResource.ModuleInfo> modules = (List<HealthModuleInfoResource.ModuleInfo>) healthModuleInfoResource.resource();
+        Set<String> expected = ModuleLayer.boot().modules().stream()
+                .map(Module::getName)
+                .filter(name -> name.startsWith("io.descoped"))
+                .collect(Collectors.toSet());
+        assertEquals(expected, modules.stream().map(info -> info.moduleName).collect(Collectors.toSet()));
+        assertTrue(expected.contains("io.descoped.dc.application"), "server-base's own module is listed");
         System.out.printf("%s -> %s%n", healthModuleInfoResource.name(), healthModuleInfoResource.resource());
     }
 

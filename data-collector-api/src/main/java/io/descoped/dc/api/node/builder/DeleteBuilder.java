@@ -18,7 +18,7 @@ import java.util.Objects;
 import static io.descoped.dc.api.Builders.status;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class DeleteBuilder extends OperationBuilder {
+public final class DeleteBuilder extends OperationBuilder {
 
     @JsonUnwrapped(prefix = "request")
     Headers requestHeaders = new Headers();

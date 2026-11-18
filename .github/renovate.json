@@ -1,0 +1,87 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard"
+  ],
+  "packageRules": [
+    {
+      "description": "Minor and patch updates of stable (1.0 and later) versions merge on their own when CI on JDK 17 and 27 is green",
+      "matchManagers": [
+        "maven",
+        "github-actions"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest"
+      ],
+      "matchCurrentVersion": "!/^0\\./",
+      "automerge": true
+    },
+    {
+      "description": "Major updates wait for review",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "automerge": false
+    },
+    {
+      "description": "0.x versions are never automerged: a 0.x minor may break (lmdbjava 0.9.3 changed its JPMS module name and broke the build)",
+      "matchManagers": [
+        "maven"
+      ],
+      "matchCurrentVersion": "/^0\\./",
+      "automerge": false
+    },
+    {
+      "description": "The Descoped libraries stay on 2.x until rawdata-client 3.0.0 is on Maven Central: rawdata 2.x and 3.x need different majors of service-provider-api under one JPMS module name, so they move together in one pull request (see .claude/CLAUDE.md). Lift this rule in that pull request.",
+      "matchPackageNames": [
+        "io.descoped.spi:**",
+        "io.descoped.config:**",
+        "io.descoped.secrets:**",
+        "io.descoped.encryption:**",
+        "io.descoped.rawdata:**"
+      ],
+      "allowedVersions": "<3"
+    },
+    {
+      "description": "commons-jexl3 stays on 3.2.1 until the expression sandbox is introduced: 3.3 restricts permissions by default, which changes what specifications may evaluate. Lift this rule in that pull request.",
+      "matchPackageNames": [
+        "org.apache.commons:commons-jexl3"
+      ],
+      "allowedVersions": "3.2.1"
+    },
+    {
+      "description": "JDK versions in the workflows are deliberate: CI builds on JDK 17 and 27, `respond` on 17. They are changed by hand, never bumped.",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDepNames": [
+        "java-jdk"
+      ],
+      "enabled": false
+    },
+    {
+      "description": "Maven bumps through the wrapper: Renovate does not update distributionSha256Sum, so CI fails until it is set by hand (see .claude/CLAUDE.md, Maven Wrapper)",
+      "matchManagers": [
+        "maven-wrapper"
+      ],
+      "labels": [
+        "maven-wrapper"
+      ],
+      "prBodyNotes": [
+        "Update `distributionSha256Sum` in `.mvn/wrapper/maven-wrapper.properties` to the SHA-256 of the new `apache-maven-<version>-bin.zip`, after checking the zip against Maven's published `.sha512`."
+      ]
+    }
+  ],
+  "vulnerabilityAlerts": {
+    "labels": [
+      "security"
+    ],
+    "automerge": true
+  }
+}

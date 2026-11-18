@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public class PaginateBuilder extends NodeWithIdBuilder {
+public final class PaginateBuilder extends NodeWithIdBuilder {
 
     @JsonProperty
     Map<String, String> variables = new LinkedHashMap<>();
