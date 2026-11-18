@@ -29,7 +29,7 @@ module io.descoped.dc.server {
     requires java.net.http;
     requires undertow.core;
 
-    requires org.lmdbjava;
+    requires lmdbjava;
     requires org.objectweb.asm;
 
     opens io.descoped.dc.server;
