@@ -79,9 +79,10 @@
     }
   ],
   "vulnerabilityAlerts": {
+    "description": "Security updates are raised at once but wait for review: they skip packageRules, so automerge here would also merge majors and 0.x bumps",
     "labels": [
       "security"
     ],
-    "automerge": true
+    "automerge": false
   }
 }

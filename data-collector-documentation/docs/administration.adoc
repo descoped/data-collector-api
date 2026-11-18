@@ -37,12 +37,13 @@ endif::[]
 |Numer of fixed threads available in thread pool.
 
 |content.stream.connector
-|discarding \| rawdata
-|Configures the content stream connector.
+|rawdata
+|Configures the content stream connector. `rawdata` is the only connector.
 
 |rawdata.client.provider
-|postgres
-|Supported rawdata stream providers are: `memory`, `postgres` or `kafka`.
+|discard
+|The rawdata-client provider: `memory`, `discard` (drops the content), `postgres`, `gcs` or `filesystem`. Without a
+configured `content.stream.connector`, the engine uses `rawdata` with `discard`.
 
 |===
 
