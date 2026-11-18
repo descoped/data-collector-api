@@ -1,0 +1,145 @@
+{
+  "type" : "Specification",
+  "name" : "Collect Tvinn Prod",
+  "startFunctionId" : "maskinporten-jwt-grant",
+  "id" : "TOLL-TVINN-PROD",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "ProduksjonURL" : "https://api.toll.no",
+      "clientId" : "fedbc36a-17b8-44fd-b86b-24e0c1c161e0",
+      "jwtGrantTimeToLiveInSeconds" : "30",
+      "nextMarker" : "${contentStream.hasLastPosition() ? contentStream.lastPosition() : \"last\"}"
+    },
+    "globalState" : {
+      "global.topic" : "tvinn-prod"
+    }
+  }, {
+    "type" : "Security",
+    "identities" : [ {
+      "type" : "JwtIdentity",
+      "id" : "maskinporten",
+      "headerClaims" : {
+        "alg" : "RS256",
+        "sslBundleName" : "ssb-prod-certs"
+      },
+      "claims" : {
+        "audience" : "https://maskinporten.no/",
+        "issuer" : "fedbc36a-17b8-44fd-b86b-24e0c1c161e0",
+        "scope" : "toll:declaration/clearance/feed.read",
+        "timeToLiveInSeconds" : "30"
+      }
+    } ]
+  } ],
+  "functions" : {
+    "maskinporten-jwt-grant" : {
+      "type" : "Post",
+      "id" : "maskinporten-jwt-grant",
+      "url" : "https://maskinporten.no/token/v1/token",
+      "requestHeaders" : { },
+      "bodyPublisher" : {
+        "type" : "BodyPublisher",
+        "urlEncodedData" : {
+          "type" : "JwtIdentityTokenBodyPublisherProducer",
+          "identityId" : "maskinporten",
+          "bindTo" : "JWT_GRANT",
+          "token" : "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${JWT_GRANT}"
+        }
+      },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Execute",
+        "executeId" : "loop",
+        "inputVariables" : {
+          "accessToken" : {
+            "type" : "QueryJqPath",
+            "expression" : ".access_token"
+          }
+        }
+      } ]
+    },
+    "loop" : {
+      "type" : "Paginate",
+      "id" : "loop",
+      "variables" : {
+        "fromMarker" : "${nextMarker}"
+      },
+      "threshold" : 150,
+      "addPageContent" : true,
+      "positionVariable" : "fromMarker",
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "event-list",
+        "requiredInputs" : [ "accessToken" ]
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextMarker"
+      }
+    },
+    "event-list" : {
+      "type" : "Get",
+      "id" : "event-list",
+      "url" : "${ProduksjonURL}/api/declaration/declaration-clearance-feed/atom?marker=${fromMarker}&limit=10&direction=forward",
+      "requestHeaders" : {
+        "Content-Type" : [ "application/xml" ],
+        "Authorization" : [ "Bearer ${accessToken}" ]
+      },
+      "returnVariables" : [ "nextMarker" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "expectedQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/entry/id"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextMarker" : {
+            "type" : "QueryRegEx",
+            "expression" : "(?<=[?&]marker=)[^&]*",
+            "query" : {
+              "type" : "QueryXPath",
+              "expression" : "/feed/link[@rel=\"previous\"]/@href"
+            }
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryXPath",
+            "expression" : "/entry/id"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryXPath",
+          "expression" : "/feed/entry"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    }
+  }
+}

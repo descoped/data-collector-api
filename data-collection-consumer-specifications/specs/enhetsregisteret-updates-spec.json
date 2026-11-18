@@ -1,0 +1,160 @@
+{
+  "type" : "Specification",
+  "name" : "Collect Enhetsregiseret Updates",
+  "startFunctionId" : "find-first-position",
+  "id" : "ENHETSREGISTERET-UPDATE",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "variables" : {
+      "baseURL" : "https://data.brreg.no/enhetsregisteret/api",
+      "offsetDate" : "2021-03-11T00:00:00.000Z",
+      "page" : "0",
+      "pageSize" : "20"
+    },
+    "globalState" : {
+      "global.topic" : "enhetsregister-update"
+    },
+    "headers" : {
+      "accept" : [ "application/json" ]
+    }
+  } ],
+  "functions" : {
+    "find-first-position" : {
+      "type" : "Get",
+      "id" : "find-first-position",
+      "url" : "${baseURL}/oppdateringer/enheter?dato=${offsetDate}&page=0&size=1",
+      "requestHeaders" : { },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Console"
+      }, {
+        "type" : "Execute",
+        "executeId" : "loop-pages-until-done",
+        "inputVariables" : {
+          "fromStartPosition" : {
+            "type" : "QueryEval",
+            "expression" : "${cast.toLong(contentStream.lastOrInitialPosition(0)) + 1}"
+          },
+          "nextPosition" : {
+            "type" : "QueryEval",
+            "query" : {
+              "type" : "QueryJqPath",
+              "expression" : "._embedded.oppdaterteEnheter[0]?.oppdateringsid"
+            },
+            "bindToVariable" : "updateId",
+            "expression" : "${fromStartPosition == 1L ? (cast.toLong(updateId)) : fromStartPosition}"
+          }
+        }
+      } ]
+    },
+    "loop-pages-until-done" : {
+      "type" : "Paginate",
+      "id" : "loop-pages-until-done",
+      "variables" : {
+        "fromPosition" : "${nextPosition}"
+      },
+      "threshold" : 30,
+      "addPageContent" : true,
+      "positionVariable" : "fromPosition",
+      "iterate" : [ {
+        "type" : "Execute",
+        "executeId" : "fetch-page",
+        "requiredInputs" : [ "nextPosition" ]
+      } ],
+      "until" : {
+        "type" : "ConditionWhenVariableIsNull",
+        "identifier" : "nextPosition"
+      }
+    },
+    "fetch-page" : {
+      "type" : "Get",
+      "id" : "fetch-page",
+      "url" : "${baseURL}/oppdateringer/enheter?oppdateringsid=${nextPosition}&page=${page}&&size=${pageSize}",
+      "requestHeaders" : { },
+      "returnVariables" : [ "nextPosition" ],
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : "._embedded.oppdaterteEnheter[]?"
+        },
+        "expectedQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".oppdateringsid"
+        }
+      }, {
+        "type" : "NextPage",
+        "outputs" : {
+          "nextPosition" : {
+            "type" : "QueryEval",
+            "query" : {
+              "type" : "QueryJqPath",
+              "expression" : "._embedded | .oppdaterteEnheter[-1]? | .oppdateringsid"
+            },
+            "bindToVariable" : "lastUpdateId",
+            "expression" : "${cast.toLong(lastUpdateId) + 1L}"
+          }
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryJqPath",
+            "expression" : ".oppdateringsid"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : "._embedded.oppdaterteEnheter[]?"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "entry"
+        }, {
+          "type" : "Execute",
+          "executeId" : "event-document",
+          "requiredInputs" : [ "position" ],
+          "inputVariables" : {
+            "eventURL" : {
+              "type" : "QueryJqPath",
+              "expression" : "._links.enhet.href"
+            }
+          }
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    },
+    "event-document" : {
+      "type" : "Get",
+      "id" : "event-document",
+      "url" : "${eventURL}",
+      "requestHeaders" : { },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        },
+        "failed" : [ 400, 404, 500 ]
+      } ],
+      "pipes" : [ {
+        "type" : "AddContent",
+        "positionVariableExpression" : "${position}",
+        "contentKey" : "event"
+      } ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+**/.DS_Store
+/.idea/
+/*.log
+/*.iml
+
+/target
+
+**/*certs
+**/*certs.tgz
+**/*certs.zip
+
+/profile/gcs/conf/application.properties
+**/application-override.properties

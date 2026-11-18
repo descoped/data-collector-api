@@ -1,0 +1,55 @@
+{
+  "type" : "Specification",
+  "name" : "Collect enhetsregiseret",
+  "startFunctionId" : "enheter-download",
+  "id" : "Enhetsregisteret",
+  "configure" : [ {
+    "type" : "SpecificationContext",
+    "globalState" : {
+      "global.topic" : "enhetsregister"
+    }
+  } ],
+  "functions" : {
+    "enheter-download" : {
+      "type" : "Get",
+      "id" : "enheter-download",
+      "url" : "https://data.brreg.no/enhetsregisteret/api/enheter/lastned",
+      "requestHeaders" : { },
+      "responseValidators" : [ {
+        "type" : "HttpStatusValidation",
+        "success" : {
+          "200" : [ ]
+        }
+      } ],
+      "pipes" : [ {
+        "type" : "Sequence",
+        "splitQuery" : {
+          "type" : "QueryJsonToken"
+        },
+        "expectedQuery" : {
+          "type" : "QueryJqPath",
+          "expression" : ".organisasjonsnummer"
+        }
+      }, {
+        "type" : "Parallel",
+        "variables" : {
+          "position" : {
+            "type" : "QueryJqPath",
+            "expression" : ".organisasjonsnummer"
+          }
+        },
+        "splitQuery" : {
+          "type" : "QueryJsonToken"
+        },
+        "pipes" : [ {
+          "type" : "AddContent",
+          "positionVariableExpression" : "${position}",
+          "contentKey" : "enhet"
+        }, {
+          "type" : "Publish",
+          "positionVariableExpression" : "${position}"
+        } ]
+      } ]
+    }
+  }
+}
