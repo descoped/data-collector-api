@@ -237,8 +237,13 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.16.0</version>
                     <configuration>
+                        <!-- No annotation processors are used. javac before 23 runs any it finds on the class path
+                             (log4j-core ships one), and -Xlint:all then fails on "No processor claimed". -->
+                        <proc>none</proc>
+                        <!-- -classfile: dependencies' class files reference annotation classes they do not ship
+                             (log4j-core's SpotBugs annotations); that is not this project's code. -->
                         <compilerArgs>
-                            <arg>-Xlint:all${lint.exclusions}</arg>
+                            <arg>-Xlint:all,-classfile${lint.exclusions}</arg>
                             <arg>-Werror</arg>
                         </compilerArgs>
                     </configuration>

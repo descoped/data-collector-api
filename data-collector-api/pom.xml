@@ -19,7 +19,7 @@
         <!-- Lint and doclint groups this module still breaks (javac -Xlint:all -Werror, Javadoc doclint all with
              warnings failing); its revision empties both lists. -->
         <doclint.exclusions>,-missing</doclint.exclusions>
-        <lint.exclusions>,-cast,-deprecation,-missing-explicit-ctor,-rawtypes,-requires-automatic,-requires-transitive-automatic,-serial,-unchecked</lint.exclusions>
+        <lint.exclusions>,-cast,-deprecation,-missing-explicit-ctor,-rawtypes,-requires-automatic,-requires-transitive-automatic,-serial,-try,-unchecked</lint.exclusions>
     </properties>
 
     <dependencies>

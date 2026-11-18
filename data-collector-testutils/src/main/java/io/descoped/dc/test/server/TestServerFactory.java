@@ -138,7 +138,7 @@ public class TestServerFactory {
     /**
      * Returns the current server depending on scope.
      *
-     * @return @BeforeAll a container instance will always be returned. <br/> @BeforeEach a class or container instance will be returned
+     * @return from {@code @BeforeAll}, always the container's instance; from {@code @BeforeEach}, the class's or the container's instance
      */
     public TestServer currentServer() {
         TestServerExtension.TestServerResource testServerResource = currentTestServerResourceReference.get();
@@ -151,7 +151,7 @@ public class TestServerFactory {
     /**
      * Returns the current client depending on scope.
      *
-     * @return @BeforeAll a container client will always be returned. <br/> @BeforeEach a class or container client will be returned
+     * @return from {@code @BeforeAll}, always the container's client; from {@code @BeforeEach}, the class's or the container's client
      */
     public TestClient currentClient() {
         TestServerExtension.TestServerResource testServerResource = currentTestServerResourceReference.get();

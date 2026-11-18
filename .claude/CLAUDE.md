@@ -45,7 +45,9 @@ this repository. The plan and its order of work are in the owner's notes; the wo
 - **JPMS.** Every module except testutils is a named module. A module whose exported API exposes another module's types
   `requires transitive` it. No `requires` a module does not use. Services are registered with `provides` in
   `module-info.java` and in `META-INF/services`.
-- **Lint.** `-Xlint:all -Werror` and Javadoc doclint `all` with warnings failing are the rule. A module not yet revised
+- **Lint.** `-Xlint:all -Werror` and Javadoc doclint `all` with warnings failing are the rule, with one standing
+  exception: `-classfile` (dependencies' class files that reference annotation classes they do not ship). No annotation
+  processors run (`-proc:none`). A module not yet revised
   lists the categories it still breaks in `lint.exclusions` / `doclint.exclusions` in its POM; its revision empties
   them, and nothing is added to them. Only categories javac 17 knows may be listed (javac 17 rejects
   `-Xlint:-this-escape`), so warnings that only newer javac reports are fixed, not excluded.
