@@ -53,7 +53,7 @@
         <secrets-client-api.version>3.0.0</secrets-client-api.version>
         <secrets-provider.version>3.0.0</secrets-provider.version>
         <encryption-util.version>3.0.1</encryption-util.version>
-        <rawdata-client.version>3.0.0</rawdata-client.version>
+        <rawdata-client.version>3.0.1</rawdata-client.version>
 
         <slf4j.version>2.0.20</slf4j.version>
         <log4j2.version>2.26.1</log4j2.version>
