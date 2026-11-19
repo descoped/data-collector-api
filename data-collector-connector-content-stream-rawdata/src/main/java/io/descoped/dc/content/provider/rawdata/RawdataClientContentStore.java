@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class RawdataClientContentStore implements ContentStore {
+public final class RawdataClientContentStore implements ContentStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(RawdataClientContentStore.class);
 

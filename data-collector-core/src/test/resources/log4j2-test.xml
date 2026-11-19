@@ -27,15 +27,7 @@
             <AppenderRef ref="Console"/>
         </Logger>
 
-        <Logger name="io.descoped.dc.content.provider.discarding.DiscardingContentStore"
-                level="${sys:log4j2.level:-${env:LOG4J_LEVEL:-${TEST_LOG_LEVEL}}}" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
 
-        <Logger name="io.descoped.dc.content.provider.discarding.DiscardingContentStreamBuffer"
-                level="${sys:log4j2.level:-${env:LOG4J_LEVEL:-${TEST_LOG_LEVEL}}}" additivity="false">
-            <AppenderRef ref="Console"/>
-        </Logger>
 
         <Logger name="io.descoped.rawdata.api" level="${sys:log4j2.level:-${env:LOG4J_LEVEL:-${TEST_LOG_LEVEL}}}"
                 additivity="false">

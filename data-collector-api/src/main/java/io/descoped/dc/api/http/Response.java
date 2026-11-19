@@ -18,10 +18,10 @@ public interface Response {
     byte[] body();
 
     /**
-     * Use: Response.<TYPE>bodyHandler()
+     * The body handler that received this response's body, typed by the caller: {@code response.<TYPE>bodyHandler()}.
      *
-     * @param <R>
-     * @return
+     * @param <R> the body type the handler produces
+     * @return the body handler, or empty when the body was read into memory
      */
     <R> Optional<BodyHandler<R>> bodyHandler();
 

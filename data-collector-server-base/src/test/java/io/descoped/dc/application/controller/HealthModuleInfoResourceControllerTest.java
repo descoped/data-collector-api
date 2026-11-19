@@ -16,16 +16,26 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class HealthModuleInfoResourceControllerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(HealthModuleInfoResourceControllerTest.class);
 
     @Test
-    public void thatModuleListIsEmptyUntilModuleSystemCanBeInitializedInTests() {
+    public void thatModuleListHasTheDescopedModulesOfTheBootLayer() {
         HealthModuleInfoResource healthModuleInfoResource = new HealthModuleInfoResource();
-        assertEquals(((List) healthModuleInfoResource.resource()).size(), 6);
+        @SuppressWarnings("unchecked")
+        List<HealthModuleInfoResource.ModuleInfo> modules = (List<HealthModuleInfoResource.ModuleInfo>) healthModuleInfoResource.resource();
+        Set<String> names = modules.stream().map(info -> info.moduleName).collect(Collectors.toSet());
+        // server-base's own module and the modules it requires are always resolved in its tests
+        assertTrue(names.containsAll(Set.of(
+                        "io.descoped.dc.application",
+                        "io.descoped.dc.api",
+                        "io.descoped.service.provider.api",
+                        "io.descoped.dynamic.config")),
+                () -> "missing modules in " + names);
+        assertTrue(names.stream().allMatch(name -> name.startsWith("io.descoped")), () -> "not an io.descoped module in " + names);
         System.out.printf("%s -> %s%n", healthModuleInfoResource.name(), healthModuleInfoResource.resource());
     }
 

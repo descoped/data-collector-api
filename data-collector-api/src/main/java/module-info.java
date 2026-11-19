@@ -1,17 +1,13 @@
 module io.descoped.dc.api {
-    requires io.descoped.dynamic.config;
-    requires io.descoped.service.provider.api;
-    requires io.descoped.rawdata.api;
+    // Types of these modules appear in this module's exported API.
+    requires transitive io.descoped.service.provider.api;
+    requires transitive de.huxhorn.sulky.ulid;
+    requires transitive com.fasterxml.jackson.databind;
 
     requires org.slf4j;
-    requires io.github.classgraph;
-    requires de.huxhorn.sulky.ulid;
     requires commons.jexl3;
-    requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
-    requires com.fasterxml.jackson.dataformat.yaml;
-    requires java.xml;
-    requires io.descoped.secrets.client.api;
+    requires transitive com.fasterxml.jackson.dataformat.yaml;
 
     //opens io.descoped.dc.api.node.builder to com.fasterxml.jackson.databind;
     opens io.descoped.dc.api.node.builder;

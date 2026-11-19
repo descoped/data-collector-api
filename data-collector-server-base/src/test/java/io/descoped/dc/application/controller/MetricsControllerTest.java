@@ -7,10 +7,6 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.Summary;
-import okhttp3.Headers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -18,7 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
 import java.time.Instant;
 import java.util.Optional;
 
@@ -30,7 +28,7 @@ public class MetricsControllerTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(MetricsControllerTest.class);
 
-    private static OkHttpClient client = new OkHttpClient.Builder().build();
+    private static final HttpClient client = HttpClient.newHttpClient();
     private static UndertowApplication server;
 
     @BeforeAll
@@ -49,17 +47,14 @@ public class MetricsControllerTest {
 
     static public HttpResponse GET(String uri, String... headers) {
         try {
-            URL url = new URL("http", server.getHost(), server.getPort(), uri);
-            Request.Builder requestBuilder = new Request.Builder().url(url);
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder(
+                    URI.create("http://" + server.getHost() + ":" + server.getPort() + uri)).GET();
             if (headers != null && headers.length > 1) {
-                requestBuilder.headers(Headers.of(headers));
+                requestBuilder.headers(headers);
             }
-
-            Request request = requestBuilder.get().build();
-            try (Response response = client.newCall(request).execute()) {
-                return new HttpResponse(response.code(), response.body().string());
-
-            }
+            java.net.http.HttpResponse<String> response = client.send(requestBuilder.build(),
+                    java.net.http.HttpResponse.BodyHandlers.ofString());
+            return new HttpResponse(response.statusCode(), response.body());
         } catch (Exception e) {
             LOG.error("Error: {}", captureStackTrace(e));
             throw new RuntimeException(e);
