@@ -1,14 +1,14 @@
 package io.descoped.dc.server.integrity;
 
+import io.descoped.dc.api.ids.TimeOrderedIds;
+import java.util.UUID;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import de.huxhorn.sulky.ulid.ULID;
 import io.descoped.config.DynamicConfiguration;
 import io.descoped.dc.api.content.ContentStore;
 import io.descoped.dc.api.content.ContentStream;
 import io.descoped.dc.api.content.ContentStreamBuffer;
 import io.descoped.dc.api.content.ContentStreamConsumer;
-import io.descoped.dc.api.ulid.ULIDGenerator;
 import io.descoped.dc.api.util.JsonParser;
 import io.descoped.dc.server.content.ContentStoreComponent;
 import io.descoped.dc.server.db.SequenceKey;
@@ -55,8 +55,8 @@ public class IntegrityCheckJob {
             ContentStreamBuffer peekBuffer = null;
             boolean test = true;
             int timeoutInSeconds = 15;
-            if (configuration.evaluateToString("data.collector.integrityCheck.consumer.timeoutInSeconds") != null) {
-                timeoutInSeconds = configuration.evaluateToInt("data.collector.integrityCheck.consumer.timeoutInSeconds");
+            if (configuration.find("data.collector.integrityCheck.consumer.timeoutInSeconds").orElse(null) != null) {
+                timeoutInSeconds = configuration.getInt("data.collector.integrityCheck.consumer.timeoutInSeconds");
             }
             try {
                 LOG.info("Check integrity for topic: {}", topic);
@@ -71,7 +71,7 @@ public class IntegrityCheckJob {
                         test = false;
                     }
 
-                    index.writeSequence(buffer.ulid(), buffer.position());
+                    index.writeSequence(buffer.id(), buffer.position());
 
                     if (lastPosition != null && lastPosition.equals(buffer.position())) {
                         LOG.info("Reached en of stream for topic: {}", topic);
@@ -123,11 +123,11 @@ public class IntegrityCheckJob {
     // generate a duplicate report in json format
     public void generateReport() {
         Path reportPath = index.getDatabaseDir().resolve("report");
-        String reportId = ULIDGenerator.toUUID(ULIDGenerator.generate()).toString() + ".json";
+        String reportId = TimeOrderedIds.generate().toString() + ".json";
         LOG.info("Generating report to: {}/{}", reportPath, reportId);
 
         AtomicReference<SequenceKey> prevSequenceKey = new AtomicReference<>();
-        Map<String, Set<ULID.Value>> duplicatePositionAndUlidSet = new LinkedHashMap<>();
+        Map<String, Set<UUID>> duplicatePositionAndIdSet = new LinkedHashMap<>();
         Map<String, AtomicLong> duplicatePositionCounter = new LinkedHashMap<>();
 
         try (JsonArrayWriter writer = new JsonArrayWriter(reportPath, reportId, 5000)) {
@@ -141,22 +141,22 @@ public class IntegrityCheckJob {
                 // check if we hit a duplicate on stream
                 if (prevSequenceKey.get().position().equals(sequenceKey.position())) {
                     // make counters for position and increment duplicateCount
-                    duplicatePositionAndUlidSet.computeIfAbsent(prevSequenceKey.get().position(), duplicateUlidSet -> new TreeSet<>()).add(prevSequenceKey.get().ulid());
-                    duplicatePositionAndUlidSet.get(sequenceKey.position()).add(sequenceKey.ulid());
+                    duplicatePositionAndIdSet.computeIfAbsent(prevSequenceKey.get().position(), duplicateIdSet -> new TreeSet<>(TimeOrderedIds.ORDER)).add(prevSequenceKey.get().id());
+                    duplicatePositionAndIdSet.get(sequenceKey.position()).add(sequenceKey.id());
                 }
 
                 // if we got duplicates then write data
-                if (duplicatePositionAndUlidSet.size() > 0 && (!prevSequenceKey.get().position().equals(sequenceKey.position()) || !hasNext)) {
+                if (duplicatePositionAndIdSet.size() > 0 && (!prevSequenceKey.get().position().equals(sequenceKey.position()) || !hasNext)) {
                     ObjectNode positionNode = writer.parser().createObjectNode();
                     ArrayNode ulidArray = writer.parser().createArrayNode();
-                    Set<ULID.Value> ulidSet = duplicatePositionAndUlidSet.get(prevSequenceKey.get().position());
-                    ulidSet.forEach(ulid -> {
-                        ulidArray.add(ULIDGenerator.toUUID(ulid).toString());
+                    Set<UUID> idSet = duplicatePositionAndIdSet.get(prevSequenceKey.get().position());
+                    idSet.forEach(id -> {
+                        ulidArray.add(id.toString());
                     });
-                    duplicatePositionCounter.computeIfAbsent(prevSequenceKey.get().position(), counter -> new AtomicLong()).set(ulidSet.size());
+                    duplicatePositionCounter.computeIfAbsent(prevSequenceKey.get().position(), counter -> new AtomicLong()).set(idSet.size());
                     positionNode.set(prevSequenceKey.get().position(), ulidArray);
                     writer.write(positionNode);
-                    duplicatePositionAndUlidSet.clear();
+                    duplicatePositionAndIdSet.clear();
                 }
 
                 // move marker to next

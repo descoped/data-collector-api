@@ -30,7 +30,7 @@ public class MetricsResourceFactory {
         List<Class<? extends MetricsResource>> classes = new ArrayList<>();
         try (ScanResult scanResult = new ClassGraph()
                 .enableClassInfo()
-                .whitelistPackages("io.descoped.dc")
+                .acceptPackages("io.descoped.dc")
                 .scan()
         ) {
             ClassInfoList classInfoList = scanResult.getClassesImplementing(MetricsResource.class.getName());

@@ -29,7 +29,7 @@ class TestServerExtensionTest {
     void testDefaultMethodConfiguration() {
         DynamicConfiguration defaultConfiguration = ConfigurationFactory.instance().get(TestConfigurationBinding.clazz(TestServerExtensionTest.class));
         assertNotNull(defaultConfiguration);
-        assertNull(defaultConfiguration.evaluateToString("k1"));
+        assertNull(defaultConfiguration.find("k1").orElse(null));
         assertConfiguration("testDefaultMethodConfiguration");
     }
 
@@ -62,7 +62,7 @@ class TestServerExtensionTest {
         assertEquals(0, keyAndValueList.size() % 2, "KeyValue pairs are not even!");
         IntStream.range(0, keyAndValueList.size())
                 .filter(i -> i % 2 == 0)
-                .forEach(n -> assertEquals(keyAndValueList.get(n + 1), testMethodConfiguration.evaluateToString(keyAndValueList.get(n))));
+                .forEach(n -> assertEquals(keyAndValueList.get(n + 1), testMethodConfiguration.find(keyAndValueList.get(n)).orElse(null)));
         assertEquals(testServer.getConfiguration(), testMethodConfiguration);
     }
 }

@@ -39,9 +39,12 @@ this repository. The plan and its order of work are in the owner's notes; the wo
   other with `${project.version}`, never on released 2.x versions. Dependency versions are properties in the root POM,
   not `dependencyManagement`, so the BOM manages the data collector modules only.
 - **The Descoped libraries move together.** service-provider-api, dynamic-configuration, secrets-client,
-  encryption-util and rawdata-client stay on 2.x until rawdata-client 3.0.0 is on Maven Central; then all move to 3.x
-  in one pull request (rawdata 2.x and 3.x need different service-provider-api majors under one JPMS module name).
-  `.github/renovate.json` holds them below 3.
+  encryption-util and rawdata-client are on 3.x; a later major moves all of them in one pull request (rawdata-client 3
+  needs service-provider-api 3 under the JPMS module name 2 used). Renovate groups their majors. Their providers
+  (rawdata `filesystem`, `gcs`, `postgres`; secrets `safe-configuration`, `dynamic-configuration`,
+  `google-secret-manager`) are `runtime` dependencies, never `requires`d: the API modules declare `uses`.
+- **Ids are UUIDv7** (`io.descoped.dc.api.ids.TimeOrderedIds`), as rawdata-client 3 gives messages. They are ordered
+  with `TimeOrderedIds.ORDER` (unsigned), never `UUID.compareTo`.
 - **JPMS.** Every module except testutils is a named module. A module whose exported API exposes another module's types
   `requires transitive` it. No `requires` a module does not use. Services are registered with `provides` in
   `module-info.java` and in `META-INF/services`.

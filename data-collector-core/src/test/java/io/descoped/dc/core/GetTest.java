@@ -320,7 +320,7 @@ public class GetTest {
                 );
 
         Map<String, String> configurationMap = Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "memory");
-        ContentStore contentStore = ProviderConfigurator.configure(configurationMap, configurationMap.get("content.stream.connector"), ContentStoreInitializer.class);
+        ContentStore contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, configurationMap.get("content.stream.connector"), configurationMap);
 
         Worker.WorkerBuilder worker = Worker.newBuilder()
                 .specification(specificationBuilder)

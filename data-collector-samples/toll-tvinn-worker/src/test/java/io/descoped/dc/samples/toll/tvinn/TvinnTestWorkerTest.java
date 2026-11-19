@@ -1,6 +1,6 @@
 package io.descoped.dc.samples.toll.tvinn;
 
-import io.descoped.config.StoreBasedDynamicConfiguration;
+import io.descoped.config.DynamicConfiguration;
 import io.descoped.dc.api.Specification;
 import io.descoped.dc.api.node.builder.SpecificationBuilder;
 import io.descoped.dc.api.util.CommonUtils;
@@ -111,17 +111,17 @@ public class TvinnTestWorkerTest {
         String serialized = specificationBuilder.serialize();
         SpecificationBuilder spec = Specification.deserialize(serialized);
         Worker.newBuilder()
-                .configuration(new StoreBasedDynamicConfiguration.Builder()
-                        .values("content.stream.connector", "rawdata")
-                        .values("rawdata.client.provider", "memory")
-                        .values("data.collector.worker.threads", "25")
-                        .values("postgres.driver.host", "localhost")
-                        .values("postgres.driver.port", "5432")
-                        .values("postgres.driver.user", "rdc")
-                        .values("postgres.driver.password", "rdc")
-                        .values("postgres.driver.database", "rdc")
-                        .values("rawdata.postgres.consumer.prefetch-size", "100")
-                        .values("rawdata.postgres.consumer.prefetch-poll-interval-when-empty", "1000")
+                .configuration(DynamicConfiguration.builder()
+                        .value("content.stream.connector", "rawdata")
+                        .value("rawdata.client.provider", "memory")
+                        .value("data.collector.worker.threads", "25")
+                        .value("postgres.driver.host", "localhost")
+                        .value("postgres.driver.port", "5432")
+                        .value("postgres.driver.user", "rdc")
+                        .value("postgres.driver.password", "rdc")
+                        .value("postgres.driver.database", "rdc")
+                        .value("rawdata.postgres.consumer.prefetch-size", "100")
+                        .value("rawdata.postgres.consumer.prefetch-poll-interval-when-empty", "1000")
                         .build()
                         .asMap())
 //                .buildCertificateFactory(CommonUtils.currentPath())

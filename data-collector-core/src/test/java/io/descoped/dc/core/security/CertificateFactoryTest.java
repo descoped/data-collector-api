@@ -14,7 +14,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-import static io.descoped.secrets.api.SecretManagerClient.safeCharArrayAsUTF8;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -82,7 +81,7 @@ public class CertificateFactoryTest {
 
             @Override
             public char[] passphrase() {
-                return safeCharArrayAsUTF8(props.getProperty("secret.passphrase").getBytes());
+                return props.getProperty("secret.passphrase").toCharArray();
             }
 
             @Override

@@ -93,7 +93,7 @@ data.collector.sslBundle.passphrase=secretNam
 ### Rawdata Encryption Credentials
 
 ```
-rawdata.encryption.provider = (dynamic-secret-configuration | google-secret-manager)
+rawdata.encryption.provider = (dynamic-configuration | google-secret-manager)
 rawdata.encryption.gcp.projectId => google-secret-manager
 rawdata.encryption.gcp.serviceAccountKeyPath => google-secret-manager
 rawdata.encryption.key  = (encryptionKey | secretName)

@@ -101,8 +101,8 @@ public class RawdataClientContentStreamProducer implements ContentStreamProducer
     private RawdataMessage createRawdataMessage(ContentStreamBuffer buffer) {
         RawdataMessage.Builder messageBuilder = RawdataMessage.builder();
 
-        if (buffer.ulid() != null) {
-            messageBuilder.ulid(buffer.ulid());
+        if (buffer.id() != null) {
+            messageBuilder.id(buffer.id());
         }
         messageBuilder.position(buffer.position());
 

@@ -3,7 +3,6 @@ package io.descoped.dc.samples.enhetsregisteret;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.Builders;
 import io.descoped.dc.api.Specification;
 import io.descoped.dc.api.handler.QueryFeature;
@@ -54,17 +53,17 @@ import static io.descoped.dc.api.Builders.whenVariableIsNull;
  */
 public class EnhetsregisteretUpdatesWorkerTest {
 
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .values("content.stream.connector", "rawdata")
-            .values("rawdata.client.provider", "filesystem")
-            .values("data.collector.worker.threads", "20")
-            .values("rawdata.topic", "enhetsregister-update")
-            .values("local-temp-folder", "target/avro/temp")
-            .values("filesystem.storage-folder", "target/avro/rawdata-store")
-            .values("avro-file.max.seconds", "60")
-            .values("avro-file.max.bytes", Long.toString(512 * 1024 * 1024)) // 512 MiB
-            .values("avro-file.sync.interval", Long.toString(200))
-            .values("listing.min-interval-seconds", "0")
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .value("content.stream.connector", "rawdata")
+            .value("rawdata.client.provider", "filesystem")
+            .value("data.collector.worker.threads", "20")
+            .value("rawdata.topic", "enhetsregister-update")
+            .value("local-temp-folder", "target/avro/temp")
+            .value("filesystem.storage-folder", "target/avro/rawdata-store")
+            .value("avro-file.max.seconds", "60")
+            .value("avro-file.max.bytes", Long.toString(512 * 1024 * 1024)) // 512 MiB
+            .value("avro-file.sync.interval", Long.toString(200))
+            .value("listing.min-interval-seconds", "0")
             .environment("DC_")
             .build();
 
@@ -147,8 +146,8 @@ public class EnhetsregisteretUpdatesWorkerTest {
         Function<byte[], String> toJson = (bytes) -> jsonParser.toPrettyJSON(jsonParser.fromJson(new String(bytes), ObjectNode.class));
         var dashLine = IntStream.range(0, 80).mapToObj(i -> "-").reduce("", String::concat);
 
-        try (var client = ProviderConfigurator.configure(configuration.asMap(), configuration.evaluateToString("rawdata.client.provider"), RawdataClientInitializer.class)) {
-            try (var consumer = client.consumer(configuration.evaluateToString("rawdata.topic"))) {
+        try (var client = ProviderConfigurator.configure(RawdataClientInitializer.class, configuration.find("rawdata.client.provider").orElse(null), configuration.asMap())) {
+            try (var consumer = client.consumer(configuration.find("rawdata.topic").orElse(null))) {
                 RawdataMessage message;
                 while ((message = consumer.receive(1, TimeUnit.SECONDS)) != null) { //  && pos++ < 500
                     pos++;

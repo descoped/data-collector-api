@@ -14,6 +14,7 @@ import io.descoped.rawdata.api.RawdataClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.SecretKey;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -31,7 +32,7 @@ public final class RawdataClientContentStore implements ContentStore {
     private final HealthContentStreamMonitor monitor;
     private final RawdataClientContentStream contentStream;
     private final EncryptionClient encryptionClient;
-    private final byte[] secretKey;
+    private final SecretKey secretKey;
     private final Map<ContentStateKey, ContentStreamBuffer.Builder> contentBuffers = new ConcurrentHashMap<>();
     private final Map<String, Lock> lockByTopic = new ConcurrentHashMap<>();
     private final AtomicBoolean closed = new AtomicBoolean(false);
@@ -40,7 +41,7 @@ public final class RawdataClientContentStore implements ContentStore {
         this.encryptionClient = new EncryptionClient(Algorithm.AES256);
 
         if (encryptionKey != null && encryptionKey.length > 0 && encryptionSalt != null && encryptionSalt.length > 0) {
-            this.secretKey = encryptionClient.generateSecretKey(encryptionKey, encryptionSalt).getEncoded();
+            this.secretKey = encryptionClient.deriveKey(encryptionKey, encryptionSalt);
         } else {
             this.secretKey = null;
         }

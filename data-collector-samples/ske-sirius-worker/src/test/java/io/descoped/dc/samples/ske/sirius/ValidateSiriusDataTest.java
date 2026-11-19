@@ -1,8 +1,7 @@
 package io.descoped.dc.samples.ske.sirius;
 
-import de.huxhorn.sulky.ulid.ULID;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.Builders;
-import io.descoped.dc.api.ulid.ULIDGenerator;
 import io.descoped.dc.api.util.CommonUtils;
 import io.descoped.dc.core.handler.Queries;
 import io.descoped.rawdata.api.RawdataClient;
@@ -10,7 +9,6 @@ import io.descoped.rawdata.api.RawdataClientInitializer;
 import io.descoped.rawdata.api.RawdataConsumer;
 import io.descoped.rawdata.api.RawdataMessage;
 import io.descoped.rawdata.api.RawdataProducer;
-import io.descoped.rawdata.provider.postgres.FileAndClasspathReaderUtils;
 import io.descoped.service.provider.api.ProviderConfigurator;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
@@ -90,7 +88,7 @@ public class ValidateSiriusDataTest {
         /*
          * Create rawdata client
          */
-        RawdataClient rawdataClient = ProviderConfigurator.configure(Map.of(), "memory", RawdataClientInitializer.class);
+        RawdataClient rawdataClient = ProviderConfigurator.configure(RawdataClientInitializer.class, "memory", Map.of());
 
         /*
          * Cache Hendelseliste
@@ -488,7 +486,7 @@ public class ValidateSiriusDataTest {
     }
 
     static class TaxReturn {
-        final UUID ulid;                // unique sortable id
+        final UUID id;                // unique sortable id
         final String position;          // hendelseliste sekvensnummer
         final int incomeYear;           // hendelseliste income year
         final Date registrationDate;    // hendelseliste juridical registration date
@@ -499,13 +497,13 @@ public class ValidateSiriusDataTest {
         final int statusCode;           // manifest status code
         final String errorCode;         // skattemedling response containing feil kode
 
-        public TaxReturn(UUID ulid, String position, int incomeYear, Date registrationDate, EventType eventType, String feedIdentifier, String identifier, boolean shielded, int statusCode, String errorCode) {
-            Objects.requireNonNull(ulid);
+        public TaxReturn(UUID id, String position, int incomeYear, Date registrationDate, EventType eventType, String feedIdentifier, String identifier, boolean shielded, int statusCode, String errorCode) {
+            Objects.requireNonNull(id);
             Objects.requireNonNull(position);
             if (incomeYear == 0) throw new RuntimeException("Missing IncomeYear!");
             Objects.requireNonNull(registrationDate);
             Objects.requireNonNull(feedIdentifier);
-            this.ulid = ulid;
+            this.id = id;
             this.position = position;
             this.incomeYear = incomeYear;
             this.registrationDate = registrationDate;
@@ -525,7 +523,7 @@ public class ValidateSiriusDataTest {
             return incomeYear == taxReturn.incomeYear &&
                     shielded == taxReturn.shielded &&
                     statusCode == taxReturn.statusCode &&
-                    Objects.equals(ulid, taxReturn.ulid) &&
+                    Objects.equals(id, taxReturn.id) &&
                     Objects.equals(position, taxReturn.position) &&
                     Objects.equals(registrationDate, taxReturn.registrationDate) &&
                     Objects.equals(eventType, taxReturn.eventType) &&
@@ -544,13 +542,13 @@ public class ValidateSiriusDataTest {
 
         @Override
         public int hashCode() {
-            return Objects.hash(ulid, position, incomeYear, registrationDate, eventType, feedIdentifier, identifier, shielded, statusCode, errorCode);
+            return Objects.hash(id, position, incomeYear, registrationDate, eventType, feedIdentifier, identifier, shielded, statusCode, errorCode);
         }
 
         @Override
         public String toString() {
             return "TaxReturn{" +
-                    "ulid=" + ulid +
+                    "id=" + id +
                     ", position='" + position + '\'' +
                     ", incomeYear=" + incomeYear +
                     ", registrationDate=" + Hendelse.formatDateTime(registrationDate) +
@@ -630,8 +628,8 @@ public class ValidateSiriusDataTest {
             }
 
             public TaxReturn build() {
-                ULID.Value ulid = ULIDGenerator.generate();
-                UUID uuid = ULIDGenerator.toUUID(ulid);
+                UUID id = TimeOrderedIds.generate();
+                UUID uuid = id;
                 tick();
                 return new TaxReturn(uuid, position, incomeYear, registrationDate, eventType, feedIdentifier, identifier, shielded, statusCode, errorCode);
             }
@@ -714,19 +712,19 @@ public class ValidateSiriusDataTest {
     }
 
     static class TaxReturnStream {
-        final UUID ulid;                // unique sortable id
+        final UUID id;                // unique sortable id
         final String position;
         final String identifier;
         final int incomeYear;
         final Date registrationDate;
         final boolean shielded;
 
-        public TaxReturnStream(UUID ulid, String position, String identifier, int incomeYear, Date registrationDate, boolean shielded) {
-            Objects.requireNonNull(ulid);
+        public TaxReturnStream(UUID id, String position, String identifier, int incomeYear, Date registrationDate, boolean shielded) {
+            Objects.requireNonNull(id);
             Objects.requireNonNull(position);
             if (incomeYear == 0) throw new RuntimeException("Missing IncomeYear!");
             Objects.requireNonNull(registrationDate);
-            this.ulid = ulid;
+            this.id = id;
             this.position = position;
             this.identifier = identifier;
             this.incomeYear = incomeYear;
@@ -767,8 +765,8 @@ public class ValidateSiriusDataTest {
             }
 
             public TaxReturnStream build() {
-                ULID.Value ulid = ULIDGenerator.generate();
-                UUID uuid = ULIDGenerator.toUUID(ulid);
+                UUID id = TimeOrderedIds.generate();
+                UUID uuid = id;
                 TaxReturn.Builder.tick();
                 return new TaxReturnStream(uuid, position, identifier, incomeYear, registrationDate, shielded);
             }
@@ -786,9 +784,9 @@ public class ValidateSiriusDataTest {
 
         boolean createTaxReturn(TaxReturn taxReturn) {
             return doTransaction(() -> {
-                String sql = FileAndClasspathReaderUtils.readFileOrClasspathResource("no/ssb/dc/samples/ske/sirius/create-tax-return.sql");
+                String sql = readResource("no/ssb/dc/samples/ske/sirius/create-tax-return.sql");
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                    ps.setObject(1, taxReturn.ulid);
+                    ps.setObject(1, taxReturn.id);
                     ps.setString(2, taxReturn.position);
                     ps.setInt(3, taxReturn.incomeYear);
                     ps.setTimestamp(4, Timestamp.from(taxReturn.registrationDate.toInstant()));
@@ -808,7 +806,7 @@ public class ValidateSiriusDataTest {
 
         boolean createIdentity(IdentityHistory identityHistory) {
             return doTransaction(() -> {
-                String sql = FileAndClasspathReaderUtils.readFileOrClasspathResource("no/ssb/dc/samples/ske/sirius/create-identity.sql");
+                String sql = readResource("no/ssb/dc/samples/ske/sirius/create-identity.sql");
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setObject(1, identityHistory.fid);
                     ps.setString(2, identityHistory.identity);
@@ -836,7 +834,7 @@ public class ValidateSiriusDataTest {
         private IdentityHistory findIdentity(String identity, int incomeYear, String sqlResource) {
             AtomicReference<IdentityHistory> identityMap = new AtomicReference<>();
             doTransaction(() -> {
-                String sql = FileAndClasspathReaderUtils.readFileOrClasspathResource(sqlResource);
+                String sql = readResource(sqlResource);
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, identity);
                     ps.setInt(2, incomeYear);
@@ -868,7 +866,7 @@ public class ValidateSiriusDataTest {
         IdentityHistory getNextIdentity(String identity, int incomeYear) {
             AtomicReference<IdentityHistory> identityMap = new AtomicReference<>();
             doTransaction(() -> {
-                String sql = FileAndClasspathReaderUtils.readFileOrClasspathResource("no/ssb/dc/samples/ske/sirius/find-next-identity.sql");
+                String sql = readResource("no/ssb/dc/samples/ske/sirius/find-next-identity.sql");
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
                     ps.setString(1, identity);
                     ps.setInt(2, incomeYear);
@@ -898,9 +896,9 @@ public class ValidateSiriusDataTest {
 
         boolean createTaxReturnStream(TaxReturnStream taxReturnStream) {
             return doTransaction(() -> {
-                String sql = FileAndClasspathReaderUtils.readFileOrClasspathResource("no/ssb/dc/samples/ske/sirius/create-tax-return-stream.sql");
+                String sql = readResource("no/ssb/dc/samples/ske/sirius/create-tax-return-stream.sql");
                 try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                    ps.setObject(1, taxReturnStream.ulid);
+                    ps.setObject(1, taxReturnStream.id);
                     ps.setString(2, taxReturnStream.position);
                     ps.setString(3, taxReturnStream.identifier);
                     ps.setInt(4, taxReturnStream.incomeYear);
@@ -945,7 +943,7 @@ public class ValidateSiriusDataTest {
 
         private void dropOrCreateDatabase(Connection conn) {
             try {
-                String initSQL = FileAndClasspathReaderUtils.readFileOrClasspathResource("no/ssb/dc/samples/ske/sirius/init-db.sql");
+                String initSQL = readResource("no/ssb/dc/samples/ske/sirius/init-db.sql");
                 conn.beginRequest();
 
                 try (Scanner s = new Scanner(initSQL)) {
@@ -980,4 +978,15 @@ public class ValidateSiriusDataTest {
         }
     }
 
+
+    static String readResource(String name) {
+        try (java.io.InputStream in = ValidateSiriusDataTest.class.getClassLoader().getResourceAsStream(name)) {
+            if (in == null) {
+                throw new IllegalArgumentException("No such resource: " + name);
+            }
+            return new String(in.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (java.io.IOException e) {
+            throw new java.io.UncheckedIOException(e);
+        }
+    }
 }

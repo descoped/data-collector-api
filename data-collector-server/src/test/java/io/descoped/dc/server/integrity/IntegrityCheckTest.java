@@ -3,7 +3,6 @@ package io.descoped.dc.server.integrity;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.content.ContentStore;
 import io.descoped.dc.api.content.ContentStream;
 import io.descoped.dc.api.content.ContentStreamProducer;
@@ -59,11 +58,11 @@ public class IntegrityCheckTest {
     @Disabled
     @Test
     void testIntegrityChecker() throws Exception {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .values("content.stream.connector", "rawdata")
-                .values("rawdata.client.provider", "memory")
-                .values("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
-                .values("data.collector.integrityCheck.dbSizeInMb", "100")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .value("content.stream.connector", "rawdata")
+                .value("rawdata.client.provider", "memory")
+                .value("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
+                .value("data.collector.integrityCheck.dbSizeInMb", "100")
                 .build();
 
         ContentStoreComponent contentStoreComponent = ContentStoreComponent.create(configuration);
@@ -110,11 +109,11 @@ public class IntegrityCheckTest {
     @Disabled
     @Test
     void testIntegrityCheckerController() throws InterruptedException {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .values("content.stream.connector", "rawdata")
-                .values("rawdata.client.provider", "memory")
-                .values("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
-                .values("data.collector.integrityCheck.database.location", "./target")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .value("content.stream.connector", "rawdata")
+                .value("rawdata.client.provider", "memory")
+                .value("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
+                .value("data.collector.integrityCheck.database.location", "./target")
                 .build();
 
         TestServer server = TestServer.create(configuration);

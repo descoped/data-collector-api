@@ -48,7 +48,7 @@ public final class WorkerService implements Service {
                          BusinessSSLResourceComponent businessSSLResourceComponent,
                          ContentStoreComponent contentStoreComponent) {
         this(configuration, metricsResourceFactory, healthResourceFactory, businessSSLResourceComponent, contentStoreComponent,
-                configuration.evaluateToBoolean("data.collector.print-execution-plan"), null);
+                configuration.getBoolean("data.collector.print-execution-plan", false), null);
     }
 
     public WorkerService(DynamicConfiguration configuration,
@@ -140,7 +140,7 @@ public final class WorkerService implements Service {
             }
 
             if (businessSSLResourceComponent == null || businessSSLResourceComponent.getDelegate() == null) {
-                String configuredCertBundlesPath = configuration.evaluateToString("data.collector.certs.directory");
+                String configuredCertBundlesPath = configuration.find("data.collector.certs.directory").orElse(null);
                 Path certBundlesPath = configuredCertBundlesPath == null ? CommonUtils.currentPath() : Paths.get(configuredCertBundlesPath);
                 workerBuilder.buildCertificateFactory(certBundlesPath);
             } else {

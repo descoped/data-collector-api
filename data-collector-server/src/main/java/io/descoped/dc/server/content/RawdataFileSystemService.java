@@ -7,15 +7,15 @@ import io.descoped.dc.api.content.ContentStreamBuffer;
 import io.descoped.dc.api.content.ContentStreamConsumer;
 import io.descoped.dc.api.util.CommonUtils;
 import io.descoped.dc.application.spi.Service;
-import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
-import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,7 +43,7 @@ public class RawdataFileSystemService implements Service {
 
     @Override
     public boolean isEnabled() {
-        return configuration.evaluateToBoolean("data.collector.rawdata.dump.enabled");
+        return configuration.getBoolean("data.collector.rawdata.dump.enabled", false);
     }
 
     @Override
@@ -52,16 +52,16 @@ public class RawdataFileSystemService implements Service {
             return;
         }
 
-        if (!configuration.evaluateToBoolean("data.collector.rawdata.dump.enabled")) {
+        if (!configuration.getBoolean("data.collector.rawdata.dump.enabled", false)) {
             return;
         }
 
-        if (configuration.evaluateToString("data.collector.rawdata.dump.location") == null) {
+        if (configuration.find("data.collector.rawdata.dump.location").orElse(null) == null) {
             LOG.warn("Unable to start file exporter. No location is defined");
             return;
         }
 
-        String location = configuration.evaluateToString("data.collector.rawdata.dump.location");
+        String location = configuration.find("data.collector.rawdata.dump.location").orElse(null);
         Path targetPath;
         if (location.isEmpty()) {
             targetPath = Paths.get(".").toAbsolutePath().resolve("storage").normalize();
@@ -69,7 +69,7 @@ public class RawdataFileSystemService implements Service {
             targetPath = Paths.get(location).toAbsolutePath().normalize();
         }
 
-        String topic = configuration.evaluateToString("data.collector.rawdata.dump.topic");
+        String topic = configuration.find("data.collector.rawdata.dump.topic").orElse(null);
 
         workDir = targetPath.resolve(topic);
         consumerFuture = createFuture(topic, workDir)
@@ -100,10 +100,8 @@ public class RawdataFileSystemService implements Service {
     }
 
     CompletableFuture<Void> createFuture(String topic, Path targetPath) {
-        TikaConfig config = TikaConfig.getDefaultConfig();
         Metadata metadata = new Metadata();
-        AutoDetectParser parser = new AutoDetectParser(config);
-        Detector detector = parser.getDetector();
+        Detector detector = new DefaultDetector();
 
         return CompletableFuture.runAsync(() -> {
             LOG.info("Starting rawdata exporter!");
@@ -120,7 +118,7 @@ public class RawdataFileSystemService implements Service {
                             byte[] data = buffer.get(key);
                             String content = new String(data, StandardCharsets.UTF_8);
 
-                            MediaType mediaType = detector.detect(new ByteArrayInputStream(data), metadata);
+                            MediaType mediaType = detector.detect(TikaInputStream.get(data), metadata, new ParseContext());
                             String subtype = mediaType.getSubtype();
                             if ("plain".equals(subtype)) {
                                 if (content.startsWith("{") || content.startsWith("[") && !key.endsWith(".json")) {

@@ -9,8 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static io.descoped.secrets.api.SecretManagerClient.safeCharArrayAsUTF8;
-
 public class SecretManagerSSLResource implements BusinessSSLResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SecretManagerSSLResource.class);
@@ -22,7 +20,7 @@ public class SecretManagerSSLResource implements BusinessSSLResource {
 
     public SecretManagerSSLResource(DynamicConfiguration configuration) {
         this.configuration = configuration;
-        this.businessSslResourceProvider = configuration.evaluateToString("data.collector.sslBundle.provider");
+        this.businessSslResourceProvider = configuration.find("data.collector.sslBundle.provider").orElse(null);
         if (businessSslResourceProvider == null) {
             throw new RuntimeException("SSL Bundle Provider is NOT defined! Please check your config!");
         }
@@ -31,10 +29,10 @@ public class SecretManagerSSLResource implements BusinessSSLResource {
 
         Map<String, String> providerConfiguration = new LinkedHashMap<>();
         providerConfiguration.put("secrets.provider", businessSslResourceProvider);
-        providerConfiguration.put("secrets.projectId", configuration.evaluateToString("data.collector.sslBundle.gcp.projectId"));
-        String gcsServiceAccountKeyPath = configuration.evaluateToString("data.collector.sslBundle.gcp.serviceAccountKeyPath");
+        providerConfiguration.put("secrets.project-id", configuration.get("data.collector.sslBundle.gcp.projectId"));
+        String gcsServiceAccountKeyPath = configuration.find("data.collector.sslBundle.gcp.serviceAccountKeyPath").orElse(null);
         if (gcsServiceAccountKeyPath != null) {
-            providerConfiguration.put("secrets.serviceAccountKeyPath", gcsServiceAccountKeyPath);
+            providerConfiguration.put("secrets.service-account-key-path", gcsServiceAccountKeyPath);
         }
 
         this.secretManagerClient = SecretManagerClient.create(providerConfiguration);
@@ -51,32 +49,32 @@ public class SecretManagerSSLResource implements BusinessSSLResource {
 
     @Override
     public String getType() {
-        return configuration.evaluateToString("data.collector.sslBundle.type");
+        return configuration.find("data.collector.sslBundle.type").orElse(null);
     }
 
     @Override
     public String bundleName() {
-        return configuration.evaluateToString("data.collector.sslBundle.name");
+        return configuration.find("data.collector.sslBundle.name").orElse(null);
     }
 
     @Override
     public char[] publicCertificate() {
-        return isPEM() ? safeCharArrayAsUTF8(secretManagerClient.readBytes(configuration.evaluateToString("data.collector.sslBundle.publicCertificate"))) : new char[0];
+        return isPEM() ? secretManagerClient.readChars(configuration.get("data.collector.sslBundle.publicCertificate")) : new char[0];
     }
 
     @Override
     public char[] privateCertificate() {
-        return isPEM() ? safeCharArrayAsUTF8(secretManagerClient.readBytes(configuration.evaluateToString("data.collector.sslBundle.privateCertificate"))) : new char[0];
+        return isPEM() ? secretManagerClient.readChars(configuration.get("data.collector.sslBundle.privateCertificate")) : new char[0];
     }
 
     @Override
     public byte[] archiveCertificate() {
-        return !isPEM() ? secretManagerClient.readBytes(configuration.evaluateToString("data.collector.sslBundle.archiveCertificate")) : new byte[0];
+        return !isPEM() ? secretManagerClient.readBytes(configuration.get("data.collector.sslBundle.archiveCertificate")) : new byte[0];
     }
 
     @Override
     public char[] passphrase() {
-        return safeCharArrayAsUTF8(secretManagerClient.readBytes(configuration.evaluateToString("data.collector.sslBundle.passphrase")));
+        return secretManagerClient.readChars(configuration.get("data.collector.sslBundle.passphrase"));
     }
 
     @Override

@@ -3,9 +3,7 @@ package io.descoped.dc.content.provider.rawdata;
 import io.descoped.dc.api.content.ContentStore;
 import io.descoped.dc.api.content.ContentStoreInitializer;
 import io.descoped.rawdata.api.RawdataClient;
-import io.descoped.rawdata.api.RawdataClientInitializer;
 import io.descoped.secrets.api.SecretManagerClient;
-import io.descoped.service.provider.api.ProviderConfigurator;
 import io.descoped.service.provider.api.ProviderName;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
-
-import static io.descoped.secrets.api.SecretManagerClient.safeCharArrayAsUTF8;
 
 @ProviderName("rawdata")
 public class RawdataClientContentStoreInitializer implements ContentStoreInitializer {
@@ -24,102 +19,88 @@ public class RawdataClientContentStoreInitializer implements ContentStoreInitial
     private static final Logger LOG = LoggerFactory.getLogger(RawdataClientContentStoreInitializer.class);
 
     @Override
-    public String providerId() {
-        return "rawdata";
-    }
-
-    @Override
     public Set<String> configurationKeys() {
         return Set.of("rawdata.client.provider");
     }
 
     /*
-     * Google SecretManager config properties:
+     * Encryption of content, optional:
      *
-     * rawdata.encryption.provider = (dynamic-secret-configuration | google-secret-manager)
-     * rawdata.encryption.gcp.projectId => google-secret-manager
-     * rawdata.encryption.gcp.serviceAccountKeyPath => google-secret-manager
-     * rawdata.encryption.key  = (configuration key | secret manager encryptionKey)
-     * rawdata.encryption.salt = (configuration salt | secret manager encryptionKey)
+     * rawdata.encryption.provider = dynamic-configuration | google-secret-manager; without it, the key and salt are
+     *                                read from this configuration
+     * rawdata.encryption.key      = the password (dynamic-configuration, or this configuration), or the name of the
+     *                                secret that holds it (google-secret-manager)
+     * rawdata.encryption.salt     = the salt, at least 16 bytes, or the name of the secret that holds it
+     * rawdata.encryption.gcp.serviceAccountKeyPath = dynamic-configuration: a properties file with the two secrets;
+     *                                google-secret-manager: a service-account key (Application Default Credentials
+     *                                when absent)
+     * rawdata.encryption.gcp.projectId = google-secret-manager: the project
      */
 
     @Override
     public ContentStore initialize(Map<String, String> configuration) {
-        LOG.info("Content stream connector: {}", configuration.get("content.stream.connector"));
+        LOG.info("Rawdata client provider: {}", configuration.get(RawdataClient.PROVIDER_KEY));
 
-        LOG.info("Rawdata client provider: {}", configuration.get("rawdata.client.provider"));
-        LOG.info("Rawdata encryption enabled: {}", configuration.containsKey("rawdata.encryption.key"));
-
-        // get encryption provider
         String encryptionProvider = configuration.get("rawdata.encryption.provider");
-        Map<String, String> encryptionProviderMap = new LinkedHashMap<>();
+        boolean ignoreEncryption = Boolean.parseBoolean(configuration.get("recovery.rawdata.encryption.credentials.ignore"));
+        Map<String, String> secretsConfiguration = ignoreEncryption ? Map.of() : secretsConfiguration(encryptionProvider, configuration);
+        LOG.info("Rawdata encryption enabled: {}", !secretsConfiguration.isEmpty());
 
-        // load encryption keys from custom config file
-        if ("dynamic-secret-configuration".equals(encryptionProvider)) {
-            String gcpServiceAccountKeyPath = configuration.get("rawdata.encryption.gcp.serviceAccountKeyPath");
-            if (gcpServiceAccountKeyPath == null) {
-                LOG.info("Use custom encryption credentials configuration: {}", gcpServiceAccountKeyPath);
-                encryptionProviderMap.putAll(configuration);
+        if (secretsConfiguration.isEmpty()) {
+            return new RawdataClientContentStore(RawdataClient.create(configuration), null, null);
+        }
+
+        boolean google = "google-secret-manager".equals(encryptionProvider);
+        String keySecretName = google ? required(configuration, "rawdata.encryption.key") : "rawdata.encryption.key";
+        String saltSecretName = google ? required(configuration, "rawdata.encryption.salt") : "rawdata.encryption.salt";
+        char[] encryptionKey = null;
+        byte[] encryptionSalt = null;
+        try (SecretManagerClient secretManagerClient = SecretManagerClient.create(secretsConfiguration)) {
+            encryptionKey = secretManagerClient.readChars(keySecretName);
+            encryptionSalt = secretManagerClient.readBytes(saltSecretName);
+            return new RawdataClientContentStore(RawdataClient.create(configuration), encryptionKey, encryptionSalt);
+        } finally {
+            if (encryptionKey != null) Arrays.fill(encryptionKey, '\u0000');
+            if (encryptionSalt != null) Arrays.fill(encryptionSalt, (byte) 0);
+        }
+    }
+
+    private static Map<String, String> secretsConfiguration(String encryptionProvider, Map<String, String> configuration) {
+        Map<String, String> secrets = new LinkedHashMap<>();
+        String keyPath = configuration.get("rawdata.encryption.gcp.serviceAccountKeyPath");
+        if ("dynamic-configuration".equals(encryptionProvider)) {
+            secrets.put("secrets.provider", encryptionProvider);
+            if (keyPath != null) {
+                secrets.put("secrets.property-resource-path", keyPath);
             } else {
-                LOG.info("Use application configuration for encryption credentials");
+                putInline(secrets, configuration);
             }
-            encryptionProviderMap.put("secrets.provider", encryptionProvider);
-            if (gcpServiceAccountKeyPath != null) {
-                encryptionProviderMap.put("secrets.propertyResourcePath", gcpServiceAccountKeyPath);
-            }
-
-            // get encryption keys from google secret manager
         } else if ("google-secret-manager".equals(encryptionProvider)) {
-            LOG.info("Use Google Secret Manager for encryption credentials");
-            encryptionProviderMap.put("secrets.provider", encryptionProvider);
-            encryptionProviderMap.put("secrets.projectId", Optional.ofNullable(configuration.get("rawdata.encryption.gcp.projectId")).orElseThrow());
-            // fallback to compute-engine if service-account-file is not set
-            String gcpServiceAccountFile = configuration.get("rawdata.encryption.gcp.serviceAccountKeyPath");
-            if (gcpServiceAccountFile != null) {
-                encryptionProviderMap.put("secrets.serviceAccountKeyPath", gcpServiceAccountFile);
+            secrets.put("secrets.provider", encryptionProvider);
+            secrets.put("secrets.project-id", required(configuration, "rawdata.encryption.gcp.projectId"));
+            if (keyPath != null) {
+                secrets.put("secrets.service-account-key-path", keyPath);
             }
-
-            // fallback: load encryption keys from current configuration
+        } else if (encryptionProvider != null) {
+            throw new IllegalArgumentException("Unknown rawdata.encryption.provider: " + encryptionProvider
+                    + " (dynamic-configuration or google-secret-manager)");
         } else if (configuration.containsKey("rawdata.encryption.key") && configuration.containsKey("rawdata.encryption.salt")) {
-            LOG.info("Fallback application configuration for encryption credentials");
-            encryptionProviderMap.putAll(configuration);
-            encryptionProviderMap.put("secrets.provider", "dynamic-secret-configuration");
+            secrets.put("secrets.provider", "dynamic-configuration");
+            putInline(secrets, configuration);
         }
+        return secrets;
+    }
 
-        if (encryptionProviderMap.isEmpty()) {
-            RawdataClient client = ProviderConfigurator.configure(configuration, configuration.get("rawdata.client.provider"), RawdataClientInitializer.class);
-            return new RawdataClientContentStore(client, null, null);
+    private static void putInline(Map<String, String> secrets, Map<String, String> configuration) {
+        secrets.put("secrets.values.rawdata.encryption.key", required(configuration, "rawdata.encryption.key"));
+        secrets.put("secrets.values.rawdata.encryption.salt", required(configuration, "rawdata.encryption.salt"));
+    }
 
-        } else {
-            // Set in RecoveryContentStoreComponent
-            boolean ignoreRawdataEncryptionCredentialsDuringRecovery = Boolean.parseBoolean(configuration.get("recovery.rawdata.encryption.credentials.ignore"));
-            if (ignoreRawdataEncryptionCredentialsDuringRecovery) {
-                RawdataClient client = ProviderConfigurator.configure(configuration, configuration.get("rawdata.client.provider"), RawdataClientInitializer.class);
-                return new RawdataClientContentStore(client, null, null);
-            }
-
-            LOG.debug("Load encryption credentials from: {}", encryptionProvider == null ? "application configuration" : encryptionProvider);
-            char[] encryptionKeySecretValue = null;
-            byte[] encryptionSaltSecretValue = null;
-            try (SecretManagerClient secretManagerClient = SecretManagerClient.create(encryptionProviderMap)) {
-                String encryptionKeySecretName = "google-secret-manager".equals(encryptionProvider) ?
-                        Optional.ofNullable(configuration.get("rawdata.encryption.key")).orElseThrow() :
-                        "rawdata.encryption.key";
-
-                String encryptionSaltSecretName = "google-secret-manager".equals(encryptionProvider) ?
-                        Optional.ofNullable(configuration.get("rawdata.encryption.salt")).orElseThrow() :
-                        "rawdata.encryption.salt";
-
-                encryptionKeySecretValue = safeCharArrayAsUTF8(secretManagerClient.readBytes(encryptionKeySecretName));
-                encryptionSaltSecretValue = secretManagerClient.readBytes(encryptionSaltSecretName);
-
-                RawdataClient client = ProviderConfigurator.configure(configuration, configuration.get("rawdata.client.provider"), RawdataClientInitializer.class);
-                return new RawdataClientContentStore(client, encryptionKeySecretValue, encryptionSaltSecretValue);
-
-            } finally {
-                if (encryptionKeySecretValue != null) Arrays.fill(encryptionKeySecretValue, '\u0000');
-                if (encryptionSaltSecretValue != null) Arrays.fill(encryptionSaltSecretValue, (byte) 0);
-            }
+    private static String required(Map<String, String> configuration, String key) {
+        String value = configuration.get(key);
+        if (value == null || value.isBlank()) {
+            throw new IllegalArgumentException("Missing configuration: " + key);
         }
+        return value;
     }
 }

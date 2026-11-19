@@ -35,7 +35,7 @@ public class TestServer implements TestUriResolver {
          * Please note: only Google Secret Manager is supported!
          */
 
-        String businessSslResourceProvider = configuration.evaluateToString("data.collector.sslBundle.provider");
+        String businessSslResourceProvider = configuration.find("data.collector.sslBundle.provider").orElse(null);
         Supplier<SecretManagerSSLResource> sslResourceSupplier = () -> new SecretManagerSSLResource(configuration);
 
         application = UndertowApplication.initializeUndertowApplication(configuration, testServerServicePort,

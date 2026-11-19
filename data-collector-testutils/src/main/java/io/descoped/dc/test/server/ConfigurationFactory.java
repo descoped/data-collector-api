@@ -1,7 +1,6 @@
 package io.descoped.dc.test.server;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +20,13 @@ class ConfigurationFactory {
         return ConfigurationFactorySingleton.INSTANCE;
     }
 
-    private StoreBasedDynamicConfiguration.Builder createDynamicBuilder() {
-        return new StoreBasedDynamicConfiguration.Builder()
-                .propertiesResource("application-defaults.properties")
-                .propertiesResource("application-test.properties");
+    private DynamicConfiguration.Builder createDynamicBuilder() {
+        return DynamicConfiguration.builder()
+                .classpath("application-defaults.properties")
+                .classpath("application-test.properties");
     }
 
-    private DynamicConfiguration buildDynamicBuilder(StoreBasedDynamicConfiguration.Builder builder) {
+    private DynamicConfiguration buildDynamicBuilder(DynamicConfiguration.Builder builder) {
         return builder
                 .systemProperties()
                 .environment("DC_")
@@ -46,7 +45,7 @@ class ConfigurationFactory {
      * @return Default configuration unless key matches class- or -method level configuration binding
      */
     DynamicConfiguration get(TestConfigurationBinding testConfigurationBinding) {
-        StoreBasedDynamicConfiguration.Builder builder = createDynamicBuilder();
+        DynamicConfiguration.Builder builder = createDynamicBuilder();
 
         List<Configuration> configurationList = serverConfiguration.getOrDefault(testConfigurationBinding, new ArrayList<>());
         for (Configuration configuration : configurationList) {
@@ -81,7 +80,7 @@ class ConfigurationFactory {
     }
 
     abstract static class Configuration {
-        abstract void copyTo(StoreBasedDynamicConfiguration.Builder builder);
+        abstract void copyTo(DynamicConfiguration.Builder builder);
     }
 
     static class ConfigurationProfile extends Configuration {
@@ -92,8 +91,8 @@ class ConfigurationFactory {
         }
 
         @Override
-        void copyTo(StoreBasedDynamicConfiguration.Builder builder) {
-            builder.propertiesResource(String.format("application-%s.properties", profileName));
+        void copyTo(DynamicConfiguration.Builder builder) {
+            builder.classpath(String.format("application-%s.properties", profileName));
         }
 
         @Override
@@ -125,8 +124,8 @@ class ConfigurationFactory {
         }
 
         @Override
-        void copyTo(StoreBasedDynamicConfiguration.Builder builder) {
-            overrideMap.forEach((key, value) -> builder.values(key, value));
+        void copyTo(DynamicConfiguration.Builder builder) {
+            overrideMap.forEach((key, value) -> builder.value(key, value));
         }
 
         @Override

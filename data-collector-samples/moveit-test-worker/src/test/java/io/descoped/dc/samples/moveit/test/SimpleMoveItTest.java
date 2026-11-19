@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.github.mizosoft.methanol.MultipartBodyPublisher;
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.Builders;
 import io.descoped.dc.api.handler.QueryFeature;
 import io.descoped.dc.api.http.Client;
@@ -32,16 +31,16 @@ public class SimpleMoveItTest {
     private static final Logger LOG = LoggerFactory.getLogger(SimpleMoveItTest.class);
     private static final Client client = Client.newClientBuilder().followRedirects(Client.Redirect.ALWAYS).version(Client.Version.HTTP_1_1).build();
     private static final JsonParser jsonParser = JsonParser.createJsonParser();
-    private static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder().propertiesResource("application-ignore.properties").build();
+    private static final DynamicConfiguration configuration = DynamicConfiguration.builder().classpath("application-ignore.properties").build();
     private static final byte[] AUTHORIZATION_DATA;
 
     static {
-        AUTHORIZATION_DATA = String.format("grant_type=password&username=%s&password=%s", configuration.evaluateToString("moveIt.server.username"), configuration.evaluateToString("moveIt.server.password")).getBytes();
+        AUTHORIZATION_DATA = String.format("grant_type=password&username=%s&password=%s", configuration.find("moveIt.server.username").orElse(null), configuration.find("moveIt.server.password").orElse(null)).getBytes();
     }
 
     static Response GET(String url, String accessToken) {
         Request request = Request.newRequestBuilder()
-                .url(configuration.evaluateToString("moveIt.server.url") + url)
+                .url(configuration.find("moveIt.server.url").orElse(null) + url)
                 .header("Authorization", "Bearer " + accessToken)
                 .GET()
                 .build();
@@ -53,7 +52,7 @@ public class SimpleMoveItTest {
 
     static Response POST(String url, byte[] payload) {
         Request request = Request.newRequestBuilder()
-                .url(configuration.evaluateToString("moveIt.server.url") + url)
+                .url(configuration.find("moveIt.server.url").orElse(null) + url)
                 .POST(payload)
                 .build();
 
@@ -68,7 +67,7 @@ public class SimpleMoveItTest {
 
     static Response POST(String url, String accessToken, byte[] payload, String contentType) {
         Request.Builder requestBuilder = Request.newRequestBuilder()
-                .url(configuration.evaluateToString("moveIt.server.url") + url)
+                .url(configuration.find("moveIt.server.url").orElse(null) + url)
                 .header("Authorization", "Bearer " + accessToken);
         if (contentType != null) {
             requestBuilder.header("Content-Type", contentType);
@@ -84,7 +83,7 @@ public class SimpleMoveItTest {
 
     static Response POST(String url, String accessToken, Flow.Publisher<ByteBuffer> bodyPublisher, String boundary) {
         Request.Builder requestBuilder = Request.newRequestBuilder()
-                .url(configuration.evaluateToString("moveIt.server.url") + url)
+                .url(configuration.find("moveIt.server.url").orElse(null) + url)
                 .header("Authorization", "Bearer " + accessToken);
         requestBuilder
                 .header("Content-Type", "multipart/form-data;boundary=" + boundary);

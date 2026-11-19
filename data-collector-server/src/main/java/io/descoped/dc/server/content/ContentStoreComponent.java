@@ -34,7 +34,7 @@ public class ContentStoreComponent implements Component {
         if (isOpen()) {
             return;
         }
-        contentStore = ProviderConfigurator.configure(configuration.asMap(), configuration.evaluateToString("content.stream.connector"), ContentStoreInitializer.class);
+        contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, configuration.find("content.stream.connector").orElse(null), configuration.asMap());
         closed.set(false);
     }
 

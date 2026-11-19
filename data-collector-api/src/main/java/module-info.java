@@ -1,7 +1,6 @@
 module io.descoped.dc.api {
     // Types of these modules appear in this module's exported API.
     requires transitive io.descoped.service.provider.api;
-    requires transitive de.huxhorn.sulky.ulid;
     requires transitive com.fasterxml.jackson.databind;
 
     requires org.slf4j;
@@ -27,7 +26,7 @@ module io.descoped.dc.api {
     exports io.descoped.dc.api.content;
     exports io.descoped.dc.api.handler;
     exports io.descoped.dc.api.http;
-    exports io.descoped.dc.api.ulid;
+    exports io.descoped.dc.api.ids;
     exports io.descoped.dc.api.error;
     exports io.descoped.dc.api.security;
     exports io.descoped.dc.api.services;

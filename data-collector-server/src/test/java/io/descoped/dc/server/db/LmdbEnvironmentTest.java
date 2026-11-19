@@ -1,7 +1,7 @@
 package io.descoped.dc.server.db;
 
-import de.huxhorn.sulky.ulid.ULID;
-import io.descoped.dc.api.ulid.ULIDGenerator;
+import io.descoped.dc.api.ids.TimeOrderedIds;
+import java.util.UUID;
 import io.descoped.dc.api.util.CommonUtils;
 import io.descoped.dc.server.integrity.IntegrityCheckIndex;
 import org.junit.jupiter.api.Disabled;
@@ -38,18 +38,18 @@ public class LmdbEnvironmentTest {
 
                 for (int n = 1; n < 100; n++) {
                     {
-                        ULID.Value ulid = ULIDGenerator.generate();
-                        index.writeSequence(ulid, String.valueOf(n));
+                        UUID id = TimeOrderedIds.generate();
+                        index.writeSequence(id, String.valueOf(n));
                     }
 
                     if (n == 11 || n == 88) {
-                        ULID.Value ulid = ULIDGenerator.generate();
-                        index.writeSequence(ulid, String.valueOf(n));
+                        UUID id = TimeOrderedIds.generate();
+                        index.writeSequence(id, String.valueOf(n));
                     }
 
                     if (n == 88) {
-                        ULID.Value ulid = ULIDGenerator.generate();
-                        index.writeSequence(ulid, String.valueOf(n));
+                        UUID id = TimeOrderedIds.generate();
+                        index.writeSequence(id, String.valueOf(n));
                     }
                 }
                 index.commitQueue();
@@ -70,11 +70,11 @@ public class LmdbEnvironmentTest {
 
                 duplicateMap.forEach((sequenceKey, duplicateList) ->
                         LOG.trace("{}/{}", sequenceKey, duplicateList.stream().map(key ->
-                                Long.toString(key.ulid().timestamp() + key.ulid().getLeastSignificantBits())).collect(Collectors.joining(",")))
+                                Long.toString(TimeOrderedIds.timestamp(key.id()) + key.id().getLeastSignificantBits())).collect(Collectors.joining(",")))
                 );
 
                 index.readSequence((sequenceKey, hasNext) -> {
-                    LOG.trace("{}/{}", sequenceKey.position(), ULIDGenerator.toUUID(sequenceKey.ulid()));
+                    LOG.trace("{}/{}", sequenceKey.position(), sequenceKey.id());
                 });
             }
         }

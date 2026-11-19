@@ -53,7 +53,7 @@ public class HealthResourceFactory {
         List<Class<? extends HealthResource>> classes = new ArrayList<>();
         try (ScanResult scanResult = new ClassGraph()
                 .enableClassInfo()
-                .whitelistPackages("io.descoped.dc")
+                .acceptPackages("io.descoped.dc")
                 .scan()
         ) {
             ClassInfoList classInfoList = scanResult.getClassesImplementing(HealthResource.class.getName());

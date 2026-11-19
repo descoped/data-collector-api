@@ -180,12 +180,12 @@ public class IntegrityCheckJobSummary {
         @JsonProperty
         Integer duplicateCount;
         @JsonProperty
-        List<String> ulid;
+        List<String> id;
 
-        public PositionSummary(String position, Integer duplicateCount, List<String> ulid) {
+        public PositionSummary(String position, Integer duplicateCount, List<String> id) {
             this.position = position;
             this.duplicateCount = duplicateCount;
-            this.ulid = ulid;
+            this.id = id;
         }
     }
 

@@ -2,7 +2,6 @@ package io.descoped.dc.samples.ske.freg;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.http.Client;
 import io.descoped.dc.api.http.Request;
 import io.descoped.dc.api.http.Response;
@@ -29,8 +28,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SimpleFregKomplettUttrekkTest {
 
     static final Logger LOG = LoggerFactory.getLogger(SimpleFregKomplettUttrekkTest.class);
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .propertiesResource("application-override.properties") // gitignored
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .classpath("application-override.properties") // gitignored
             .build();
     static final Boolean USE_MASKINPORTEN_AUTH = false;
     static final AtomicReference<SSLContext> certificateContext = new AtomicReference<>();
@@ -107,7 +106,7 @@ public class SimpleFregKomplettUttrekkTest {
     }
 
     static String getAccessToken() {
-        MaskinportenAuth auth = new MaskinportenAuth(MaskinportenAuth.TEST_MASKINPORTEN_NO, configuration.evaluateToString("ssb.ske.freg.test.clientId"), Paths.get("/Volumes/SSB BusinessSSL/certs"), "ske-prod-certs");
+        MaskinportenAuth auth = new MaskinportenAuth(MaskinportenAuth.TEST_MASKINPORTEN_NO, configuration.find("ssb.ske.freg.test.clientId").orElse(null), Paths.get("/Volumes/SSB BusinessSSL/certs"), "ske-prod-certs");
         String jwtGrant = auth.createMaskinportenJwtGrant();
         return auth.getMaskinportenJwtAccessToken(jwtGrant);
     }

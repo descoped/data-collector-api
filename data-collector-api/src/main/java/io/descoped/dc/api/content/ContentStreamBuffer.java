@@ -1,17 +1,23 @@
 package io.descoped.dc.api.content;
 
-import de.huxhorn.sulky.ulid.ULID;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public interface ContentStreamBuffer {
 
-    ULID.Value ulid();
+    /**
+     * The message id: a UUIDv7, ordered by {@link TimeOrderedIds#ORDER}; null before the message is published.
+     *
+     * @return the id
+     */
+    UUID id();
 
     default long timestamp() {
-        return ulid().timestamp();
+        return TimeOrderedIds.timestamp(id());
     }
 
     String position();
@@ -26,7 +32,7 @@ public interface ContentStreamBuffer {
 
     interface Builder {
 
-        Builder ulid(ULID.Value ulid);
+        Builder id(UUID id);
 
         Builder position(String position);
 

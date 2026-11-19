@@ -1,7 +1,6 @@
 package io.descoped.dc.server.content;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.rawdata.api.RawdataClient;
 import io.descoped.rawdata.api.RawdataClientInitializer;
 import io.descoped.rawdata.api.RawdataConsumer;
@@ -21,30 +20,30 @@ public class ExportRawdataStreamTest {
 
     final static Logger LOG = LoggerFactory.getLogger(ExportRawdataStreamTest.class);
 
-    final static DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .values("rawdata.client.provider", "postgres")
-            .values("data.collector.worker.threads", "20")
-            .values("postgres.driver.host", "localhost")
-            .values("postgres.driver.port", "15432")
-            .values("postgres.driver.user", "rdc")
-            .values("postgres.driver.password", "rdc")
-            .values("postgres.driver.database", "rdc")
-            .values("rawdata.postgres.consumer.prefetch-size", "100")
-            .values("rawdata.postgres.consumer.prefetch-poll-interval-when-empty", "1000")
-            .values("local-temp-folder", "target/_tmp_avro_")
-            .values("avro-file.max.seconds", "86400")
-            .values("avro-file.max.bytes", "67108864")
-            .values("avro-file.sync.interval", "524288")
-            .values("gcs.bucket-name", "")
-            .values("gcs.listing.min-interval-seconds", "30")
-            .values("gcs.service-account.key-file", "")
+    final static DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .value("rawdata.client.provider", "postgres")
+            .value("data.collector.worker.threads", "20")
+            .value("postgres.driver.host", "localhost")
+            .value("postgres.driver.port", "15432")
+            .value("postgres.driver.user", "rdc")
+            .value("postgres.driver.password", "rdc")
+            .value("postgres.driver.database", "rdc")
+            .value("rawdata.postgres.consumer.prefetch-size", "100")
+            .value("rawdata.postgres.consumer.prefetch-poll-interval-when-empty", "1000")
+            .value("local-temp-folder", "target/_tmp_avro_")
+            .value("avro-file.max.seconds", "86400")
+            .value("avro-file.max.bytes", "67108864")
+            .value("avro-file.sync.interval", "524288")
+            .value("gcs.bucket-name", "")
+            .value("gcs.listing.min-interval-seconds", "30")
+            .value("gcs.service-account.key-file", "")
             .environment("DC_")
             .build();
 
     @Disabled
     @Test
     void export() {
-        RawdataClient rawdataClient = ProviderConfigurator.configure(configuration.asMap(), configuration.evaluateToString("rawdata.client.provider"), RawdataClientInitializer.class);
+        RawdataClient rawdataClient = ProviderConfigurator.configure(RawdataClientInitializer.class, configuration.find("rawdata.client.provider").orElse(null), configuration.asMap());
         assertNotNull(rawdataClient);
 
         try (RawdataConsumer consumer = rawdataClient.consumer("sirius-person-utkast")) {

@@ -1,7 +1,6 @@
 package io.descoped.dc.samples.moveit.test;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.Builders;
 import io.descoped.dc.api.Specification;
 import io.descoped.dc.api.context.ExecutionContext;
@@ -57,13 +56,13 @@ public class MoveItDeleteTest {
 
     static final Logger LOG = LoggerFactory.getLogger(MoveItDeleteTest.class);
 
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .propertiesResource("application-ignore.properties")
-            .values("content.stream.connector", "rawdata")
-            .values("rawdata.client.provider", "memory")
-            .values("data.collector.worker.threads", "20")
-            .values("data.collector.http.version", Client.Version.HTTP_1_1.name())
-            .values("data.collector.http.followRedirects", Client.Redirect.ALWAYS.name())
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .classpath("application-ignore.properties")
+            .value("content.stream.connector", "rawdata")
+            .value("rawdata.client.provider", "memory")
+            .value("data.collector.worker.threads", "20")
+            .value("data.collector.http.version", Client.Version.HTTP_1_1.name())
+            .value("data.collector.http.followRedirects", Client.Redirect.ALWAYS.name())
             .build();
 
     @Disabled
@@ -80,7 +79,7 @@ public class MoveItDeleteTest {
                         // global configuration
                         .configure(context()
                                 .topic("moveit-test-delete")
-                                .variable("baseURL", configuration.evaluateToString("moveIt.server.url"))
+                                .variable("baseURL", configuration.find("moveIt.server.url").orElse(null))
                                 .variable("rootFolder", "/Home/moveitapi")
                                 .variable("pageSize", "5")
                                 .variable("nextPage", "${cast.toLong(contentStream.lastOrInitialPagePosition(1))}") // resume page position

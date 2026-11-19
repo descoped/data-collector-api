@@ -1,6 +1,6 @@
 package io.descoped.dc.server;
 
-import io.descoped.config.StoreBasedDynamicConfiguration;
+import io.descoped.config.DynamicConfiguration;
 import io.descoped.dc.application.server.UndertowApplication;
 import io.descoped.dc.application.ssl.BusinessSSLResourceSupplier;
 import io.descoped.dc.application.ssl.SecretManagerSSLResource;
@@ -10,6 +10,7 @@ import net.bytebuddy.agent.ByteBuddyAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
 import java.util.function.Supplier;
 
 public class Server {
@@ -31,16 +32,16 @@ public class Server {
             LOG.debug("Using logback configuration: {}", logbackConfigurationFile);
         }
 
-        StoreBasedDynamicConfiguration.Builder configurationBuilder = new StoreBasedDynamicConfiguration.Builder()
-                .propertiesResource("application-defaults.properties")
-                .propertiesResource("/conf/application-defaults.properties")
-                .propertiesResource("/conf/application.properties")
-                .propertiesResource("/conf/application-override.properties");
+        DynamicConfiguration.Builder configurationBuilder = DynamicConfiguration.builder()
+                .classpath("application-defaults.properties")
+                .file(Path.of("/conf/application-defaults.properties"))
+                .file(Path.of("/conf/application.properties"))
+                .file(Path.of("/conf/application-override.properties"));
         /*
          * pre-req: `docker-compose up` in this repo
          */
         if (configurationOverride == ConfigurationOverride.DEBUG_USING_POSTGRES) {
-            configurationBuilder.propertiesResource("application-integration.properties");
+            configurationBuilder.classpath("application-integration.properties");
         }
 
         /*
@@ -55,7 +56,7 @@ public class Server {
                 .environment("DC_")
                 .systemProperties();
 
-        StoreBasedDynamicConfiguration configuration = configurationBuilder.build();
+        DynamicConfiguration configuration = configurationBuilder.build();
 
         /*
          * Delegated certificate loader from Google Secret Manager is placed here, because we don't won't a
@@ -66,7 +67,7 @@ public class Server {
          * Please note: only Google Secret Manager is supported!
          */
 
-        String businessSslResourceProvider = configuration.evaluateToString("data.collector.sslBundle.provider");
+        String businessSslResourceProvider = configuration.find("data.collector.sslBundle.provider").orElse(null);
         Supplier<SecretManagerSSLResource> sslResourceSupplier = () -> new SecretManagerSSLResource(configuration);
 
         UndertowApplication application = UndertowApplication.initializeUndertowApplication(configuration,

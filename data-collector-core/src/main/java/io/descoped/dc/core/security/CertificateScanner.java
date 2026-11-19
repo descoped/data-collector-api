@@ -1,6 +1,7 @@
 package io.descoped.dc.core.security;
 
 import io.descoped.secrets.api.SecretManagerClient;
+import io.descoped.secrets.api.SecretNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,8 +15,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-
-import static io.descoped.secrets.api.SecretManagerClient.safeCharArrayAsUTF8;
 
 class CertificateScanner {
 
@@ -53,7 +52,7 @@ class CertificateScanner {
                     Path fileNamePath = file.toAbsolutePath();
                     try (SecretManagerClient secretsClient = SecretManagerClient.create(Map.of(
                             "secrets.provider", "safe-configuration",
-                            "secrets.propertyResourcePath", fileNamePath.toString()
+                            "secrets.property-resource-path", fileNamePath.toString()
                     ))) {
                         CertificateBundle.Builder builder = new CertificateBundle.Builder();
 
@@ -66,8 +65,8 @@ class CertificateScanner {
                             return FileVisitResult.TERMINATE;
                         }
 
-                        boolean isPEMBundle = secretsClient.readBytes("private.key") != null && secretsClient.readBytes("public.certificate") != null;
-                        boolean isP12Bundle = secretsClient.readBytes("archive.certificate") != null;
+                        boolean isPEMBundle = hasSecret(secretsClient, "private.key") && hasSecret(secretsClient, "public.certificate");
+                        boolean isP12Bundle = hasSecret(secretsClient, "archive.certificate");
 
                         if (isPEMBundle) {
                             if (validateSecretProperties(secretsClient, file, "secret.passphrase", "private.key", "public.certificate")) {
@@ -104,7 +103,7 @@ class CertificateScanner {
                             LOG.warn("Skipping bundle '{}'. Error with configuration!", bundleName);
                         }
 
-                        builder.passphrase(safeCharArrayAsUTF8(secretsClient.readBytes("secret.passphrase")));
+                        builder.passphrase(secretsClient.readChars("secret.passphrase"));
 
                         certificateBundles.put(bundleName, builder.build());
                     }
@@ -117,7 +116,7 @@ class CertificateScanner {
 
     private boolean validateSecretProperties(SecretManagerClient secretsClient, Path file, String... secretProperties) {
         for (String secretProperty : secretProperties) {
-            if (secretsClient.readBytes(secretProperty) == null) {
+            if (!hasSecret(secretsClient, secretProperty)) {
                 LOG.warn("Undefined property '{}' in 'secret.passphrase'. Skip loading certificate bundle for: {}", secretProperty, file.toAbsolutePath());
                 return true;
             }
@@ -158,4 +157,14 @@ class CertificateScanner {
                 '}';
     }
 
+
+    private static boolean hasSecret(SecretManagerClient secretsClient, String name) {
+        try {
+            byte[] value = secretsClient.readBytes(name);
+            java.util.Arrays.fill(value, (byte) 0);
+            return true;
+        } catch (SecretNotFoundException e) {
+            return false;
+        }
+    }
 }

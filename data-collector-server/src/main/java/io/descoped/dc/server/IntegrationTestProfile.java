@@ -1,17 +1,16 @@
 package io.descoped.dc.server;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.util.CommonUtils;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 class IntegrationTestProfile {
 
-    static String[] loadApplicationPropertiesFromConsumerSpecificationProfile(String profile, String... replacePropertyKeyValueWithFullPath) {
+    static Map<String, String> loadApplicationPropertiesFromConsumerSpecificationProfile(String profile, String... replacePropertyKeyValueWithFullPath) {
         Path currentPath = CommonUtils.currentPath();
         while (!currentPath.resolve("data-collection-consumer-specifications").toFile().exists()) {
             currentPath = currentPath.getParent();
@@ -20,21 +19,19 @@ class IntegrationTestProfile {
             }
         }
         Path applicationPropertiesPath = currentPath.resolve("data-collection-consumer-specifications").resolve("profile").resolve(profile).resolve("conf").resolve("application.properties");
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .propertiesResource(applicationPropertiesPath.toAbsolutePath().toString())
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .requiredFile(applicationPropertiesPath.toAbsolutePath())
                 .build();
-        List<String> keyValuePairs = new ArrayList<>();
+        Map<String, String> values = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : configuration.asMap().entrySet()) {
             Path consumerSpecificationProjectPath = currentPath.resolve("data-collection-consumer-specifications");
             List<String> prefixFullPathForPropertyNames = List.of(replacePropertyKeyValueWithFullPath);
             if (prefixFullPathForPropertyNames.stream().anyMatch(name -> name.equals(entry.getKey()))) {
-                keyValuePairs.add(entry.getKey());
-                keyValuePairs.add(consumerSpecificationProjectPath.toAbsolutePath().normalize().toString() + entry.getValue());
+                values.put(entry.getKey(), consumerSpecificationProjectPath.toAbsolutePath().normalize().toString() + entry.getValue());
             } else {
-                keyValuePairs.add(entry.getKey());
-                keyValuePairs.add(entry.getValue());
+                values.put(entry.getKey(), entry.getValue());
             }
         }
-        return keyValuePairs.toArray(new String[0]);
+        return values;
     }
 }

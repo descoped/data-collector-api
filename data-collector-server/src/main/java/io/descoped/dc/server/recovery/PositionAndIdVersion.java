@@ -1,42 +1,43 @@
 package io.descoped.dc.server.recovery;
 
-import de.huxhorn.sulky.ulid.ULID;
 
+import io.descoped.dc.api.ids.TimeOrderedIds;
+import java.util.UUID;
 import java.util.Objects;
 
 /**
- * Maintain the state of the oldest version of an ulid
+ * Maintain the state of the oldest version of an id
  */
-public class PositionAndULIDVersion {
+public class PositionAndIdVersion {
 
     private String position;
-    private ULID.Value ulid;
+    private UUID id;
 
-    public PositionAndULIDVersion() {
+    public PositionAndIdVersion() {
     }
 
     public String position() {
         return position;
     }
 
-    public ULID.Value ulid() {
-        return ulid;
+    public UUID id() {
+        return id;
     }
 
     public boolean isEmpty() {
-        return this.ulid == null && this.position == null;
+        return this.id == null && this.position == null;
     }
 
-    public boolean isOlder(ULID.Value ulid) {
+    public boolean isOlder(UUID id) {
         if (isEmpty()) {
             return true; // ensure we accept
         }
-        return this.ulid.compareTo(ulid) == 1;
+        return TimeOrderedIds.ORDER.compare(this.id, id) > 0;
     }
 
-    public boolean compareAndSet(ULID.Value ulid, String position) {
-        if (isOlder(ulid)) {
-            this.ulid = ulid;
+    public boolean compareAndSet(UUID id, String position) {
+        if (isOlder(id)) {
+            this.id = id;
             this.position = position;
             return true;
         }
@@ -47,20 +48,20 @@ public class PositionAndULIDVersion {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        PositionAndULIDVersion that = (PositionAndULIDVersion) o;
-        return Objects.equals(ulid, that.ulid) &&
+        PositionAndIdVersion that = (PositionAndIdVersion) o;
+        return Objects.equals(id, that.id) &&
                 Objects.equals(position, that.position);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ulid, position);
+        return Objects.hash(id, position);
     }
 
     @Override
     public String toString() {
-        return "ULIDVersion{" +
-                "ulid=" + ulid +
+        return "PositionAndIdVersion{" +
+                "id=" + id +
                 ", position='" + position + '\'' +
                 '}';
     }
