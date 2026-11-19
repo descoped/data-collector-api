@@ -3,9 +3,14 @@ package io.descoped.dc.application.ssl;
 import io.descoped.config.DynamicConfiguration;
 import io.descoped.dc.api.security.BusinessSSLResource;
 import io.descoped.secrets.api.SecretManagerClient;
+import io.descoped.secrets.api.SecretNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,7 +34,7 @@ public class SecretManagerSSLResource implements BusinessSSLResource {
 
         Map<String, String> providerConfiguration = new LinkedHashMap<>();
         providerConfiguration.put("secrets.provider", businessSslResourceProvider);
-        providerConfiguration.put("secrets.project-id", configuration.get("data.collector.sslBundle.gcp.projectId"));
+        providerConfiguration.put("secrets.project-id", configuration.find("data.collector.sslBundle.gcp.projectId").orElse(null));
         String gcsServiceAccountKeyPath = configuration.find("data.collector.sslBundle.gcp.serviceAccountKeyPath").orElse(null);
         if (gcsServiceAccountKeyPath != null) {
             providerConfiguration.put("secrets.service-account-key-path", gcsServiceAccountKeyPath);
@@ -59,26 +64,48 @@ public class SecretManagerSSLResource implements BusinessSSLResource {
 
     @Override
     public char[] publicCertificate() {
-        return isPEM() ? secretManagerClient.readChars(configuration.get("data.collector.sslBundle.publicCertificate")) : new char[0];
+        return isPEM() ? asUTF8Chars(readBytesOrNull(configuration.find("data.collector.sslBundle.publicCertificate").orElse(null))) : new char[0];
     }
 
     @Override
     public char[] privateCertificate() {
-        return isPEM() ? secretManagerClient.readChars(configuration.get("data.collector.sslBundle.privateCertificate")) : new char[0];
+        return isPEM() ? asUTF8Chars(readBytesOrNull(configuration.find("data.collector.sslBundle.privateCertificate").orElse(null))) : new char[0];
     }
 
     @Override
     public byte[] archiveCertificate() {
-        return !isPEM() ? secretManagerClient.readBytes(configuration.get("data.collector.sslBundle.archiveCertificate")) : new byte[0];
+        return !isPEM() ? readBytesOrNull(configuration.find("data.collector.sslBundle.archiveCertificate").orElse(null)) : new byte[0];
     }
 
     @Override
     public char[] passphrase() {
-        return secretManagerClient.readChars(configuration.get("data.collector.sslBundle.passphrase"));
+        return asUTF8Chars(readBytesOrNull(configuration.find("data.collector.sslBundle.passphrase").orElse(null)));
     }
 
     @Override
     public void close() {
         secretManagerClient.close();
+    }
+
+    // secrets-client 2 returned null for a missing secret; 3 throws
+    private byte[] readBytesOrNull(String secretName) {
+        try {
+            return secretManagerClient.readBytes(secretName);
+        } catch (SecretNotFoundException e) {
+            return null;
+        }
+    }
+
+    // secrets-client 2's safeCharArrayAsUTF8: a missing or empty secret is an empty array
+    private static char[] asUTF8Chars(byte[] bytes) {
+        if (bytes == null || bytes.length == 0) {
+            return new char[0];
+        }
+        CharBuffer charBuffer = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(bytes));
+        char[] chars = new char[charBuffer.remaining()];
+        charBuffer.get(chars);
+        Arrays.fill(bytes, (byte) 0);
+        charBuffer.clear();
+        return chars;
     }
 }

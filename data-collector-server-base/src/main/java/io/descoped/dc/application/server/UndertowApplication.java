@@ -78,7 +78,7 @@ public class UndertowApplication {
         Set<String> corsAllowHeaders = Set.of(configuration.get("http.cors.allow.header", "Content-Type,Authorization")
                 .split(","));
         boolean corsAllowCredentials = Boolean.parseBoolean(configuration.find("http.cors.allow.credentials").orElse(null));
-        int corsMaxAge = configuration.getInt("http.cors.allow.max-age", 900);
+        int corsMaxAge = configuration.find("http.cors.allow.max-age").map(Integer::parseInt).orElse(900);
 
         return new CORSHandler(pathHandler, pathHandler, corsAllowOrigin,
                 corsAllowCredentials, StatusCodes.NO_CONTENT, corsMaxAge, corsAllowMethods, corsAllowHeaders
@@ -87,7 +87,7 @@ public class UndertowApplication {
 
     public static UndertowApplication initializeUndertowApplication(DynamicConfiguration configuration,
                                                                     BusinessSSLResourceSupplier businessSSLResourceSupplier) {
-        int port = configuration.getInt("http.port");
+        int port = Integer.parseInt(configuration.find("http.port").orElse(null));
         return initializeUndertowApplication(configuration, port, businessSSLResourceSupplier);
     }
 

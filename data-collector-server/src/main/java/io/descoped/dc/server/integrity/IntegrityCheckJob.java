@@ -54,7 +54,7 @@ public class IntegrityCheckJob {
             ContentStreamBuffer buffer;
             ContentStreamBuffer peekBuffer = null;
             boolean test = true;
-            int timeoutInSeconds = configuration.getInt("data.collector.integrityCheck.consumer.timeoutInSeconds", 15);
+            int timeoutInSeconds = configuration.find("data.collector.integrityCheck.consumer.timeoutInSeconds").map(Integer::parseInt).orElse(15);
             try {
                 LOG.info("Check integrity for topic: {}", topic);
                 while (!terminated.get() && (buffer = consumer.receive(timeoutInSeconds, TimeUnit.SECONDS)) != null) {

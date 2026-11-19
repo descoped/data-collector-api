@@ -85,11 +85,12 @@ public class RawdataClientContentStoreInitializer implements ContentStoreInitial
         if (DYNAMIC.equals(encryptionProvider) || "dynamic-configuration".equals(encryptionProvider)) {
             // secrets-client 3 names this provider dynamic-configuration
             secrets.put("secrets.provider", "dynamic-configuration");
+            // the log lines are as in 2.x
             if (keyPath == null) {
-                LOG.info("Use application configuration for encryption credentials");
+                LOG.info("Use custom encryption credentials configuration: {}", keyPath);
                 putInline(secrets, configuration);
             } else {
-                LOG.info("Use custom encryption credentials configuration: {}", keyPath);
+                LOG.info("Use application configuration for encryption credentials");
                 secrets.put("secrets.property-resource-path", keyPath);
             }
         } else if (GOOGLE.equals(encryptionProvider)) {
