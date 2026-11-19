@@ -29,9 +29,10 @@ import java.util.function.Supplier;
  *     <li>{@link #systemProperties()}: every system property.</li>
  * </ul>
  *
- * <p>The sources are {@linkplain ConfigurationSource#secret() secret} to dynamic-configuration, so their values are
- * taken literally, as before: a value that contains <code>&#36;{</code> is never resolved as a reference. They are still
- * returned by {@code asMap()} and the getters like any other value.
+ * <p>Values are taken literally, as before: a value that contains <code>&#36;{</code> is never resolved as a reference.
+ * The sources escape it as <code>&#36;&#36;{</code>, the escape dynamic-configuration turns back into
+ * <code>&#36;{</code>, so every value comes out exactly as written. The sources are not secret, so the values show in
+ * {@code describe()} and in error messages as with any other source.
  */
 public final class Configurations {
 
@@ -127,12 +128,9 @@ public final class Configurations {
 
             @Override
             public Map<String, String> load() {
-                return loader.get();
-            }
-
-            @Override
-            public boolean secret() {
-                return true;
+                Map<String, String> literal = new LinkedHashMap<>();
+                loader.get().forEach((key, value) -> literal.put(key, value.replace("${", "$${")));
+                return literal;
             }
         };
     }
