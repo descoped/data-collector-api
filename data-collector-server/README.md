@@ -10,7 +10,7 @@ the [Data Collector documentation](https://github.com/descoped/data-collector-pr
 
 ```
 cd data-collector-project
-mvn clean install
+./mvnw clean install
 ```
 
 ### Build and release docker-dev image
@@ -21,9 +21,10 @@ mvn clean install
 > :warning: Versioning must follow: https://semver.org
 
 ```
-cd data-collector-server
+cd data-collector-project
+./mvnw -B -pl data-collector-server -am clean verify dependency:copy-dependencies -DskipTests
 
-mvn -B clean install -DskipTests && mvn -B dependency:copy-dependencies
+cd data-collector-server
 
 docker login -u USERNAME
 

@@ -15,7 +15,7 @@ services:
     - dc-postgres-db
 
   dc-postgres-db:
-    image: postgres:12-alpine
+    image: postgres:18.7-alpine
     ports:
       - 15432:5432
     environment:
@@ -26,7 +26,7 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-    - dc-postgres-test:/var/lib/postgresql/data
+    - dc-postgres-test:/var/lib/postgresql
     - $WORKDIR/profile/$PROFILE/init-db-and-user.sql:/docker-entrypoint-initdb.d/init.sql
 
   dc-adminer:
@@ -37,14 +37,14 @@ services:
     - dc-postgres-db
 
   grafana:
-    image: grafana/grafana:6.6.2
+    image: grafana/grafana:13.3.1
     ports:
     - 3000:3000
     depends_on:
     - prom
 
   prom:
-    image: prom/prometheus:v2.16.0
+    image: prom/prometheus:v3.16.0
     volumes:
     - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"

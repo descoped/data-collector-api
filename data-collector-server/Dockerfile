@@ -1,14 +1,17 @@
-FROM statisticsnorway/alpine-jdk15-buildtools:latest as build
+FROM eclipse-temurin:17.0.21_9-jdk-alpine-3.24 AS build
 
 #
-# Build DataCollector Backend
+# Split the jars into a module path and a class path, as Maven Surefire runs the tests
 #
-
+COPY target/dependency /build/lib/
+COPY target/data-collector-*.jar /build/lib/
+COPY docker/SplitModulePath.java /build/
+RUN java /build/SplitModulePath.java /build/lib /build/classpath io.descoped.dc.server
 
 #
 # Build DataCollector image
 #
-FROM alpine:latest
+FROM alpine:3.24.4
 
 RUN apk add --no-cache bash su-exec curl openssl
 
@@ -29,14 +32,14 @@ ENV ENABLE_JMX_REMOTE_DEBUGGING=true
 #
 # Resources from build image
 #
-COPY --from=build /opt/jdk /opt/jdk/
-COPY target/dependency $DC_HOME/lib/
+COPY --from=build /opt/java/openjdk /opt/jdk/
+COPY --from=build /build/lib $DC_HOME/lib/
+COPY --from=build /build/classpath $DC_HOME/classpath/
 RUN mkdir -p /ld_lib \
-    && LMDB_NATIVE_JAR=$(find $DC_HOME/lib -type f -iname 'jffi-*-native.jar') \
+    && LMDB_NATIVE_JAR=$(find $DC_HOME/classpath -type f -iname 'jffi-*-native.jar') \
     && unzip "$LMDB_NATIVE_JAR" "jni/x86_64-Linux/*" -d /ld_lib \
     && rm -f "$LMDB_NATIVE_JAR"
-COPY target/data-collector-*.jar $DC_HOME/lib/
-COPY target/classes/logback-stash.xml $DC_HOME/
+COPY target/classes/log4j2-logstash.xml $DC_HOME/
 
 ADD docker/start-collector.sh /run.sh
 RUN chmod +x /run.sh
