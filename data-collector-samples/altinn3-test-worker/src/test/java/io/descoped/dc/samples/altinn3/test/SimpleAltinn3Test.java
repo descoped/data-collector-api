@@ -4,7 +4,6 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.Builders;
 import io.descoped.dc.api.http.Client;
 import io.descoped.dc.api.http.HttpStatus;
@@ -15,17 +14,18 @@ import io.descoped.dc.api.util.JsonParser;
 import io.descoped.dc.core.handler.Queries;
 import io.descoped.dc.core.security.CertificateContext;
 import io.descoped.dc.core.security.CertificateFactory;
-import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
+import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.ParseContext;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -65,8 +65,8 @@ public class SimpleAltinn3Test {
     static final Logger LOG = LoggerFactory.getLogger(SimpleAltinn3Test.class);
     static final boolean LOG_ACCESS_TOKENS = false;
 
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .propertiesResource("application-override.properties") // gitignored
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .classpath("application-override.properties") // gitignored
             .build();
 
     static final Client client = Client.newClient();
@@ -83,7 +83,7 @@ public class SimpleAltinn3Test {
     @Disabled
     @Test
     void collectAltinnData() throws IOException {
-        String jwtGrant = createMaskinportenJwtGrant(configuration.evaluateToInt("ssb.jwtGrant.expiration"));
+        String jwtGrant = createMaskinportenJwtGrant(configuration.getInt("ssb.jwtGrant.expiration"));
 
         // Request JWT access token from Maskinporten
         String jwtAccessToken = getMaskinportenJwtAccessToken(jwtGrant);
@@ -94,8 +94,8 @@ public class SimpleAltinn3Test {
         // Get Instances
         List<JsonNode> instanceList;
         {
-//            String url = String.format("https://platform.tt02.altinn.no/storage/api/v1/instances?org=ssb&appId=%s", configuration.evaluateToString("ssb.altinn.app-id"));
-            String url = String.format("https://platform.altinn.no/storage/api/v1/instances?org=ssb&appId=%s", configuration.evaluateToString("ssb.altinn.app-id"));
+//            String url = String.format("https://platform.tt02.altinn.no/storage/api/v1/instances?org=ssb&appId=%s", configuration.find("ssb.altinn.app-id").orElse(null));
+            String url = String.format("https://platform.altinn.no/storage/api/v1/instances?org=ssb&appId=%s", configuration.find("ssb.altinn.app-id").orElse(null));
             LOG.trace("GetInstanceData-URL: {}", url);
             Response response = doGetRequest(url, jwtReplacementToken);
             assertEquals(200, response.statusCode(), getHttpError(response));
@@ -112,8 +112,7 @@ public class SimpleAltinn3Test {
              * 2. iterer over data element
              * 3. hent ned dokument
              */
-            TikaConfig config = TikaConfig.getDefaultConfig();
-            Detector detector = config.getDetector();
+            Detector detector = new DefaultDetector();
             List<MediaType> textMediaTypes = List.of("plain/text", "application/json", "application/xml").stream().map(MediaType::parse).collect(Collectors.toList());
 
             for (JsonNode instance : instanceList) {
@@ -138,7 +137,7 @@ public class SimpleAltinn3Test {
                     assertEquals(200, response.statusCode(), getHttpError(response));
 
                     String content = new String(response.body(), StandardCharsets.UTF_8);
-                    MediaType mediaType = detector.detect(new ByteArrayInputStream(content.getBytes()), new Metadata());
+                    MediaType mediaType = detector.detect(TikaInputStream.get(content.getBytes()), new Metadata(), new ParseContext());
                     /*
                     boolean isTextContent = textMediaTypes.stream().anyMatch(mediaType::equals);
                     if (!isTextContent) {
@@ -188,8 +187,8 @@ public class SimpleAltinn3Test {
                 .withClaim("scope", "altinn:instances.read altinn:instances.write")
 //                .withClaim("scope", "altinn:serviceowner/intances.read altinn:serviceowner/intances.write")
 //                .withClaim("scope", "serviceowner/intances.read serviceowner/intances.write")
-//                .withIssuer(configuration.evaluateToString("ssb.altinn.test.clientId"))
-                .withIssuer(configuration.evaluateToString("ssb.altinn.prod.clientId"))
+//                .withIssuer(configuration.find("ssb.altinn.test.clientId").orElse(null))
+                .withIssuer(configuration.find("ssb.altinn.prod.clientId").orElse(null))
                 .withExpiresAt(Date.from(Instant.now().atOffset(ZoneOffset.UTC).plusSeconds(expirationInSeconds).toInstant()))
                 .withIssuedAt(Date.from(Instant.now().atOffset(ZoneOffset.UTC).toInstant()))
                 .withJWTId(UUID.randomUUID().toString())

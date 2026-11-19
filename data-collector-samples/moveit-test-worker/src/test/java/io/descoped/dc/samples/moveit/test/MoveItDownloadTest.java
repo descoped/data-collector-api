@@ -1,7 +1,6 @@
 package io.descoped.dc.samples.moveit.test;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.Specification;
 import io.descoped.dc.api.http.Client;
 import io.descoped.dc.api.node.builder.SpecificationBuilder;
@@ -58,13 +57,13 @@ public class MoveItDownloadTest {
 
     static final Logger LOG = LoggerFactory.getLogger(MoveItDownloadTest.class);
 
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .propertiesResource("application-ignore.properties")
-            .values("content.stream.connector", "rawdata")
-            .values("rawdata.client.provider", "memory")
-            .values("data.collector.worker.threads", "20")
-            .values("data.collector.http.version", Client.Version.HTTP_1_1.name())
-            .values("data.collector.http.followRedirects", Client.Redirect.ALWAYS.name())
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .classpath("application-ignore.properties")
+            .value("content.stream.connector", "rawdata")
+            .value("rawdata.client.provider", "memory")
+            .value("data.collector.worker.threads", "20")
+            .value("data.collector.http.version", Client.Version.HTTP_1_1.name())
+            .value("data.collector.http.followRedirects", Client.Redirect.ALWAYS.name())
             .build();
 
     SpecificationBuilder createSpecification(String serverURL) {
@@ -150,7 +149,7 @@ public class MoveItDownloadTest {
     void consumeMoveItFiles() {
         Worker.newBuilder()
                 .configuration(configuration.asMap())
-                .specification(createSpecification(configuration.evaluateToString("moveIt.server.url")))
+                .specification(createSpecification(configuration.find("moveIt.server.url").orElse(null)))
                 .build()
                 .run();
     }
@@ -158,7 +157,7 @@ public class MoveItDownloadTest {
     @Disabled
     @Test
     void validateDeserializer() {
-        SpecificationBuilder actualSpecificationBuilder = createSpecification(configuration.evaluateToString("moveIt.server.url"));
+        SpecificationBuilder actualSpecificationBuilder = createSpecification(configuration.find("moveIt.server.url").orElse(null));
         String serialized = actualSpecificationBuilder.serialize();
         SpecificationBuilder expectedSpecificationBuilder = Specification.deserialize(serialized);
         assertEquals(actualSpecificationBuilder, expectedSpecificationBuilder);
@@ -175,7 +174,7 @@ public class MoveItDownloadTest {
             throw new RuntimeException(String.format("Couldn't locate '%s' under currentPath: %s%n", targetPath.toFile().getName(), currentPath.toAbsolutePath().toString()));
         }
 
-        Files.writeString(targetPath.resolve("specs").resolve("moveit-test-spec.json"), createSpecification(configuration.evaluateToString("moveIt.server.url")).serialize());
+        Files.writeString(targetPath.resolve("specs").resolve("moveit-test-spec.json"), createSpecification(configuration.find("moveIt.server.url").orElse(null)).serialize());
     }
 
 }

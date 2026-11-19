@@ -28,13 +28,10 @@ public class ContentStreamTest {
 
     @Test
     public void thatContentStoreInitializer() {
-        ContentStore contentStore = ProviderConfigurator.configure(Map.of(
+        ContentStore contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, "rawdata", Map.of(
                         "rawdata.client.provider", "memory",
                         "rawdata.encryption.key", "password",
-                        "rawdata.encryption.salt", "salt"),
-                "rawdata",
-                ContentStoreInitializer.class
-        );
+                        "rawdata.encryption.salt", "salt"));
         assertNotNull(contentStore);
         HttpRequestInfo httpRequestInfo = new HttpRequestInfo(CorrelationIds.create(ExecutionContext.empty()), null, -1, new Headers(), new Headers(), -1);
         contentStore.bufferDocument("topic", "1", "entry", "PAYLOAD".getBytes(), httpRequestInfo);
@@ -44,7 +41,7 @@ public class ContentStreamTest {
 
     @Test
     public void thatRawdataClientProducesContent() {
-        RawdataClient client = ProviderConfigurator.configure(Map.of(), "memory", RawdataClientInitializer.class);
+        RawdataClient client = ProviderConfigurator.configure(RawdataClientInitializer.class, "memory", Map.of());
         EncryptionClient encryptionClient = new EncryptionClient(Algorithm.AES256);
         ContentStream contentStream = new RawdataClientContentStream(client);
         ContentStreamProducer producer = contentStream.producer("ns");
@@ -64,7 +61,7 @@ public class ContentStreamTest {
             for (; ; ) {
                 ContentStreamBuffer message = consumer.receive(30, TimeUnit.SECONDS);
                 if (message != null) {
-                    System.out.printf("Consumed message with id: %s%n", message.ulid());
+                    System.out.printf("Consumed message with id: %s%n", message.id());
                     if (message.position().equals("582AACB30")) {
                         return;
                     }
@@ -93,7 +90,7 @@ public class ContentStreamTest {
                 "content.stream.connector", "rawdata",
                 "rawdata.client.provider", "memory"
         );
-        ContentStore contentStore = ProviderConfigurator.configure(configuration, configuration.get("content.stream.connector"), ContentStoreInitializer.class);
+        ContentStore contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, configuration.get("content.stream.connector"), configuration);
         ContentStream contentStream = contentStore.contentStream();
 
         Thread consumerThread = new Thread(() -> consumeMessages(contentStream));

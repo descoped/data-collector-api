@@ -7,9 +7,7 @@ module io.descoped.dc.core {
     requires io.descoped.service.provider.api;
     requires io.descoped.rawdata.api;
     requires transitive io.descoped.dc.api;
-    requires io.descoped.secrets.client.api;
-    requires io.descoped.secrets.provider.safe.configuration;
-    requires io.descoped.secrets.provider.dynamic.configuration;
+    requires io.descoped.secrets.api;
 
     requires java.logging;
     requires transitive java.instrument;
@@ -23,7 +21,6 @@ module io.descoped.dc.core {
     requires transitive net.bytebuddy;
     requires net.bytebuddy.agent;
 
-    requires de.huxhorn.sulky.ulid;
     requires commons.jexl3;
     requires com.fasterxml.jackson.databind;
     requires com.fasterxml.jackson.annotation;
@@ -33,7 +30,7 @@ module io.descoped.dc.core {
     requires io.github.classgraph;
     requires org.bouncycastle.pkix;
     requires org.bouncycastle.provider;
-    requires jackson.jq;
+    requires net.thisptr.jackson.jq;
 
     requires com.auth0.jwt;
 

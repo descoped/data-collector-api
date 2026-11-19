@@ -1,7 +1,6 @@
 package io.descoped.dc.samples.ske.freg;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.http.Client;
 import io.descoped.dc.api.http.HttpStatus;
 import io.descoped.dc.api.http.Request;
@@ -25,8 +24,8 @@ public class SimpleFregMaskinportenTest {
 
     static final Logger LOG = LoggerFactory.getLogger(SimpleFregMaskinportenTest.class);
 
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .propertiesResource("application-override.properties") // gitignored
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .classpath("application-override.properties") // gitignored
             .build();
 
     static final Client client = Client.newClient();
@@ -43,7 +42,7 @@ public class SimpleFregMaskinportenTest {
     @Disabled
     @Test
     public void collectFregHendelseliste() throws IOException {
-        MaskinportenAuth auth = new MaskinportenAuth(MaskinportenAuth.TEST_MASKINPORTEN_NO, configuration.evaluateToString("ssb.ske.freg.test.clientId"), CommonUtils.currentPath().resolve("pkcs12-certs"), "ssb-test-certs");
+        MaskinportenAuth auth = new MaskinportenAuth(MaskinportenAuth.TEST_MASKINPORTEN_NO, configuration.find("ssb.ske.freg.test.clientId").orElse(null), CommonUtils.currentPath().resolve("pkcs12-certs"), "ssb-test-certs");
         String jwtGrant = auth.createMaskinportenJwtGrant();
         LOG.trace("jwtGrant: {}", jwtGrant);
         String jwtAccessToken = auth.getMaskinportenJwtAccessToken(jwtGrant);

@@ -27,7 +27,7 @@ public class FreemarkerTemplateEngine {
         return contextClassLoader;
     }
 
-    private Configuration configure() {
+    Configuration configure() {
         Configuration config = new Configuration(Configuration.VERSION_2_3_29);
         config.setClassLoaderForTemplateLoading(tccl(), basePackagePath);
         config.setDefaultEncoding("UTF-8");

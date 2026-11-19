@@ -2,7 +2,6 @@ package io.descoped.dc.samples.altinn3.test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.Builders;
 import io.descoped.dc.api.Specification;
 import io.descoped.dc.api.context.ExecutionContext;
@@ -41,36 +40,36 @@ public class AltinnProdWorkerTest {
 
     static final Logger LOG = LoggerFactory.getLogger(AltinnProdWorkerTest.class);
 
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .propertiesResource("application-override.properties") // gitignored
-            .values("content.stream.connector", "rawdata")
-            .values("rawdata.client.provider", "filesystem")
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .classpath("application-override.properties") // gitignored
+            .value("content.stream.connector", "rawdata")
+            .value("rawdata.client.provider", "filesystem")
 
-            .values("data.collector.worker.threads", "20")
-            .values("data.collector.rawdata.dump.enabled", "true")
-            .values("data.collector.rawdata.dump.location", "")
-            .values("data.collector.rawdata.dump.topic", "altinn-test")
+            .value("data.collector.worker.threads", "20")
+            .value("data.collector.rawdata.dump.enabled", "true")
+            .value("data.collector.rawdata.dump.location", "")
+            .value("data.collector.rawdata.dump.topic", "altinn-test")
 
-            .values("local-temp-folder", "target/avro/temp")
-            .values("filesystem.storage-folder", "target/avro/rawdata-store")
-            .values("avro-file.max.seconds", "60")
-            .values("avro-file.max.bytes", Long.toString(64 * 1024 * 1024)) // 512 MiB
-            .values("avro-file.sync.interval", Long.toString(200))
-            .values("listing.min-interval-seconds", "0")
+            .value("local-temp-folder", "target/avro/temp")
+            .value("filesystem.storage-folder", "target/avro/rawdata-store")
+            .value("avro-file.max.seconds", "60")
+            .value("avro-file.max.bytes", Long.toString(64 * 1024 * 1024)) // 512 MiB
+            .value("avro-file.sync.interval", Long.toString(200))
+            .value("listing.min-interval-seconds", "0")
 
-            .values("data.collector.sslBundle.provider", "google-secret-manager")
-            .values("data.collector.sslBundle.gcp.projectId", "descoped-team")
-            .values("data.collector.sslBundle.gcp.serviceAccountKeyPath", "/Users/oranheim/bin/descoped-team-rawdata-altinn3-8bc551b20687.json")
-            .values("data.collector.sslBundle.type", "p12")
-            .values("data.collector.sslBundle.name", "ssb-test-certs")
-            .values("data.collector.sslBundle.archiveCertificate", "ssb-prod-p12-certificate")
-            .values("data.collector.sslBundle.passphrase", "ssb-prod-p12-passphrase")
+            .value("data.collector.sslBundle.provider", "google-secret-manager")
+            .value("data.collector.sslBundle.gcp.projectId", "descoped-team")
+            .value("data.collector.sslBundle.gcp.serviceAccountKeyPath", "/Users/oranheim/bin/descoped-team-rawdata-altinn3-8bc551b20687.json")
+            .value("data.collector.sslBundle.type", "p12")
+            .value("data.collector.sslBundle.name", "ssb-test-certs")
+            .value("data.collector.sslBundle.archiveCertificate", "ssb-prod-p12-certificate")
+            .value("data.collector.sslBundle.passphrase", "ssb-prod-p12-passphrase")
 
-            .values("rawdata.encryption.provider", "google-secret-manager")
-            .values("rawdata.encryption.gcp.serviceAccountKeyPath", "/Users/oranheim/bin/descoped-team-rawdata-altinn3-8bc551b20687.json")
-            .values("rawdata.encryption.gcp.projectId", "descoped-team")
-            .values("rawdata.encryption.key", "rawdata-staging-altinn3-encryption-key")
-            .values("rawdata.encryption.salt", "rawdata-staging-altinn3-encryption-salt")
+            .value("rawdata.encryption.provider", "google-secret-manager")
+            .value("rawdata.encryption.gcp.serviceAccountKeyPath", "/Users/oranheim/bin/descoped-team-rawdata-altinn3-8bc551b20687.json")
+            .value("rawdata.encryption.gcp.projectId", "descoped-team")
+            .value("rawdata.encryption.key", "rawdata-staging-altinn3-encryption-key")
+            .value("rawdata.encryption.salt", "rawdata-staging-altinn3-encryption-salt")
             .build();
 
     static final SpecificationBuilder specificationBuilder = Specification.start("ALTINN-TEST", "Altinn 3", "maskinporten-jwt-grant")

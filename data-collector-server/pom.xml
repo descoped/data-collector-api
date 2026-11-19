@@ -50,19 +50,21 @@
         </dependency>
         <dependency>
             <groupId>io.descoped.rawdata</groupId>
+            <artifactId>rawdata-client-provider-filesystem</artifactId>
+            <version>${rawdata-client.version}</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.descoped.rawdata</groupId>
             <artifactId>rawdata-client-provider-gcs</artifactId>
             <version>${rawdata-client.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>javax.annotation</groupId>
-                    <artifactId>javax.annotation-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.descoped.rawdata</groupId>
             <artifactId>rawdata-client-provider-postgres</artifactId>
             <version>${rawdata-client.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.descoped.config</groupId>
@@ -78,6 +80,7 @@
             <groupId>io.descoped.secrets</groupId>
             <artifactId>secrets-provider-google-secret-manager</artifactId>
             <version>${secrets-provider.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.github.classgraph</groupId>

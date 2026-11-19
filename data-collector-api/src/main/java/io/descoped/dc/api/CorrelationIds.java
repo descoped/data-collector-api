@@ -1,7 +1,7 @@
 package io.descoped.dc.api;
 
 import io.descoped.dc.api.context.ExecutionContext;
-import io.descoped.dc.api.ulid.ULIDGenerator;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,7 +37,7 @@ public class CorrelationIds {
     }
 
     public UUID add() {
-        UUID uuid = ULIDGenerator.toUUID(ULIDGenerator.generate());
+        UUID uuid = TimeOrderedIds.generate();
         correlationIds.add(uuid);
         return uuid;
     }

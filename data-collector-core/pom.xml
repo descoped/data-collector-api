@@ -47,11 +47,13 @@
             <groupId>io.descoped.secrets</groupId>
             <artifactId>secrets-provider-safe-configuration</artifactId>
             <version>${secrets-provider.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.descoped.secrets</groupId>
             <artifactId>secrets-provider-dynamic-configuration</artifactId>
             <version>${secrets-provider.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.github.classgraph</groupId>
@@ -116,6 +118,12 @@
         <dependency>
             <groupId>io.descoped.dc</groupId>
             <artifactId>data-collector-connector-content-stream-rawdata</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.descoped.dc</groupId>
+            <artifactId>data-collector-connector-content-stream-discarding</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

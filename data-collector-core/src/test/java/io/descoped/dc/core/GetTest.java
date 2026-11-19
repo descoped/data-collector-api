@@ -132,7 +132,7 @@ public class GetTest {
                                 .url(testServer.testURL("/api/events/${eventId}?type=event"))
                         )
                 )
-                .configuration(Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "discard"))
+                .configuration(Map.of("content.stream.connector", "discarding"))
                 .header("Accept", "application/xml")
                 .variable("fromPosition", 1)
                 .build()
@@ -159,7 +159,7 @@ public class GetTest {
                                 )
                         )
                 )
-                .configuration(Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "discard"))
+                .configuration(Map.of("content.stream.connector", "discarding"))
                 //.configuration(Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "memory"))
                 .header("Accept", "application/xml")
                 .variable("fromPosition", 1)
@@ -188,7 +188,7 @@ public class GetTest {
                                     )
                             )
                     )
-                    .configuration(Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "discard", "data.collector.http.request.timeout.seconds", "0"))
+                    .configuration(Map.of("content.stream.connector", "discarding", "data.collector.http.request.timeout.seconds", "0"))
                     .header("Accept", "application/xml")
                     .variable("fromPosition", 1)
                     .build()
@@ -231,7 +231,7 @@ public class GetTest {
         ExecutionContext output = Worker.newBuilder()
                 .specification(specificationBuilder
                 )
-                .configuration(Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "discard"))
+                .configuration(Map.of("content.stream.connector", "discarding"))
                 .header("Accept", "application/xml")
                 .variable("fromPosition", 1)
                 .build()
@@ -269,7 +269,7 @@ public class GetTest {
         ExecutionContext output = Worker.newBuilder()
                 .specification(specification
                 )
-                .configuration(Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "discard"))
+                .configuration(Map.of("content.stream.connector", "discarding"))
                 .header("Accept", "application/xml")
                 .variable("fromPosition", 1)
                 .build()
@@ -320,7 +320,7 @@ public class GetTest {
                 );
 
         Map<String, String> configurationMap = Map.of("content.stream.connector", "rawdata", "rawdata.client.provider", "memory");
-        ContentStore contentStore = ProviderConfigurator.configure(configurationMap, configurationMap.get("content.stream.connector"), ContentStoreInitializer.class);
+        ContentStore contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, configurationMap.get("content.stream.connector"), configurationMap);
 
         Worker.WorkerBuilder worker = Worker.newBuilder()
                 .specification(specificationBuilder)

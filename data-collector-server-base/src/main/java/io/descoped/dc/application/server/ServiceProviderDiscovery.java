@@ -29,7 +29,7 @@ class ServiceProviderDiscovery {
 
     static <T> Iterable<Class<T>> discover(Class<T> serviceProviderClass) {
         Set<Class<T>> serviceList = new LinkedHashSet<>();
-        try (ScanResult scanResult = new ClassGraph().whitelistPathsNonRecursive("META-INF/services").scan()) {
+        try (ScanResult scanResult = new ClassGraph().acceptPathsNonRecursive("META-INF/services").scan()) {
             LOG.trace("serviceProviderClass: {}", serviceProviderClass.getName());
             scanResult.getResourcesWithLeafName(serviceProviderClass.getName()).forEachByteArray((Resource res, byte[] content) -> {
                 try {

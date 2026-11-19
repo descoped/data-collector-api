@@ -7,7 +7,7 @@ import io.descoped.dc.api.content.ContentStream;
 import io.descoped.dc.api.content.ContentStreamBuffer;
 import io.descoped.dc.api.content.ContentStreamConsumer;
 import io.descoped.dc.api.content.ContentStreamProducer;
-import io.descoped.dc.api.ulid.ULIDGenerator;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.server.content.ContentStoreComponent;
 import io.descoped.dc.server.db.LmdbEnvironment;
 import io.descoped.dc.server.db.SequenceDbHelper;
@@ -57,9 +57,9 @@ public class RecoveryWorker {
         try (LmdbEnvironment lmdbEnvironment = new LmdbEnvironment(configuration, dbLocation, sourceTopic)) {
             Dbi<ByteBuffer> sequenceDb = lmdbEnvironment.open();
             SequenceDbHelper sequenceDbHelper = new SequenceDbHelper(lmdbEnvironment, sequenceDb);
-            PositionAndULIDVersion firstPosition = sequenceDbHelper.findFirstPosition();
+            PositionAndIdVersion firstPosition = sequenceDbHelper.findFirstPosition();
             monitor.setStartPosition(firstPosition.position());
-            PositionAndULIDVersion lastPosition = sequenceDbHelper.findLastPosition();
+            PositionAndIdVersion lastPosition = sequenceDbHelper.findLastPosition();
             monitor.setLastPosition(lastPosition.position());
 
             int publishAtCount = 1000;
@@ -85,7 +85,7 @@ public class RecoveryWorker {
                         publishBuffers(bufferCounter, bufferedPositions, producer);
                     }
 
-                    if (lastPosition.ulid().equals(buffer.ulid()) && lastPosition.position().equals(buffer.position())) {
+                    if (lastPosition.id().equals(buffer.id()) && lastPosition.position().equals(buffer.position())) {
                         if (!bufferedPositions.isEmpty()) {
                             publishBuffers(bufferCounter, bufferedPositions, producer);
                         }
@@ -94,7 +94,7 @@ public class RecoveryWorker {
                 }
                 monitor.setEnded();
                 if (peekBuffer != null) {
-                    lastTimestamp.set(peekBuffer.ulid().timestamp());
+                    lastTimestamp.set(TimeOrderedIds.timestamp(peekBuffer.id()));
                 }
                 LOG.info("Successful recovery from {} to {}. Recovered {} positions.", sourceTopic, targetTopic, monitor.copiedPositions.get());
             } catch (Exception e) {
@@ -117,8 +117,8 @@ public class RecoveryWorker {
             ContentStreamConsumer consumer = contentStream.consumer(targetTopic);
             try {
                 ContentStreamBuffer lastRecoveredMessage = contentStream.lastMessage(targetTopic);
-                long fromTimestamp = lastRecoveredMessage != null && lastRecoveredMessage.ulid().timestamp() < lastTimestamp.get() ?
-                        lastRecoveredMessage.ulid().timestamp() :
+                long fromTimestamp = lastRecoveredMessage != null && TimeOrderedIds.timestamp(lastRecoveredMessage.id()) < lastTimestamp.get() ?
+                        TimeOrderedIds.timestamp(lastRecoveredMessage.id()) :
                         lastTimestamp.get();
                 LOG.trace("Post check recovered positions from timestamp: {}", Instant.ofEpochMilli(fromTimestamp).toString());
                 monitor.setPostCheckFromTimestamp(fromTimestamp);
@@ -134,7 +134,7 @@ public class RecoveryWorker {
                         monitor.setPostCheckLastPosition(buffer.position());
                         monitor.incrementPostCheckCheckedPositions();
                         ObjectNode positionNode = writer.parser().createObjectNode();
-                        positionNode.put(ULIDGenerator.toUUID(buffer.ulid()).toString(), buffer.position());
+                        positionNode.put(buffer.id().toString(), buffer.position());
                         writer.write(positionNode);
                     }
                 }

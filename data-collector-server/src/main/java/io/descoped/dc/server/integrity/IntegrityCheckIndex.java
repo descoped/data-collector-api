@@ -1,6 +1,5 @@
 package io.descoped.dc.server.integrity;
 
-import de.huxhorn.sulky.ulid.ULID;
 import io.descoped.dc.api.handler.Tuple;
 import io.descoped.dc.server.db.DirectByteBufferPool;
 import io.descoped.dc.server.db.LmdbEnvironment;
@@ -15,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.BiConsumer;
 
@@ -58,9 +58,9 @@ public class IntegrityCheckIndex implements AutoCloseable {
         }
     }
 
-    public void writeSequence(ULID.Value ulid, String position) {
+    public void writeSequence(UUID id, String position) {
         ByteBuffer keyBuffer = keyBufferPool.acquire();
-        SequenceKey sequenceKey = new SequenceKey(ulid, position);
+        SequenceKey sequenceKey = new SequenceKey(id, position);
         sequenceKey.toByteBuffer(keyBuffer);
         ByteBuffer contentBuffer = contentBufferPool.acquire();
         contentBuffer.flip();

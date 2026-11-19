@@ -9,12 +9,9 @@ module io.descoped.dc.server {
     requires transitive io.descoped.dc.application;
     requires io.descoped.dc.content.rawdata;
     requires io.descoped.rawdata.api;
-    requires io.descoped.rawdata.postgres;
-    requires io.descoped.rawdata.avro;
-    requires io.descoped.secrets.client.api;
-    requires io.descoped.secrets.provider.safe.configuration;
-    requires io.descoped.secrets.provider.dynamic.configuration;
-    requires io.descoped.secrets.provider.google.rest.api;
+    requires io.descoped.secrets.api;
+    // The rawdata and secrets providers are runtime dependencies: their API modules declare `uses`, so the
+    // providers resolve on the module path without being required.
 
     requires java.instrument;
 

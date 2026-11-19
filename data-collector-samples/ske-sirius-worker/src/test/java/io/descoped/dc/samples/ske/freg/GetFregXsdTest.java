@@ -1,7 +1,6 @@
 package io.descoped.dc.samples.ske.freg;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.http.Client;
 import io.descoped.dc.api.http.Request;
 import io.descoped.dc.api.http.Response;
@@ -29,8 +28,8 @@ public class GetFregXsdTest {
 
     static final Logger LOG = LoggerFactory.getLogger(GetFregXsdTest.class);
 
-    static final DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .propertiesResource("application-override.properties") // gitignored
+    static final DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .classpath("application-override.properties") // gitignored
             .build();
 
     static final Client client = Client.newClient();
@@ -43,7 +42,7 @@ public class GetFregXsdTest {
         Map<String, String> providerConfig = Map.of(
                 "secrets.provider", "google-secret-manager",
                 "secrets.projectId", "descoped-team",
-                "secrets.serviceAccountKeyPath", configuration.evaluateToString("gcp.service-account.file")
+                "secrets.serviceAccountKeyPath", configuration.find("gcp.service-account.file").orElse(null)
         );
         sslContext.set(getBusinessSSLContext(providerConfig));
         authToken.set(getAccessToken());
@@ -70,7 +69,7 @@ public class GetFregXsdTest {
     }
 
     static String getAccessToken() {
-        MaskinportenAuth auth = new MaskinportenAuth(MaskinportenAuth.MASKINPORTEN_NO, configuration.evaluateToString("ssb.ske.freg.prod.clientId"), sslContext.get());
+        MaskinportenAuth auth = new MaskinportenAuth(MaskinportenAuth.MASKINPORTEN_NO, configuration.find("ssb.ske.freg.prod.clientId").orElse(null), sslContext.get());
         String jwtGrant = auth.createMaskinportenJwtGrant();
         return auth.getMaskinportenJwtAccessToken(jwtGrant);
     }
@@ -124,7 +123,7 @@ public class GetFregXsdTest {
 
         @Override
         public char[] passphrase() {
-            return SecretManagerClient.safeCharArrayAsUTF8(client.readBytes("ssb-prod-p12-passphrase"));
+            return client.readChars("ssb-prod-p12-passphrase");
         }
 
         @Override

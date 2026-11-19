@@ -45,11 +45,11 @@ public class RecoveryContentStoreComponent implements Component {
         configMap.put("recovery.rawdata.encryption.credentials.ignore", "true");
 
         // custom rule to ensure that producer writes that to recovery folder
-        String gscRecoveryFolder = configuration.evaluateToString("local-temp-folder");
+        String gscRecoveryFolder = configuration.find("local-temp-folder").orElse(null);
         if (gscRecoveryFolder != null) {
             configMap.put("local-temp-folder", gscRecoveryFolder + "-recovery");
         }
-        contentStore = ProviderConfigurator.configure(configMap, this.configuration.evaluateToString("content.stream.connector"), ContentStoreInitializer.class);
+        contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, this.configuration.find("content.stream.connector").orElse(null), configMap);
         closed.set(false);
     }
 

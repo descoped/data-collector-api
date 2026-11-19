@@ -1,9 +1,9 @@
 package io.descoped.dc.server.db;
 
-import de.huxhorn.sulky.ulid.ULID;
 import io.descoped.config.DynamicConfiguration;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.util.CommonUtils;
-import io.descoped.dc.server.recovery.PositionAndULIDVersion;
+import io.descoped.dc.server.recovery.PositionAndIdVersion;
 import org.lmdbjava.CursorIterable;
 import org.lmdbjava.Dbi;
 import org.lmdbjava.Txn;
@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
@@ -36,7 +37,7 @@ public class SequenceDbHelper {
     }
 
     public static Path getSequenceDatabaseLocation(DynamicConfiguration configuration) {
-        String location = configuration.evaluateToString("data.collector.integrityCheck.database.location");
+        String location = configuration.find("data.collector.integrityCheck.database.location").orElse(null);
         return ((Supplier<Path>) () -> {
             if (location == null || location.isEmpty()) {
                 // dev directory
@@ -60,29 +61,29 @@ public class SequenceDbHelper {
         }).get();
     }
 
-    public PositionAndULIDVersion findFirstPosition() {
-        final PositionAndULIDVersion positionAndUlidVersion = new PositionAndULIDVersion();
+    public PositionAndIdVersion findFirstPosition() {
+        final PositionAndIdVersion positionAndIdVersion = new PositionAndIdVersion();
         try (Txn<ByteBuffer> txn = lmdbEnvironment.env().txnRead()) {
             Iterator<CursorIterable.KeyVal<ByteBuffer>> it = dbi.iterate(txn).iterator();
             if (it.hasNext()) {
                 CursorIterable.KeyVal<ByteBuffer> next = it.next();
                 SequenceKey sequenceKey = SequenceKey.fromByteBuffer(next.key());
-                positionAndUlidVersion.compareAndSet(sequenceKey.ulid(), sequenceKey.position());
+                positionAndIdVersion.compareAndSet(sequenceKey.id(), sequenceKey.position());
             }
         }
-        return positionAndUlidVersion;
+        return positionAndIdVersion;
     }
 
-    public PositionAndULIDVersion findLastPosition() {
-        final PositionAndULIDVersion positionAndUlidVersion = new PositionAndULIDVersion();
-        handlePositionDuplicates(event -> positionAndUlidVersion.compareAndSet(event.ulidSet().iterator().next(), event.sequenceKey().position()));
-        return positionAndUlidVersion;
+    public PositionAndIdVersion findLastPosition() {
+        final PositionAndIdVersion positionAndIdVersion = new PositionAndIdVersion();
+        handlePositionDuplicates(event -> positionAndIdVersion.compareAndSet(event.idSet().iterator().next(), event.sequenceKey().position()));
+        return positionAndIdVersion;
     }
 
     void handlePositionDuplicates(Predicate<DuplicateEvent> visit) {
         AtomicBoolean canceled = new AtomicBoolean(false);
         AtomicReference<SequenceKey> prevSequenceKey = new AtomicReference<>();
-        Map<String, SortedSet<ULID.Value>> duplicatePositionAndUlidSet = new LinkedHashMap<>();
+        Map<String, SortedSet<UUID>> duplicatePositionAndIdSet = new LinkedHashMap<>();
         try (Txn<ByteBuffer> txn = lmdbEnvironment.env().txnRead()) {
             Iterator<CursorIterable.KeyVal<ByteBuffer>> it = dbi.iterate(txn).iterator();
             while (!canceled.get() && it.hasNext()) {
@@ -99,22 +100,22 @@ public class SequenceDbHelper {
                 // check if we got a duplicate
                 if (prevSequenceKey.get().position().equals(sequenceKey.position())) {
                     // make counters for position and increment duplicateCount
-                    duplicatePositionAndUlidSet.computeIfAbsent(prevSequenceKey.get().position(), duplicateUlidSet -> new TreeSet<>()).add(prevSequenceKey.get().ulid());
-                    duplicatePositionAndUlidSet.get(sequenceKey.position()).add(sequenceKey.ulid());
+                    duplicatePositionAndIdSet.computeIfAbsent(prevSequenceKey.get().position(), duplicateIdSet -> new TreeSet<>(TimeOrderedIds.ORDER)).add(prevSequenceKey.get().id());
+                    duplicatePositionAndIdSet.get(sequenceKey.position()).add(sequenceKey.id());
                 }
 
                 // fire event on duplicates when prev is not equal to curr
-                if (duplicatePositionAndUlidSet.size() > 0 && !prevSequenceKey.get().position().equals(sequenceKey.position())) {
-                    SortedSet<ULID.Value> ulidSet = duplicatePositionAndUlidSet.get(prevSequenceKey.get().position());
+                if (duplicatePositionAndIdSet.size() > 0 && !prevSequenceKey.get().position().equals(sequenceKey.position())) {
+                    SortedSet<UUID> idSet = duplicatePositionAndIdSet.get(prevSequenceKey.get().position());
                     try {
-                        if (!visit.test(new DuplicateEvent(prevSequenceKey.get(), ulidSet, it.hasNext()))) {
+                        if (!visit.test(new DuplicateEvent(prevSequenceKey.get(), idSet, it.hasNext()))) {
                             canceled.set(true);
                         }
                     } catch (Exception e) {
                         LOG.error("Duplicate iteration error: {}", CommonUtils.captureStackTrace(e));
                         canceled.set(true);
                     }
-                    duplicatePositionAndUlidSet.clear();
+                    duplicatePositionAndIdSet.clear();
                 }
 
                 // move marker to next
@@ -125,12 +126,12 @@ public class SequenceDbHelper {
 
     static class DuplicateEvent {
         private final SequenceKey sequenceKey;
-        private final SortedSet<ULID.Value> ulidSet;
+        private final SortedSet<UUID> idSet;
         private final boolean hasNext;
 
-        DuplicateEvent(SequenceKey sequenceKey, SortedSet<ULID.Value> ulidSet, boolean hasNext) {
+        DuplicateEvent(SequenceKey sequenceKey, SortedSet<UUID> idSet, boolean hasNext) {
             this.sequenceKey = sequenceKey;
-            this.ulidSet = ulidSet;
+            this.idSet = idSet;
             this.hasNext = hasNext;
         }
 
@@ -138,8 +139,8 @@ public class SequenceDbHelper {
             return sequenceKey;
         }
 
-        SortedSet<ULID.Value> ulidSet() {
-            return ulidSet;
+        SortedSet<UUID> idSet() {
+            return idSet;
         }
 
         boolean hasNext() {

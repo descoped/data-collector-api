@@ -1,7 +1,6 @@
 package io.descoped.dc.server.content;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.content.ContentStore;
 import io.descoped.dc.api.content.ContentStreamProducer;
 import io.descoped.dc.api.util.CommonUtils;
@@ -27,13 +26,13 @@ public class RawdataFileSystemServiceTest {
 
     static int EXPECTED_MESSAGES = 100;
 
-    static DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-            .values("content.stream.connector", "rawdata")
-            .values("rawdata.client.provider", "memory")
-            .values("data.collector.rawdata.dump.enabled", "true")
-            .values("data.collector.rawdata.dump.location", CommonUtils.currentPath().resolve("target").resolve("storage").toFile().getAbsolutePath())
-            .values("data.collector.rawdata.dump.topic", "test-stream")
-            .values("data.collector.consumer.timeoutInSeconds", "1")
+    static DynamicConfiguration configuration = DynamicConfiguration.builder()
+            .value("content.stream.connector", "rawdata")
+            .value("rawdata.client.provider", "memory")
+            .value("data.collector.rawdata.dump.enabled", "true")
+            .value("data.collector.rawdata.dump.location", CommonUtils.currentPath().resolve("target").resolve("storage").toFile().getAbsolutePath())
+            .value("data.collector.rawdata.dump.topic", "test-stream")
+            .value("data.collector.consumer.timeoutInSeconds", "1")
             .build();
     static TestServer server;
     static TestClient client;
@@ -52,7 +51,7 @@ public class RawdataFileSystemServiceTest {
 
     static void produceMessages(ContentStoreComponent contentStoreComponent) {
         ContentStore contentStore = contentStoreComponent.getDelegate();
-        try (ContentStreamProducer producer = contentStore.contentStream().producer(configuration.evaluateToString("data.collector.rawdata.dump.topic"))) {
+        try (ContentStreamProducer producer = contentStore.contentStream().producer(configuration.find("data.collector.rawdata.dump.topic").orElse(null))) {
             for (int n = 0; n < EXPECTED_MESSAGES; n++) {
                 producer.publishBuilders(producer.builder().position(String.valueOf(n)).put("entry", "DATA".getBytes(StandardCharsets.UTF_8)));
             }

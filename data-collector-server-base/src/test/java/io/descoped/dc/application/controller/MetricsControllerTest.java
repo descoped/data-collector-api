@@ -1,7 +1,6 @@
 package io.descoped.dc.application.controller;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.application.server.UndertowApplication;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
@@ -33,8 +32,8 @@ public class MetricsControllerTest {
 
     @BeforeAll
     public static void beforeAll() {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .values("prometheus.defaultExports.disabled", "true")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .value("prometheus.defaultExports.disabled", "true")
                 .build();
         server = UndertowApplication.initializeUndertowApplication(configuration, findFree(), null);
         server.start();

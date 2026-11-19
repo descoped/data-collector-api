@@ -1,6 +1,5 @@
 package io.descoped.dc.content.provider.rawdata;
 
-import de.huxhorn.sulky.ulid.ULID;
 import io.descoped.dc.api.content.ContentStreamBuffer;
 import io.descoped.dc.api.content.MetadataContent;
 import io.descoped.rawdata.api.RawdataMessage;
@@ -10,16 +9,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class RawdataClientContentStreamBuffer implements ContentStreamBuffer {
 
-    private final ULID.Value ulid;
+    private final UUID id;
     private final String position;
     private final Map<String, byte[]> data;
     private final List<MetadataContent> manifestList;
 
-    RawdataClientContentStreamBuffer(ULID.Value ulid, String position, Map<String, byte[]> data, List<MetadataContent> manifestList) {
-        this.ulid = ulid;
+    RawdataClientContentStreamBuffer(UUID id, String position, Map<String, byte[]> data, List<MetadataContent> manifestList) {
+        this.id = id;
         this.position = position;
         this.data = data;
         this.manifestList = manifestList;
@@ -29,12 +29,12 @@ public class RawdataClientContentStreamBuffer implements ContentStreamBuffer {
         if (message == null) {
             return null;
         }
-        return new RawdataClientContentStreamBuffer(message.ulid(), message.position(), message.data(), new ArrayList<>());
+        return new RawdataClientContentStreamBuffer(message.id(), message.position(), message.data(), new ArrayList<>());
     }
 
     @Override
-    public ULID.Value ulid() {
-        return ulid;
+    public UUID id() {
+        return id;
     }
 
     @Override
@@ -64,14 +64,14 @@ public class RawdataClientContentStreamBuffer implements ContentStreamBuffer {
 
     public static class Builder implements ContentStreamBuffer.Builder {
 
-        private ULID.Value ulid;
+        private UUID id;
         private String position;
         final Map<String, byte[]> data = new LinkedHashMap<>();
         private List<MetadataContent> manifestList = new ArrayList<>();
 
         @Override
-        public ContentStreamBuffer.Builder ulid(ULID.Value ulid) {
-            this.ulid = ulid;
+        public ContentStreamBuffer.Builder id(UUID id) {
+            this.id = id;
             return this;
         }
 
@@ -119,7 +119,7 @@ public class RawdataClientContentStreamBuffer implements ContentStreamBuffer {
 
         @Override
         public ContentStreamBuffer build() {
-            return new RawdataClientContentStreamBuffer(ulid, position, data, manifestList);
+            return new RawdataClientContentStreamBuffer(id, position, data, manifestList);
         }
 
     }

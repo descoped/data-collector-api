@@ -1,6 +1,6 @@
 package io.descoped.dc.samples.ske.sirius;
 
-import io.descoped.config.StoreBasedDynamicConfiguration;
+import io.descoped.config.DynamicConfiguration;
 import io.descoped.dc.api.Specification;
 import io.descoped.dc.api.node.builder.SpecificationBuilder;
 import io.descoped.dc.api.util.CommonUtils;
@@ -99,24 +99,25 @@ public class SiriusWorkerTest {
         Path scanDirectory = Paths.get("/Volumes/SSB BusinessSSL/certs");
 
         Worker.newBuilder()
-                .configuration(new StoreBasedDynamicConfiguration.Builder()
-                        .values("content.stream.connector", "rawdata")
-                        .values("rawdata.client.provider", "memory")
-                        .values("data.collector.worker.threads", "20")
-                        .values("local-temp-folder", "target/_tmp_avro_")
-                        .values("avro-file.max.seconds", "86400")
-                        .values("avro-file.max.bytes", "67108864")
-                        .values("avro-file.sync.interval", "524288")
-                        .values("gcs.bucket-name", "")
-                        .values("gcs.listing.min-interval-seconds", "30")
-                        .values("gcs.service-account.key-file", "")
-                        .values("postgres.driver.host", "localhost")
-                        .values("postgres.driver.port", "5432")
-                        .values("postgres.driver.user", "rdc")
-                        .values("postgres.driver.password", "rdc")
-                        .values("postgres.driver.database", "rdc")
-                        .values("rawdata.postgres.consumer.prefetch-size", "100")
-                        .values("rawdata.postgres.consumer.prefetch-poll-interval-when-empty", "1000")
+                .configuration(DynamicConfiguration.builder()
+                        .value("content.stream.connector", "rawdata")
+//                        .value("content.stream.connector", "discarding")
+                        .value("rawdata.client.provider", "memory")
+                        .value("data.collector.worker.threads", "20")
+                        .value("local-temp-folder", "target/_tmp_avro_")
+                        .value("avro-file.max.seconds", "86400")
+                        .value("avro-file.max.bytes", "67108864")
+                        .value("avro-file.sync.interval", "524288")
+                        .value("gcs.bucket-name", "")
+                        .value("gcs.listing.min-interval-seconds", "30")
+                        .value("gcs.service-account.key-file", "")
+                        .value("postgres.driver.host", "localhost")
+                        .value("postgres.driver.port", "5432")
+                        .value("postgres.driver.user", "rdc")
+                        .value("postgres.driver.password", "rdc")
+                        .value("postgres.driver.database", "rdc")
+                        .value("rawdata.postgres.consumer.prefetch-size", "100")
+                        .value("rawdata.postgres.consumer.prefetch-poll-interval-when-empty", "1000")
                         .environment("DC_")
                         .build()
                         .asMap())

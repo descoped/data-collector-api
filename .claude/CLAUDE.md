@@ -15,6 +15,7 @@ specifications as tasks over HTTP. One Maven reactor, group `io.descoped.dc`, ow
 | `data-collector-bom` | n/a | BOM of the published modules |
 | `data-collector-api` | `io.descoped.dc.api` | the specification DSL (`Builders`, `node`, `node.builder`), the expression language (JEXL), and the service interfaces for HTTP, content stores (`ContentStoreInitializer`) and health |
 | `data-collector-core` | `io.descoped.dc.core` | the engine: `Worker`, the node handlers, the `java.net.http` client, client certificates (BusinessSSL), Maskinporten JWT, metrics |
+| `data-collector-connector-content-stream-discarding` | `io.descoped.dc.content.discarding` | content store provider `discarding`, the engine's default: keeps the last published position in memory and drops the content |
 | `data-collector-connector-content-stream-rawdata` | `io.descoped.dc.content.rawdata` | content store provider `rawdata`: content to rawdata-client topics, optionally encrypted |
 | `data-collector-server-base` | `io.descoped.dc.application` | the Undertow application: service discovery, routing, CORS, health, Prometheus metrics |
 | `data-collector-server` | `io.descoped.dc.server` | the server: tasks (`PUT /tasks`), integrity check (LMDB) and recovery of topics |
@@ -33,24 +34,32 @@ this repository. The plan and its order of work are in the owner's notes; the wo
 - **Java 17 baseline** (`maven.compiler.release` 17): every class file is Java 17 whatever JDK builds it. CI builds and
   tests on JDK 17 and JDK 27 (`ci.yml`). Nothing above Java 17 in main or test code until the owner moves the engine
   and server to JDK 27 (planned, after the migration).
+- **3.0.0 keeps the behaviour of 2.x.** The migration makes dc work on the 3.x libraries, current dependencies and
+  JDK 17; it changes no feature. Where a library changed its rules, dc keeps its own: configuration is read through
+  `io.descoped.dc.application.server.Configurations` (every class path match, environment variables and system
+  properties add keys, values are literal), the content key is derived as encryption-util 2.0.1 did, and the
+  `discarding` connector is the engine's default. A behaviour change needs the owner's decision first.
 - **3.0.0 is a clean break.** No backward-compatibility shims, deprecated aliases, data-migration code or migration
   guides for 2.x.
 - **One reactor, one version.** Every module inherits the root POM and is released with it; modules depend on each
   other with `${project.version}`, never on released 2.x versions. Dependency versions are properties in the root POM,
   not `dependencyManagement`, so the BOM manages the data collector modules only.
 - **The Descoped libraries move together.** service-provider-api, dynamic-configuration, secrets-client,
-  encryption-util and rawdata-client stay on 2.x until rawdata-client 3.0.0 is on Maven Central; then all move to 3.x
-  in one pull request (rawdata 2.x and 3.x need different service-provider-api majors under one JPMS module name).
-  `.github/renovate.json` holds them below 3.
+  encryption-util and rawdata-client are on 3.x; a later major moves all of them in one pull request (rawdata-client 3
+  needs service-provider-api 3 under the JPMS module name 2 used). Renovate groups their majors. Their providers
+  (rawdata `filesystem`, `gcs`, `postgres`; secrets `safe-configuration`, `dynamic-configuration`,
+  `google-secret-manager`) are `runtime` dependencies, never `requires`d: the API modules declare `uses`.
+- **Ids are UUIDv7** (`io.descoped.dc.api.ids.TimeOrderedIds`), as rawdata-client 3 gives messages. They are ordered
+  with `TimeOrderedIds.ORDER` (unsigned), never `UUID.compareTo`.
 - **JPMS.** Every module except testutils is a named module. A module whose exported API exposes another module's types
   `requires transitive` it. No `requires` a module does not use. Services are registered with `provides` in
   `module-info.java` and in `META-INF/services`.
-- **Lint.** `-Xlint:all -Werror` and Javadoc doclint `all` with warnings failing are the rule, with one standing
-  exception: `-classfile` (dependencies' class files that reference annotation classes they do not ship). No annotation
-  processors run (`-proc:none`). A module not yet revised
+- **Lint.** `-Xlint:all -Werror` and Javadoc doclint `all` with warnings failing are the rule, with standing
+  exceptions: `-classfile` (dependencies' class files that reference annotation classes they do not ship) and, on JDK 21
+  and later only (profile `jdk21-lint`; javac 17 rejects the name), `-this-escape`, so the 2.x classes keep their
+  constructors and stay open for subclassing. No annotation processors run (`-proc:none`). A module not yet revised
   lists the categories it still breaks in `lint.exclusions` / `doclint.exclusions` in its POM; its revision empties
-  them, and nothing is added to them. Only categories javac 17 knows may be listed (javac 17 rejects
-  `-Xlint:-this-escape`), so warnings that only newer javac reports are fixed, not excluded.
+  them, and nothing is added to them. Only categories javac 17 knows may be listed there.
 - **Undertow 2.4.x** stays the HTTP server for 3.0.0 (owner's decision, 2026-11-18).
 - **Security.** Specification expressions are evaluated only in a sandbox with an explicit allow-list; classes named in
   a specification are never loaded by name; every server endpoint requires authentication, and CORS and JMX are off by

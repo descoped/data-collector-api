@@ -1,14 +1,12 @@
 package io.descoped.dc.server.recovery;
 
-import de.huxhorn.sulky.ulid.ULID;
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.api.content.ContentStore;
 import io.descoped.dc.api.content.ContentStream;
 import io.descoped.dc.api.content.ContentStreamBuffer;
 import io.descoped.dc.api.content.ContentStreamConsumer;
 import io.descoped.dc.api.content.ContentStreamProducer;
-import io.descoped.dc.api.ulid.ULIDGenerator;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.util.CommonUtils;
 import io.descoped.dc.server.content.ContentStoreComponent;
 import io.descoped.dc.server.db.LmdbEnvironment;
@@ -25,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Date;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
@@ -59,11 +58,11 @@ public class RecoveryTest {
     @Disabled
     @Test
     public void readIndex() {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .values("content.stream.connector", "rawdata")
-                .values("rawdata.client.provider", "memory")
-                .values("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
-                .values("data.collector.integrityCheck.dbSizeInMb", "100")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .value("content.stream.connector", "rawdata")
+                .value("rawdata.client.provider", "memory")
+                .value("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
+                .value("data.collector.integrityCheck.dbSizeInMb", "100")
                 .build();
 
         Path dbLocation = CommonUtils.currentPath().resolve("certs").resolve("lmdb");
@@ -71,31 +70,31 @@ public class RecoveryTest {
 
         long past = System.currentTimeMillis();
         SequenceDbHelper sequenceDbHelper = new SequenceDbHelper(lmdbEnvironment, lmdbEnvironment.open());
-        PositionAndULIDVersion firstPosition = sequenceDbHelper.findFirstPosition();
-        PositionAndULIDVersion lastPosition = sequenceDbHelper.findLastPosition();
+        PositionAndIdVersion firstPosition = sequenceDbHelper.findFirstPosition();
+        PositionAndIdVersion lastPosition = sequenceDbHelper.findLastPosition();
         long now = System.currentTimeMillis() - past;
         LOG.trace("Time take: {}", now);
         LOG.trace("First: {} -> {} -> {}",
                 firstPosition.position(),
-                ULIDGenerator.toUUID(firstPosition.ulid()).toString(),
-                new Date(firstPosition.ulid().timestamp())
+                firstPosition.id().toString(),
+                new Date(TimeOrderedIds.timestamp(firstPosition.id()))
         );
         LOG.trace("Last: {} -> {} -> {}",
                 lastPosition.position(),
-                ULIDGenerator.toUUID(lastPosition.ulid()).toString(),
-                new Date(lastPosition.ulid().timestamp())
+                lastPosition.id().toString(),
+                new Date(TimeOrderedIds.timestamp(lastPosition.id()))
         );
     }
 
     @Disabled
     @Test
     public void testController() throws InterruptedException {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .values("content.stream.connector", "rawdata")
-                .values("rawdata.client.provider", "memory")
-                .values("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
-                .values("data.collector.integrityCheck.dbSizeInMb", "100")
-                .values("data.collector.integrityCheck.database.location", "./target")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .value("content.stream.connector", "rawdata")
+                .value("rawdata.client.provider", "memory")
+                .value("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
+                .value("data.collector.integrityCheck.dbSizeInMb", "100")
+                .value("data.collector.integrityCheck.database.location", "./target")
                 .build();
 
         TestServer server = TestServer.create(configuration);
@@ -160,12 +159,12 @@ public class RecoveryTest {
     @Disabled
     @Test
     public void readIndexAndConsumerSourceAndProduceTarget() throws InterruptedException {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .values("content.stream.connector", "rawdata")
-                .values("rawdata.client.provider", "memory")
-                .values("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
-                .values("data.collector.integrityCheck.dbSizeInMb", "100")
-                .values("data.collector.integrityCheck.database.location", "./target")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .value("content.stream.connector", "rawdata")
+                .value("rawdata.client.provider", "memory")
+                .value("data.collector.integrityCheck.consumer.timeoutInSeconds", "1")
+                .value("data.collector.integrityCheck.dbSizeInMb", "100")
+                .value("data.collector.integrityCheck.database.location", "./target")
                 .build();
 
         TestServer server = TestServer.create(configuration);
@@ -206,10 +205,10 @@ public class RecoveryTest {
             while ((buffer = consumer.receive(1, TimeUnit.SECONDS)) != null) {
                 peekBuffer = buffer;
                 if (Integer.parseInt(buffer.position()) < 10) {
-                    LOG.trace("{} [{}]: {}", buffer.position(), buffer.ulid(), new Date(buffer.ulid().timestamp()), buffer.data().size());
+                    LOG.trace("{} [{}]: {}", buffer.position(), buffer.id(), new Date(TimeOrderedIds.timestamp(buffer.id())), buffer.data().size());
                 }
             }
-            LOG.trace("{} [{}]: {}", peekBuffer.position(), peekBuffer.ulid(), new Date(peekBuffer.ulid().timestamp()), peekBuffer.data().size());
+            LOG.trace("{} [{}]: {}", peekBuffer.position(), peekBuffer.id(), new Date(TimeOrderedIds.timestamp(peekBuffer.id())), peekBuffer.data().size());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -221,23 +220,23 @@ public class RecoveryTest {
 
     @Test
     public void thatLeastVersionIsSelected() {
-        ULID.Value v1 = ULIDGenerator.generate();
-        ULID.Value v2 = ULIDGenerator.generate();
-        ULID.Value v3 = ULIDGenerator.generate();
+        UUID v1 = TimeOrderedIds.generate();
+        UUID v2 = TimeOrderedIds.generate();
+        UUID v3 = TimeOrderedIds.generate();
 
-        PositionAndULIDVersion version = new PositionAndULIDVersion();
+        PositionAndIdVersion version = new PositionAndIdVersion();
 
         version.compareAndSet(v2, "1");
-        assertEquals(v2, version.ulid());
+        assertEquals(v2, version.id());
 
         version.compareAndSet(v3, "1");
-        assertEquals(v2, version.ulid());
+        assertEquals(v2, version.id());
 
         version.compareAndSet(v1, "1");
-        assertEquals(v1, version.ulid());
+        assertEquals(v1, version.id());
 
         version.compareAndSet(v3, "1");
-        assertEquals(v1, version.ulid());
+        assertEquals(v1, version.id());
     }
 
 

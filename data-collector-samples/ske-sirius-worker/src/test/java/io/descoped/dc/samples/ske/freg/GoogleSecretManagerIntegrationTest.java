@@ -1,7 +1,6 @@
 package io.descoped.dc.samples.ske.freg;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.secrets.api.SecretManagerClient;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,8 @@ public class GoogleSecretManagerIntegrationTest {
     @Disabled
     @Test
     public void loadSecrets() {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .propertiesResource("application-override.properties")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .classpath("application-override.properties")
                 .build();
 
         Map<String, String> providerConfiguration = Map.of(
@@ -40,7 +39,7 @@ public class GoogleSecretManagerIntegrationTest {
     }
 
     static String getServiceAccountFile(DynamicConfiguration configuration) {
-        String path = configuration.evaluateToString("gcp.service-account.file");
+        String path = configuration.find("gcp.service-account.file").orElse(null);
         if (path == null || !Files.isReadable(Paths.get(path))) {
             throw new RuntimeException("Missing 'application-override.properties'-file with required property 'gcp.service-account.file'");
         }

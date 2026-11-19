@@ -38,11 +38,7 @@ public class ContentStoreExporterTest {
 
     @Test
     public void name() {
-        ContentStore contentStore = ProviderConfigurator.configure(
-                Map.of("rawdata.client.provider", "memory"),
-                "rawdata",
-                ContentStoreInitializer.class
-        );
+        ContentStore contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, "rawdata", Map.of("rawdata.client.provider", "memory"));
         assertNotNull(contentStore);
         HttpRequestInfo httpRequestInfo = new HttpRequestInfo(CorrelationIds.create(ExecutionContext.empty()), null, -1, new Headers(), new Headers(), -1);
         contentStore.addPaginationDocument("topic", "1", "page", "PAGINATION_PAGE".getBytes(), httpRequestInfo);

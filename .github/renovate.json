@@ -38,7 +38,7 @@
       "automerge": false
     },
     {
-      "description": "The Descoped libraries stay on 2.x until rawdata-client 3.0.0 is on Maven Central: rawdata 2.x and 3.x need different majors of service-provider-api under one JPMS module name, so they move together in one pull request (see .claude/CLAUDE.md). Lift this rule in that pull request.",
+      "description": "The Descoped libraries move between majors together (rawdata-client 3 needs service-provider-api 3 under the module name 2 used): their majors come in one pull request",
       "matchPackageNames": [
         "io.descoped.spi:**",
         "io.descoped.config:**",
@@ -46,7 +46,17 @@
         "io.descoped.encryption:**",
         "io.descoped.rawdata:**"
       ],
-      "allowedVersions": "<3"
+      "matchUpdateTypes": [
+        "major"
+      ],
+      "groupName": "Descoped libraries (major)"
+    },
+    {
+      "description": "classgraph 5 and later need Java 25 (class files of version 69); dc runs on Java 17. Lift this rule when the baseline moves.",
+      "matchPackageNames": [
+        "io.github.classgraph:classgraph"
+      ],
+      "allowedVersions": "<5"
     },
     {
       "description": "commons-jexl3 stays on 3.2.1 until the expression sandbox is introduced: 3.3 restricts permissions by default, which changes what specifications may evaluate. Lift this rule in that pull request.",

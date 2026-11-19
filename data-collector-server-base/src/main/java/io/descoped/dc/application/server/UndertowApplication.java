@@ -44,18 +44,6 @@ public class UndertowApplication {
     private final Map<Class<? extends Service>, Service> services;
     private final HealthApplicationMonitor applicationMonitor;
 
-    private String evaluateToStringOrDefault(DynamicConfiguration configuration, String key, String defaultValue) {
-        return configuration.evaluateToString(key) == null ? defaultValue : configuration.evaluateToString(key);
-    }
-
-    private int evaluateToIntOrDefault(DynamicConfiguration configuration, String key, Integer defaultValue) {
-        return configuration.evaluateToString(key) == null ? defaultValue : configuration.evaluateToInt(key);
-    }
-
-    private boolean evaluateToBooleanOrDefault(DynamicConfiguration configuration, String key, Boolean defaultValue) {
-        return configuration.evaluateToString(key) == null ? defaultValue : configuration.evaluateToBoolean(key);
-    }
-
     private UndertowApplication(DynamicConfiguration configuration,
                                 String host,
                                 int port,
@@ -83,14 +71,14 @@ public class UndertowApplication {
     }
 
     private CORSHandler configureCORSHandler(DynamicConfiguration configuration, PathHandler pathHandler) {
-        List<Pattern> corsAllowOrigin = Stream.of(evaluateToStringOrDefault(configuration, "http.cors.allow.origin", ".*")
+        List<Pattern> corsAllowOrigin = Stream.of(configuration.get("http.cors.allow.origin", ".*")
                 .split(",")).map(Pattern::compile).collect(Collectors.toUnmodifiableList());
-        Set<String> corsAllowMethods = Set.of(evaluateToStringOrDefault(configuration, "http.cors.allow.methods", "POST,GET,PUT,DELETE,HEAD")
+        Set<String> corsAllowMethods = Set.of(configuration.get("http.cors.allow.methods", "POST,GET,PUT,DELETE,HEAD")
                 .split(","));
-        Set<String> corsAllowHeaders = Set.of(evaluateToStringOrDefault(configuration, "http.cors.allow.header", "Content-Type,Authorization")
+        Set<String> corsAllowHeaders = Set.of(configuration.get("http.cors.allow.header", "Content-Type,Authorization")
                 .split(","));
-        boolean corsAllowCredentials = evaluateToBooleanOrDefault(configuration, "http.cors.allow.credentials", false);
-        int corsMaxAge = evaluateToIntOrDefault(configuration, "http.cors.allow.max-age", 900);
+        boolean corsAllowCredentials = Boolean.parseBoolean(configuration.find("http.cors.allow.credentials").orElse(null));
+        int corsMaxAge = configuration.find("http.cors.allow.max-age").map(Integer::parseInt).orElse(900);
 
         return new CORSHandler(pathHandler, pathHandler, corsAllowOrigin,
                 corsAllowCredentials, StatusCodes.NO_CONTENT, corsMaxAge, corsAllowMethods, corsAllowHeaders
@@ -99,19 +87,19 @@ public class UndertowApplication {
 
     public static UndertowApplication initializeUndertowApplication(DynamicConfiguration configuration,
                                                                     BusinessSSLResourceSupplier businessSSLResourceSupplier) {
-        int port = configuration.evaluateToInt("http.port");
+        int port = Integer.parseInt(configuration.find("http.port").orElse(null));
         return initializeUndertowApplication(configuration, port, businessSSLResourceSupplier);
     }
 
     public static UndertowApplication initializeUndertowApplication(DynamicConfiguration configuration,
                                                                     Integer port,
                                                                     BusinessSSLResourceSupplier businessSSLResourceSupplier) {
-        if (!configuration.evaluateToBoolean("prometheus.defaultExports.disabled")) {
+        if (!Boolean.parseBoolean(configuration.find("prometheus.defaultExports.disabled").orElse(null))) {
             DefaultExports.initialize();
         }
         LOG.info("Initializing Data Collector server ...");
         if (businessSSLResourceSupplier != null) {
-            LOG.info("Use delegated certificate provider: {}", configuration.evaluateToString("data.collector.sslBundle.provider"));
+            LOG.info("Use delegated certificate provider: {}", configuration.find("data.collector.sslBundle.provider").orElse(null));
         }
 
         MetricsResourceFactory metricsResourceFactory = MetricsResourceFactory.create();
@@ -121,7 +109,7 @@ public class UndertowApplication {
         HealthApplicationMonitor applicationMonitor = healthResourceFactory.getHealthResource(HealthApplicationResource.class).getMonitor();
         applicationMonitor.setServerStatus(HealthApplicationMonitor.ServerStatus.INITIALIZING);
 
-        String host = configuration.evaluateToString("http.host") == null ? "localhost" : configuration.evaluateToString("http.host");
+        String host = configuration.get("http.host", "localhost");
 
         applicationMonitor.setHost(host);
         applicationMonitor.setPort(port);

@@ -1,6 +1,6 @@
 package io.descoped.dc.test.server;
 
-import io.descoped.config.StoreBasedDynamicConfiguration;
+import io.descoped.config.DynamicConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
@@ -49,14 +49,14 @@ class ConfigurationFactoryTest {
 
     @Test
     void testConfigurationProfileIsLoaded() {
-        StoreBasedDynamicConfiguration.Builder builder = new StoreBasedDynamicConfiguration.Builder();
+        DynamicConfiguration.Builder builder = DynamicConfiguration.builder();
 
         ConfigurationFactory.ConfigurationProfile configurationProfile = new ConfigurationFactory.ConfigurationProfile("dummy");
         configurationProfile.copyTo(builder);
 
-        StoreBasedDynamicConfiguration configuration = builder.build();
+        DynamicConfiguration configuration = builder.build();
 
-        assertEquals("v1", configuration.evaluateToString("k1"));
+        assertEquals("v1", configuration.find("k1").orElse(null));
 
         assertEquals(configurationProfile, new ConfigurationFactory.ConfigurationProfile("dummy"));
         assertEquals(configurationProfile.hashCode(), Objects.hash("dummy"));
@@ -65,15 +65,15 @@ class ConfigurationFactoryTest {
 
     @Test
     void testConfigurationOverrideIsLoaded() {
-        StoreBasedDynamicConfiguration.Builder builder = new StoreBasedDynamicConfiguration.Builder();
+        DynamicConfiguration.Builder builder = DynamicConfiguration.builder();
 
         Map<String, String> map = Map.of("k1", "v1");
         ConfigurationFactory.ConfigurationOverride configurationOverride = new ConfigurationFactory.ConfigurationOverride(map);
         configurationOverride.copyTo(builder);
 
-        StoreBasedDynamicConfiguration configuration = builder.build();
+        DynamicConfiguration configuration = builder.build();
 
-        assertEquals("v1", configuration.evaluateToString("k1"));
+        assertEquals("v1", configuration.find("k1").orElse(null));
 
         assertEquals(configurationOverride, new ConfigurationFactory.ConfigurationOverride(map));
         assertEquals(configurationOverride.hashCode(), map.hashCode());
@@ -82,7 +82,7 @@ class ConfigurationFactoryTest {
 
     @Test
     void testConfigurationProfileAndOverrideIsLoaded() {
-        StoreBasedDynamicConfiguration.Builder builder = new StoreBasedDynamicConfiguration.Builder();
+        DynamicConfiguration.Builder builder = DynamicConfiguration.builder();
 
         ConfigurationFactory.ConfigurationProfile configurationProfile = new ConfigurationFactory.ConfigurationProfile("dummy");
         configurationProfile.copyTo(builder);
@@ -91,10 +91,10 @@ class ConfigurationFactoryTest {
         ConfigurationFactory.ConfigurationOverride configurationOverride = new ConfigurationFactory.ConfigurationOverride(map);
         configurationOverride.copyTo(builder);
 
-        StoreBasedDynamicConfiguration configuration = builder.build();
+        DynamicConfiguration configuration = builder.build();
 
-        assertEquals("v1", configuration.evaluateToString("k1"));
-        assertEquals("v2", configuration.evaluateToString("k2"));
+        assertEquals("v1", configuration.find("k1").orElse(null));
+        assertEquals("v2", configuration.find("k2").orElse(null));
 
         assertEquals(configurationOverride, new ConfigurationFactory.ConfigurationOverride(map));
         assertEquals(configurationOverride.hashCode(), map.hashCode());

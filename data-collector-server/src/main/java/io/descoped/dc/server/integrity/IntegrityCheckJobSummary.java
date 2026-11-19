@@ -180,7 +180,7 @@ public class IntegrityCheckJobSummary {
         @JsonProperty
         Integer duplicateCount;
         @JsonProperty
-        List<String> ulid;
+        List<String> ulid; // the JSON report keeps its 2.x field name; the values are message ids (UUIDv7)
 
         public PositionSummary(String position, Integer duplicateCount, List<String> ulid) {
             this.position = position;

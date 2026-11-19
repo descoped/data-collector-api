@@ -1,7 +1,6 @@
 package io.descoped.dc.test.server;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import org.junit.jupiter.api.Test;
 
 import java.util.Random;
@@ -17,13 +16,13 @@ public class TestServerTest {
 
     @Test
     public void testServer() throws InterruptedException {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
-                .values("http.host", "0.0.0.0")
-                .values("http.cors.allow.origin", ".*")
-                .values("http.cors.allow.header", "Content-Type,Authorization")
-                .values("http.cors.allow.methods", "POST,GET,PUT,DELETE,HEAD")
-                .values("http.cors.allow.credentials", "false")
-                .values("http.cors.allow.max-age", "900")
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
+                .value("http.host", "0.0.0.0")
+                .value("http.cors.allow.origin", ".*")
+                .value("http.cors.allow.header", "Content-Type,Authorization")
+                .value("http.cors.allow.methods", "POST,GET,PUT,DELETE,HEAD")
+                .value("http.cors.allow.credentials", "false")
+                .value("http.cors.allow.max-age", "900")
                 .build();
 
         TestServerFactory testServerFactory = new TestServerFactory(null);

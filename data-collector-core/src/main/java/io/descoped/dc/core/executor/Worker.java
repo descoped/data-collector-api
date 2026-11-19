@@ -17,7 +17,7 @@ import io.descoped.dc.api.node.builder.NodeBuilder;
 import io.descoped.dc.api.node.builder.SpecificationBuilder;
 import io.descoped.dc.api.security.BusinessSSLResource;
 import io.descoped.dc.api.services.Services;
-import io.descoped.dc.api.ulid.ULIDGenerator;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.util.CommonUtils;
 import io.descoped.dc.api.util.JsonParser;
 import io.descoped.dc.core.handler.ParallelHandler;
@@ -57,7 +57,7 @@ public class Worker {
         this.specificationId = specificationId;
         this.name = name;
         this.workerObservers = workerObservers;
-        this.workerId = ULIDGenerator.toUUID(ULIDGenerator.generate());
+        this.workerId = TimeOrderedIds.generate();
         this.node = node;
         this.context = context;
         this.keepContentStoreOpenOnWorkerCompletion = keepContentStoreOpenOnWorkerCompletion;
@@ -517,17 +517,13 @@ public class Worker {
             }
             globalState.put("global.topic", topicName);
 
-            // Without a configured content stream, content goes to rawdata-client's discard provider.
             if (!configurationMap.contains("content.stream.connector")) {
-                configurationMap.put("content.stream.connector", "rawdata");
-                if (!configurationMap.contains("rawdata.client.provider")) {
-                    configurationMap.put("rawdata.client.provider", "discard");
-                }
+                configurationMap.put("content.stream.connector", "discarding");
             }
 
             if (contentStore == null) {
                 LOG.warn("ContentStore should be provided to WorkerBuilder! Creating a new instance.");
-                contentStore = ProviderConfigurator.configure(configurationMap.asMap(), configurationMap.get("content.stream.connector"), ContentStoreInitializer.class);
+                contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, configurationMap.get("content.stream.connector"), configurationMap.asMap());
             }
             services.register(ContentStore.class, contentStore);
 

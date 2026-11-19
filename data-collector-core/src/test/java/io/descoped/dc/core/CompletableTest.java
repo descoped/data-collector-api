@@ -1,7 +1,6 @@
 package io.descoped.dc.core;
 
 import io.descoped.config.DynamicConfiguration;
-import io.descoped.config.StoreBasedDynamicConfiguration;
 import io.descoped.dc.core.executor.FixedThreadPool;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +14,7 @@ public class CompletableTest {
 
     @Test
     public void testCompletables() throws ExecutionException, InterruptedException {
-        DynamicConfiguration configuration = new StoreBasedDynamicConfiguration.Builder()
+        DynamicConfiguration configuration = DynamicConfiguration.builder()
                 .build();
 
         FixedThreadPool threadPool = FixedThreadPool.newInstance();

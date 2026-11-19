@@ -29,7 +29,7 @@ class TestServerExtensionTest {
     void testDefaultMethodConfiguration() {
         DynamicConfiguration defaultConfiguration = ConfigurationFactory.instance().get(TestConfigurationBinding.clazz(TestServerExtensionTest.class));
         assertNotNull(defaultConfiguration);
-        assertNull(defaultConfiguration.evaluateToString("k1"));
+        assertNull(defaultConfiguration.find("k1").orElse(null));
         assertConfiguration("testDefaultMethodConfiguration");
     }
 
@@ -62,7 +62,14 @@ class TestServerExtensionTest {
         assertEquals(0, keyAndValueList.size() % 2, "KeyValue pairs are not even!");
         IntStream.range(0, keyAndValueList.size())
                 .filter(i -> i % 2 == 0)
-                .forEach(n -> assertEquals(keyAndValueList.get(n + 1), testMethodConfiguration.evaluateToString(keyAndValueList.get(n))));
-        assertEquals(testServer.getConfiguration(), testMethodConfiguration);
+                .forEach(n -> assertEquals(keyAndValueList.get(n + 1), testMethodConfiguration.find(keyAndValueList.get(n)).orElse(null)));
+        // Both include every system property, and the JDK sets some while it runs (sun.nio.ch.bugLevel); compare the rest.
+        assertEquals(withoutSystemProperties(testServer.getConfiguration().asMap()), withoutSystemProperties(testMethodConfiguration.asMap()));
+    }
+
+    private static java.util.Map<String, String> withoutSystemProperties(java.util.Map<String, String> configuration) {
+        java.util.Map<String, String> result = new java.util.TreeMap<>(configuration);
+        result.keySet().removeAll(System.getProperties().stringPropertyNames());
+        return result;
     }
 }

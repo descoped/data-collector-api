@@ -82,7 +82,7 @@ public class HealthModuleInfoResource implements HealthResource {
                     .addClassLoader(module.getClassLoader())
                     .addModuleLayer(module.getLayer())
                     .enableClassInfo()
-                    .whitelistPaths("META-INF/maven")
+                    .acceptPaths("META-INF/maven")
                     .scan()
             ) {
                 scanResult.getResourcesWithLeafName("pom.properties")
