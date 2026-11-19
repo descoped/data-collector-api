@@ -1,4 +1,6 @@
-FROM eclipse-temurin:17.0.21_9-jdk-alpine-3.24 AS build
+# check=skip=FromPlatformFlagConstDisallowed
+# x86_64 only: the jffi and LMDB native libraries below are the x86_64 builds
+FROM --platform=linux/amd64 eclipse-temurin:17.0.21_9-jdk-alpine-3.24 AS build
 
 #
 # Split the jars into a module path and a class path, as Maven Surefire runs the tests
@@ -11,7 +13,7 @@ RUN java /build/SplitModulePath.java /build/lib /build/classpath io.descoped.dc.
 #
 # Build DataCollector image
 #
-FROM alpine:3.24.4
+FROM --platform=linux/amd64 alpine:3.24.4
 
 RUN apk add --no-cache bash su-exec curl openssl
 

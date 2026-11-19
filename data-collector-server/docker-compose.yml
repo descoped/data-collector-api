@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
     volumes:
-    - rdcpostgres-test:/var/lib/postgresql-pp-test/data
+    - rdcpostgres-test:/var/lib/postgresql
     - ./init-db-and-user.sql:/docker-entrypoint-initdb.d/init.sql
 
   adminer:

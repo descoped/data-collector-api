@@ -35,7 +35,6 @@ public class SplitModulePath {
 
         Map<String, Path> jarByModule = new HashMap<>();
         Map<String, ModuleDescriptor> descriptors = new HashMap<>();
-        Set<Path> notModules = new HashSet<>();
         List<Path> jars;
         try (Stream<Path> files = Files.list(lib)) {
             jars = files.filter(p -> p.toString().endsWith(".jar")).sorted().collect(Collectors.toList());
@@ -45,14 +44,14 @@ public class SplitModulePath {
                 Optional<ModuleReference> reference = ModuleFinder.of(jar).findAll().stream().findFirst();
                 if (reference.isPresent()) {
                     ModuleDescriptor descriptor = reference.get().descriptor();
-                    jarByModule.put(descriptor.name(), jar);
+                    Path other = jarByModule.putIfAbsent(descriptor.name(), jar);
+                    if (other != null) {
+                        throw new IllegalStateException("Two jars have module " + descriptor.name() + ": " + other + ", " + jar);
+                    }
                     descriptors.put(descriptor.name(), descriptor);
-                } else {
-                    notModules.add(jar);
                 }
             } catch (FindException e) {
                 // not a valid module (e.g. a jar name that is no Java identifier): class path
-                notModules.add(jar);
             }
         }
 
@@ -83,7 +82,7 @@ public class SplitModulePath {
         for (Path jar : jars) {
             boolean onModulePath = jarByModule.entrySet().stream()
                     .anyMatch(e -> e.getValue().equals(jar) && resolved.contains(e.getKey()));
-            if (!onModulePath || notModules.contains(jar)) {
+            if (!onModulePath) {
                 Files.move(jar, classpath.resolve(jar.getFileName()), StandardCopyOption.REPLACE_EXISTING);
                 moved++;
             }
