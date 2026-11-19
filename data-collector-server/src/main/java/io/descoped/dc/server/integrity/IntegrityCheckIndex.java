@@ -1,6 +1,5 @@
 package io.descoped.dc.server.integrity;
 
-import java.util.UUID;
 import io.descoped.dc.api.handler.Tuple;
 import io.descoped.dc.server.db.DirectByteBufferPool;
 import io.descoped.dc.server.db.LmdbEnvironment;
@@ -15,6 +14,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.Queue;
+import java.util.UUID;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.function.BiConsumer;
 

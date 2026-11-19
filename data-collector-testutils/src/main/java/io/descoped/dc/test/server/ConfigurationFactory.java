@@ -1,6 +1,7 @@
 package io.descoped.dc.test.server;
 
 import io.descoped.config.DynamicConfiguration;
+import io.descoped.dc.application.server.Configurations;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,15 +23,18 @@ class ConfigurationFactory {
 
     private DynamicConfiguration.Builder createDynamicBuilder() {
         return DynamicConfiguration.builder()
+                // dynamic-configuration 3 reads the first class path match only, so each defaults file has its own
+                // name: the harness's own, then the server's when the server is on the class path.
+                .classpath("testutils-defaults.properties")
                 .classpath("application-defaults.properties")
                 .classpath("application-test.properties");
     }
 
     private DynamicConfiguration buildDynamicBuilder(DynamicConfiguration.Builder builder) {
-        return builder
+        return Configurations.withoutBlankValues(builder
                 .systemProperties()
                 .environment("DC_")
-                .build();
+                .build());
     }
 
     Set<TestConfigurationBinding> keys() {

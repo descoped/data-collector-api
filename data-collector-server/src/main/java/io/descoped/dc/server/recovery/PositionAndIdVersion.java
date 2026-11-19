@@ -1,9 +1,9 @@
 package io.descoped.dc.server.recovery;
 
-
 import io.descoped.dc.api.ids.TimeOrderedIds;
-import java.util.UUID;
+
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Maintain the state of the oldest version of an id

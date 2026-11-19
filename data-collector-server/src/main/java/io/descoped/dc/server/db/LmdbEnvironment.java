@@ -32,8 +32,7 @@ public class LmdbEnvironment implements AutoCloseable {
         this.databaseDir = databaseDir.resolve(topic);
         createDirectories(this.databaseDir);
         this.topic = topic;
-        mapSize = configuration != null && configuration.find("data.collector.integrityCheck.dbSizeInMb").orElse(null) != null ?
-                configuration.getInt("data.collector.integrityCheck.dbSizeInMb") : 50;
+        mapSize = configuration != null ? configuration.getInt("data.collector.integrityCheck.dbSizeInMb", 50) : 50;
         env = createEnvironment();
     }
 

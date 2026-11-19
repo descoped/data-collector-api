@@ -41,7 +41,7 @@ public class RawdataClientContentStoreInitializer implements ContentStoreInitial
     public ContentStore initialize(Map<String, String> configuration) {
         LOG.info("Rawdata client provider: {}", configuration.get(RawdataClient.PROVIDER_KEY));
 
-        String encryptionProvider = configuration.get("rawdata.encryption.provider");
+        String encryptionProvider = present(configuration, "rawdata.encryption.provider") ? configuration.get("rawdata.encryption.provider") : null;
         boolean ignoreEncryption = Boolean.parseBoolean(configuration.get("recovery.rawdata.encryption.credentials.ignore"));
         Map<String, String> secretsConfiguration = ignoreEncryption ? Map.of() : secretsConfiguration(encryptionProvider, configuration);
         LOG.info("Rawdata encryption enabled: {}", !secretsConfiguration.isEmpty());
@@ -65,9 +65,9 @@ public class RawdataClientContentStoreInitializer implements ContentStoreInitial
         }
     }
 
-    private static Map<String, String> secretsConfiguration(String encryptionProvider, Map<String, String> configuration) {
+    static Map<String, String> secretsConfiguration(String encryptionProvider, Map<String, String> configuration) {
         Map<String, String> secrets = new LinkedHashMap<>();
-        String keyPath = configuration.get("rawdata.encryption.gcp.serviceAccountKeyPath");
+        String keyPath = present(configuration, "rawdata.encryption.gcp.serviceAccountKeyPath") ? configuration.get("rawdata.encryption.gcp.serviceAccountKeyPath") : null;
         if ("dynamic-configuration".equals(encryptionProvider)) {
             secrets.put("secrets.provider", encryptionProvider);
             if (keyPath != null) {
@@ -84,7 +84,8 @@ public class RawdataClientContentStoreInitializer implements ContentStoreInitial
         } else if (encryptionProvider != null) {
             throw new IllegalArgumentException("Unknown rawdata.encryption.provider: " + encryptionProvider
                     + " (dynamic-configuration or google-secret-manager)");
-        } else if (configuration.containsKey("rawdata.encryption.key") && configuration.containsKey("rawdata.encryption.salt")) {
+        } else if (present(configuration, "rawdata.encryption.key") || present(configuration, "rawdata.encryption.salt")) {
+            // Fails closed: a key without a salt, or a salt without a key, is an error, not plaintext.
             secrets.put("secrets.provider", "dynamic-configuration");
             putInline(secrets, configuration);
         }
@@ -94,6 +95,11 @@ public class RawdataClientContentStoreInitializer implements ContentStoreInitial
     private static void putInline(Map<String, String> secrets, Map<String, String> configuration) {
         secrets.put("secrets.values.rawdata.encryption.key", required(configuration, "rawdata.encryption.key"));
         secrets.put("secrets.values.rawdata.encryption.salt", required(configuration, "rawdata.encryption.salt"));
+    }
+
+    private static boolean present(Map<String, String> configuration, String key) {
+        String value = configuration.get(key);
+        return value != null && !value.isBlank();
     }
 
     private static String required(Map<String, String> configuration, String key) {

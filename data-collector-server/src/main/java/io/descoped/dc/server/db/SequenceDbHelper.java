@@ -1,8 +1,7 @@
 package io.descoped.dc.server.db;
 
-import io.descoped.dc.api.ids.TimeOrderedIds;
-import java.util.UUID;
 import io.descoped.config.DynamicConfiguration;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.util.CommonUtils;
 import io.descoped.dc.server.recovery.PositionAndIdVersion;
 import org.lmdbjava.CursorIterable;
@@ -19,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;

@@ -56,12 +56,12 @@ public class RawdataFileSystemService implements Service {
             return;
         }
 
-        if (configuration.find("data.collector.rawdata.dump.location").orElse(null) == null) {
+        String location = configuration.find("data.collector.rawdata.dump.location").orElse(null);
+        if (location == null) {
             LOG.warn("Unable to start file exporter. No location is defined");
             return;
         }
 
-        String location = configuration.find("data.collector.rawdata.dump.location").orElse(null);
         Path targetPath;
         if (location.isEmpty()) {
             targetPath = Paths.get(".").toAbsolutePath().resolve("storage").normalize();

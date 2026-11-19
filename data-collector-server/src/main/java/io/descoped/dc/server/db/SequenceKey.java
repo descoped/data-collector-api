@@ -1,10 +1,10 @@
 package io.descoped.dc.server.db;
 
-
 import io.descoped.dc.api.ids.TimeOrderedIds;
-import java.util.UUID;
+
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.UUID;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 

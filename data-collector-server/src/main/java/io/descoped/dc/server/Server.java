@@ -1,6 +1,7 @@
 package io.descoped.dc.server;
 
 import io.descoped.config.DynamicConfiguration;
+import io.descoped.dc.application.server.Configurations;
 import io.descoped.dc.application.server.UndertowApplication;
 import io.descoped.dc.application.ssl.BusinessSSLResourceSupplier;
 import io.descoped.dc.application.ssl.SecretManagerSSLResource;
@@ -56,7 +57,9 @@ public class Server {
                 .environment("DC_")
                 .systemProperties();
 
-        DynamicConfiguration configuration = configurationBuilder.build();
+        DynamicConfiguration declared = configurationBuilder.build();
+        EnvironmentOverrides.requireMatched(System.getenv(), declared.asMap().keySet());
+        DynamicConfiguration configuration = Configurations.withoutBlankValues(declared);
 
         /*
          * Delegated certificate loader from Google Secret Manager is placed here, because we don't won't a

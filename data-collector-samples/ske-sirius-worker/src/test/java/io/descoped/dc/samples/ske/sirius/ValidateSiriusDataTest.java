@@ -1,7 +1,7 @@
 package io.descoped.dc.samples.ske.sirius;
 
-import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.Builders;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.util.CommonUtils;
 import io.descoped.dc.core.handler.Queries;
 import io.descoped.rawdata.api.RawdataClient;

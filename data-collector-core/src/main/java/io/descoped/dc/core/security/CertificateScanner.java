@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -101,6 +102,7 @@ class CertificateScanner {
 
                         } else {
                             LOG.warn("Skipping bundle '{}'. Error with configuration!", bundleName);
+                            return FileVisitResult.CONTINUE;
                         }
 
                         builder.passphrase(secretsClient.readChars("secret.passphrase"));
@@ -161,7 +163,7 @@ class CertificateScanner {
     private static boolean hasSecret(SecretManagerClient secretsClient, String name) {
         try {
             byte[] value = secretsClient.readBytes(name);
-            java.util.Arrays.fill(value, (byte) 0);
+            Arrays.fill(value, (byte) 0);
             return true;
         } catch (SecretNotFoundException e) {
             return false;

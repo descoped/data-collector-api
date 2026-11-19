@@ -76,6 +76,17 @@ Follow these instructions for setting up profiling.
 
 ## Configuration
 
+The server reads, in this order, the later one winning: `application-defaults.properties` in its jar,
+`/conf/application-defaults.properties`, `/conf/application.properties` and `/conf/application-override.properties`,
+then `DC_` environment variables and system properties.
+
+**Environment variables and system properties only override keys a properties file declares**; they do not add keys.
+`DC_RAWDATA_ENCRYPTION_KEY` (or `DC_rawdata.encryption.key`) overrides `rawdata.encryption.key`. The jar's defaults
+declare every key an operator sets, most of them empty, and an empty value reads as unset. A `DC_RAWDATA_ENCRYPTION_*`
+or `DC_DATA_COLLECTOR_SSLBUNDLE_*` variable that matches no declared key stops the server, so encryption and
+certificates are never switched off by a misspelt or undeclared variable; other unmatched `DC_` variables are logged and
+ignored. To set a key the defaults do not declare, put it in `/conf/application.properties`.
+
 ### Google Secret Manager SSL properties
 
 ```
@@ -93,12 +104,21 @@ data.collector.sslBundle.passphrase=secretNam
 ### Rawdata Encryption Credentials
 
 ```
-rawdata.encryption.provider = (dynamic-configuration | google-secret-manager)
-rawdata.encryption.gcp.projectId => google-secret-manager
-rawdata.encryption.gcp.serviceAccountKeyPath => google-secret-manager
-rawdata.encryption.key  = (encryptionKey | secretName)
-rawdata.encryption.salt = (encryptionSalt | secretName)
+rawdata.encryption.provider = (dynamic-configuration | google-secret-manager), optional
+rawdata.encryption.key  = the password, or with google-secret-manager the name of the secret that holds it
+rawdata.encryption.salt = the salt, at least 16 bytes, or with google-secret-manager the name of its secret
+rawdata.encryption.gcp.projectId = google-secret-manager: the project (required)
+rawdata.encryption.gcp.serviceAccountKeyPath = google-secret-manager: a service-account key (Application Default
+                                               Credentials when absent); dynamic-configuration: a properties file
+                                               holding rawdata.encryption.key and rawdata.encryption.salt
 ```
+
+Without a provider, the key and salt are read from the configuration. Encryption fails closed: a key without a salt, a
+salt without a key, an empty secret or an unknown provider stops the server instead of writing plaintext.
+
+Content is encrypted with AES-256-GCM (encryption-util 3, ciphertext format 2). The key is derived from the password
+and salt with PBKDF2-HMAC-SHA256 and 600 000 iterations. Readers of an encrypted topic need encryption-util 3 and the
+same derivation.
 
 ### Logstash
 

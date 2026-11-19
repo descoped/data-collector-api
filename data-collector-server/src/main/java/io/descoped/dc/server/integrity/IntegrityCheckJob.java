@@ -1,7 +1,5 @@
 package io.descoped.dc.server.integrity;
 
-import io.descoped.dc.api.ids.TimeOrderedIds;
-import java.util.UUID;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import io.descoped.config.DynamicConfiguration;
@@ -9,6 +7,7 @@ import io.descoped.dc.api.content.ContentStore;
 import io.descoped.dc.api.content.ContentStream;
 import io.descoped.dc.api.content.ContentStreamBuffer;
 import io.descoped.dc.api.content.ContentStreamConsumer;
+import io.descoped.dc.api.ids.TimeOrderedIds;
 import io.descoped.dc.api.util.JsonParser;
 import io.descoped.dc.server.content.ContentStoreComponent;
 import io.descoped.dc.server.db.SequenceKey;
@@ -22,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,10 +54,7 @@ public class IntegrityCheckJob {
             ContentStreamBuffer buffer;
             ContentStreamBuffer peekBuffer = null;
             boolean test = true;
-            int timeoutInSeconds = 15;
-            if (configuration.find("data.collector.integrityCheck.consumer.timeoutInSeconds").orElse(null) != null) {
-                timeoutInSeconds = configuration.getInt("data.collector.integrityCheck.consumer.timeoutInSeconds");
-            }
+            int timeoutInSeconds = configuration.getInt("data.collector.integrityCheck.consumer.timeoutInSeconds", 15);
             try {
                 LOG.info("Check integrity for topic: {}", topic);
                 while (!terminated.get() && (buffer = consumer.receive(timeoutInSeconds, TimeUnit.SECONDS)) != null) {
@@ -148,13 +145,13 @@ public class IntegrityCheckJob {
                 // if we got duplicates then write data
                 if (duplicatePositionAndIdSet.size() > 0 && (!prevSequenceKey.get().position().equals(sequenceKey.position()) || !hasNext)) {
                     ObjectNode positionNode = writer.parser().createObjectNode();
-                    ArrayNode ulidArray = writer.parser().createArrayNode();
+                    ArrayNode idArray = writer.parser().createArrayNode();
                     Set<UUID> idSet = duplicatePositionAndIdSet.get(prevSequenceKey.get().position());
                     idSet.forEach(id -> {
-                        ulidArray.add(id.toString());
+                        idArray.add(id.toString());
                     });
                     duplicatePositionCounter.computeIfAbsent(prevSequenceKey.get().position(), counter -> new AtomicLong()).set(idSet.size());
-                    positionNode.set(prevSequenceKey.get().position(), ulidArray);
+                    positionNode.set(prevSequenceKey.get().position(), idArray);
                     writer.write(positionNode);
                     duplicatePositionAndIdSet.clear();
                 }

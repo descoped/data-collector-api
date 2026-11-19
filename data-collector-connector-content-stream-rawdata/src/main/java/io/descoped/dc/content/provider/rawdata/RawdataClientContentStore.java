@@ -40,10 +40,13 @@ public final class RawdataClientContentStore implements ContentStore {
     public RawdataClientContentStore(RawdataClient client, final char[] encryptionKey, final byte[] encryptionSalt) {
         this.encryptionClient = new EncryptionClient(Algorithm.AES256);
 
-        if (encryptionKey != null && encryptionKey.length > 0 && encryptionSalt != null && encryptionSalt.length > 0) {
-            this.secretKey = encryptionClient.deriveKey(encryptionKey, encryptionSalt);
-        } else {
+        if (encryptionKey == null && encryptionSalt == null) {
             this.secretKey = null;
+        } else if (encryptionKey == null || encryptionKey.length == 0 || encryptionSalt == null || encryptionSalt.length == 0) {
+            // Fails closed: encryption was asked for, so an empty key or salt is an error, not plaintext.
+            throw new IllegalArgumentException("Rawdata encryption needs both a key and a salt; one of them is empty");
+        } else {
+            this.secretKey = encryptionClient.deriveKey(encryptionKey, encryptionSalt);
         }
 
         this.contentStream = new RawdataClientContentStream(client, this::tryEncryptContent);
