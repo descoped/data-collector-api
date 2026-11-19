@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-public final class WorkerService implements Service {
+public class WorkerService implements Service {
 
     private static final Logger LOG = LoggerFactory.getLogger(WorkerService.class);
 
@@ -48,7 +48,7 @@ public final class WorkerService implements Service {
                          BusinessSSLResourceComponent businessSSLResourceComponent,
                          ContentStoreComponent contentStoreComponent) {
         this(configuration, metricsResourceFactory, healthResourceFactory, businessSSLResourceComponent, contentStoreComponent,
-                configuration.getBoolean("data.collector.print-execution-plan", false), null);
+                Boolean.parseBoolean(configuration.find("data.collector.print-execution-plan").orElse(null)), null);
     }
 
     public WorkerService(DynamicConfiguration configuration,

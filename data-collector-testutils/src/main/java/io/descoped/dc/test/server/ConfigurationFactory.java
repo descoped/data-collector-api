@@ -23,18 +23,15 @@ class ConfigurationFactory {
 
     private DynamicConfiguration.Builder createDynamicBuilder() {
         return DynamicConfiguration.builder()
-                // dynamic-configuration 3 reads the first class path match only, so each defaults file has its own
-                // name: the harness's own, then the server's when the server is on the class path.
-                .classpath("testutils-defaults.properties")
-                .classpath("application-defaults.properties")
-                .classpath("application-test.properties");
+                .source(Configurations.propertiesResource("application-defaults.properties"))
+                .source(Configurations.propertiesResource("application-test.properties"));
     }
 
     private DynamicConfiguration buildDynamicBuilder(DynamicConfiguration.Builder builder) {
-        return Configurations.withoutBlankValues(builder
-                .systemProperties()
-                .environment("DC_")
-                .build());
+        return builder
+                .source(Configurations.systemProperties())
+                .source(Configurations.environment("DC_"))
+                .build();
     }
 
     Set<TestConfigurationBinding> keys() {
@@ -96,7 +93,7 @@ class ConfigurationFactory {
 
         @Override
         void copyTo(DynamicConfiguration.Builder builder) {
-            builder.classpath(String.format("application-%s.properties", profileName));
+            builder.source(Configurations.propertiesResource(String.format("application-%s.properties", profileName)));
         }
 
         @Override
@@ -129,7 +126,7 @@ class ConfigurationFactory {
 
         @Override
         void copyTo(DynamicConfiguration.Builder builder) {
-            overrideMap.forEach((key, value) -> builder.value(key, value));
+            builder.source(Configurations.values(overrideMap));
         }
 
         @Override

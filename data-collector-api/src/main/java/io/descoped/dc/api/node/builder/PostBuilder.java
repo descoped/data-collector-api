@@ -19,7 +19,7 @@ import java.util.Objects;
 import static io.descoped.dc.api.Builders.status;
 
 @JsonDeserialize(using = NodeBuilderDeserializer.class)
-public final class PostBuilder extends OperationBuilder {
+public class PostBuilder extends OperationBuilder {
 
     @JsonUnwrapped(prefix = "request")
     Headers requestHeaders = new Headers();

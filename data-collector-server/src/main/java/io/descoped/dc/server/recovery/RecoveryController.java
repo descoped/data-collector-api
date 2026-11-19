@@ -21,7 +21,7 @@ import static io.descoped.dc.api.http.Request.Method.DELETE;
 import static io.descoped.dc.api.http.Request.Method.GET;
 import static io.descoped.dc.api.http.Request.Method.PUT;
 
-public final class RecoveryController implements Controller {
+public class RecoveryController implements Controller {
 
     private static final Logger LOG = LoggerFactory.getLogger(RecoveryController.class);
 

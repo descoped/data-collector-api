@@ -43,7 +43,7 @@ public class RawdataFileSystemService implements Service {
 
     @Override
     public boolean isEnabled() {
-        return configuration.getBoolean("data.collector.rawdata.dump.enabled", false);
+        return Boolean.parseBoolean(configuration.find("data.collector.rawdata.dump.enabled").orElse(null));
     }
 
     @Override
@@ -52,7 +52,7 @@ public class RawdataFileSystemService implements Service {
             return;
         }
 
-        if (!configuration.getBoolean("data.collector.rawdata.dump.enabled", false)) {
+        if (!Boolean.parseBoolean(configuration.find("data.collector.rawdata.dump.enabled").orElse(null))) {
             return;
         }
 

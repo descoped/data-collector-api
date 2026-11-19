@@ -15,6 +15,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -25,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-public final class RawdataClientContentStore implements ContentStore {
+public class RawdataClientContentStore implements ContentStore {
 
     private static final Logger LOG = LoggerFactory.getLogger(RawdataClientContentStore.class);
 
@@ -40,13 +45,10 @@ public final class RawdataClientContentStore implements ContentStore {
     public RawdataClientContentStore(RawdataClient client, final char[] encryptionKey, final byte[] encryptionSalt) {
         this.encryptionClient = new EncryptionClient(Algorithm.AES256);
 
-        if (encryptionKey == null && encryptionSalt == null) {
-            this.secretKey = null;
-        } else if (encryptionKey == null || encryptionKey.length == 0 || encryptionSalt == null || encryptionSalt.length == 0) {
-            // Fails closed: encryption was asked for, so an empty key or salt is an error, not plaintext.
-            throw new IllegalArgumentException("Rawdata encryption needs both a key and a salt; one of them is empty");
+        if (encryptionKey != null && encryptionKey.length > 0 && encryptionSalt != null && encryptionSalt.length > 0) {
+            this.secretKey = deriveKey(encryptionClient, encryptionKey, encryptionSalt);
         } else {
-            this.secretKey = encryptionClient.deriveKey(encryptionKey, encryptionSalt);
+            this.secretKey = null;
         }
 
         this.contentStream = new RawdataClientContentStream(client, this::tryEncryptContent);
@@ -222,5 +224,27 @@ public final class RawdataClientContentStore implements ContentStore {
         AtomicInteger bufferCount = new AtomicInteger();
         contentBuffers.values().forEach(bufferBuilder -> bufferCount.addAndGet(bufferBuilder.keys().size()));
         return bufferCount.get();
+    }
+
+    /*
+     * The key derivation of encryption-util 2.0.1, so the same password and salt give the same key as before:
+     * PBKDF2-HMAC-SHA256, 65 536 iterations, a 256-bit AES key, a salt of any length. encryption-util 3 derives keys
+     * with these iterations too (LEGACY_PBKDF2_ITERATIONS) but refuses salts shorter than 16 bytes, so the key is
+     * derived here and imported.
+     */
+    static SecretKey deriveKey(EncryptionClient encryptionClient, char[] password, byte[] salt) {
+        PBEKeySpec spec = new PBEKeySpec(password, salt, EncryptionClient.LEGACY_PBKDF2_ITERATIONS, encryptionClient.algorithm().getKeySize());
+        byte[] encoded = null;
+        try {
+            encoded = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256").generateSecret(spec).getEncoded();
+            return encryptionClient.importKey(encoded);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new IllegalStateException("Cannot derive the content encryption key", e);
+        } finally {
+            spec.clearPassword();
+            if (encoded != null) {
+                Arrays.fill(encoded, (byte) 0);
+            }
+        }
     }
 }

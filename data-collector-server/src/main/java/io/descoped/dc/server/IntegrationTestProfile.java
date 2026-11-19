@@ -2,6 +2,7 @@ package io.descoped.dc.server;
 
 import io.descoped.config.DynamicConfiguration;
 import io.descoped.dc.api.util.CommonUtils;
+import io.descoped.dc.application.server.Configurations;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -20,7 +21,7 @@ class IntegrationTestProfile {
         }
         Path applicationPropertiesPath = currentPath.resolve("data-collection-consumer-specifications").resolve("profile").resolve(profile).resolve("conf").resolve("application.properties");
         DynamicConfiguration configuration = DynamicConfiguration.builder()
-                .requiredFile(applicationPropertiesPath.toAbsolutePath())
+                .source(Configurations.propertiesResource(applicationPropertiesPath.toAbsolutePath().toString()))
                 .build();
         Map<String, String> values = new LinkedHashMap<>();
         for (Map.Entry<String, String> entry : configuration.asMap().entrySet()) {

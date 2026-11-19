@@ -22,6 +22,7 @@
         <module>data-collector-api</module>
         <module>data-collector-server-base</module>
         <module>data-collector-testutils</module>
+        <module>data-collector-connector-content-stream-discarding</module>
         <module>data-collector-connector-content-stream-rawdata</module>
         <module>data-collector-core</module>
         <module>data-collector-server</module>
@@ -39,6 +40,7 @@
         <!-- -Xlint:all -Werror is the rule. A module that is not yet revised lists the lint categories it still
              breaks here, as ",-unchecked,-rawtypes" and so on; its revision empties the list. -->
         <lint.exclusions/>
+        <lint.this-escape/>
         <doclint.exclusions/>
 
         <!-- Dependency versions. Kept as properties, not in dependencyManagement, so that importing
@@ -103,6 +105,18 @@
     </scm>
 
     <profiles>
+        <!-- javac 21 added the lint category this-escape, and javac 17 rejects its name. The 2.x classes call
+             overridable methods from constructors; to keep them as they are (not final), the category is turned off
+             where javac knows it. -->
+        <profile>
+            <id>jdk21-lint</id>
+            <activation>
+                <jdk>[21,)</jdk>
+            </activation>
+            <properties>
+                <lint.this-escape>,-this-escape</lint.this-escape>
+            </properties>
+        </profile>
         <!-- Releases to Maven Central through the Central Portal, by central-publishing-maven-plugin. Only releases:
              SNAPSHOTs are not published.
              Release (Ove approves each one): ./mvnw release:prepare release:perform
@@ -242,7 +256,7 @@
                         <!-- -classfile: dependencies' class files reference annotation classes they do not ship
                              (log4j-core's SpotBugs annotations); that is not this project's code. -->
                         <compilerArgs>
-                            <arg>-Xlint:all,-classfile${lint.exclusions}</arg>
+                            <arg>-Xlint:all,-classfile${lint.this-escape}${lint.exclusions}</arg>
                             <arg>-Werror</arg>
                         </compilerArgs>
                     </configuration>

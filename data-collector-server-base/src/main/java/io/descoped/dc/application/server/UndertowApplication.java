@@ -77,7 +77,7 @@ public class UndertowApplication {
                 .split(","));
         Set<String> corsAllowHeaders = Set.of(configuration.get("http.cors.allow.header", "Content-Type,Authorization")
                 .split(","));
-        boolean corsAllowCredentials = configuration.getBoolean("http.cors.allow.credentials", false);
+        boolean corsAllowCredentials = Boolean.parseBoolean(configuration.find("http.cors.allow.credentials").orElse(null));
         int corsMaxAge = configuration.getInt("http.cors.allow.max-age", 900);
 
         return new CORSHandler(pathHandler, pathHandler, corsAllowOrigin,
@@ -94,7 +94,7 @@ public class UndertowApplication {
     public static UndertowApplication initializeUndertowApplication(DynamicConfiguration configuration,
                                                                     Integer port,
                                                                     BusinessSSLResourceSupplier businessSSLResourceSupplier) {
-        if (!configuration.getBoolean("prometheus.defaultExports.disabled", false)) {
+        if (!Boolean.parseBoolean(configuration.find("prometheus.defaultExports.disabled").orElse(null))) {
             DefaultExports.initialize();
         }
         LOG.info("Initializing Data Collector server ...");

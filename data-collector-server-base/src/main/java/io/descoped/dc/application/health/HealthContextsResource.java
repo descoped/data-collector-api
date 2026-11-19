@@ -16,7 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 @HealthRenderPriority(priority = 40)
-public final class HealthContextsResource implements HealthResource {
+public class HealthContextsResource implements HealthResource {
 
     private final List<ControllerContext> contexts = new ArrayList<>();
 

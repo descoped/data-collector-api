@@ -102,10 +102,10 @@ class CertificateScanner {
 
                         } else {
                             LOG.warn("Skipping bundle '{}'. Error with configuration!", bundleName);
-                            return FileVisitResult.CONTINUE;
                         }
 
-                        builder.passphrase(secretsClient.readChars("secret.passphrase"));
+                        // secrets-client 2 read a missing passphrase as empty; 3 throws
+                        builder.passphrase(hasSecret(secretsClient, "secret.passphrase") ? secretsClient.readChars("secret.passphrase") : new char[0]);
 
                         certificateBundles.put(bundleName, builder.build());
                     }

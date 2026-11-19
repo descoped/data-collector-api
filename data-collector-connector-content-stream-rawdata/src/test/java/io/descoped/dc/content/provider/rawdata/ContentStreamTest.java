@@ -31,7 +31,7 @@ public class ContentStreamTest {
         ContentStore contentStore = ProviderConfigurator.configure(ContentStoreInitializer.class, "rawdata", Map.of(
                         "rawdata.client.provider", "memory",
                         "rawdata.encryption.key", "password",
-                        "rawdata.encryption.salt", "a-salt-of-16-bytes"));
+                        "rawdata.encryption.salt", "salt"));
         assertNotNull(contentStore);
         HttpRequestInfo httpRequestInfo = new HttpRequestInfo(CorrelationIds.create(ExecutionContext.empty()), null, -1, new Headers(), new Headers(), -1);
         contentStore.bufferDocument("topic", "1", "entry", "PAYLOAD".getBytes(), httpRequestInfo);

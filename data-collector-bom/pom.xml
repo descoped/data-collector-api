@@ -31,6 +31,11 @@
             </dependency>
             <dependency>
                 <groupId>io.descoped.dc</groupId>
+                <artifactId>data-collector-connector-content-stream-discarding</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.descoped.dc</groupId>
                 <artifactId>data-collector-connector-content-stream-rawdata</artifactId>
                 <version>${project.version}</version>
             </dependency>

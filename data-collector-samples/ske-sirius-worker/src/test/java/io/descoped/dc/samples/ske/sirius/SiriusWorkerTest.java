@@ -101,6 +101,7 @@ public class SiriusWorkerTest {
         Worker.newBuilder()
                 .configuration(DynamicConfiguration.builder()
                         .value("content.stream.connector", "rawdata")
+//                        .value("content.stream.connector", "discarding")
                         .value("rawdata.client.provider", "memory")
                         .value("data.collector.worker.threads", "20")
                         .value("local-temp-folder", "target/_tmp_avro_")

@@ -16,18 +16,8 @@ public interface ContentStreamBuffer {
      */
     UUID id();
 
-    /**
-     * The time of the message id.
-     *
-     * @return the milliseconds since 1970-01-01T00:00Z
-     * @throws IllegalStateException if the buffer has no id yet (it is not published)
-     */
     default long timestamp() {
-        UUID id = id();
-        if (id == null) {
-            throw new IllegalStateException("No id before the message is published: " + position());
-        }
-        return TimeOrderedIds.timestamp(id);
+        return TimeOrderedIds.timestamp(id());
     }
 
     String position();

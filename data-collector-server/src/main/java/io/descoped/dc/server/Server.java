@@ -11,7 +11,6 @@ import net.bytebuddy.agent.ByteBuddyAgent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.nio.file.Path;
 import java.util.function.Supplier;
 
 public class Server {
@@ -34,32 +33,30 @@ public class Server {
         }
 
         DynamicConfiguration.Builder configurationBuilder = DynamicConfiguration.builder()
-                .classpath("application-defaults.properties")
-                .file(Path.of("/conf/application-defaults.properties"))
-                .file(Path.of("/conf/application.properties"))
-                .file(Path.of("/conf/application-override.properties"));
+                .source(Configurations.propertiesResource("application-defaults.properties"))
+                .source(Configurations.propertiesResource("/conf/application-defaults.properties"))
+                .source(Configurations.propertiesResource("/conf/application.properties"))
+                .source(Configurations.propertiesResource("/conf/application-override.properties"));
         /*
          * pre-req: `docker-compose up` in this repo
          */
         if (configurationOverride == ConfigurationOverride.DEBUG_USING_POSTGRES) {
-            configurationBuilder.classpath("application-integration.properties");
+            configurationBuilder.source(Configurations.propertiesResource("application-integration.properties"));
         }
 
         /*
          * pre-req: refer to data-collection-consumer-specifications-repo and configure gcs
          */
         if (configurationOverride == ConfigurationOverride.DEBUG_USING_GCS) {
-            configurationBuilder.values(IntegrationTestProfile.loadApplicationPropertiesFromConsumerSpecificationProfile("gcs",
-                    "data.collector.certs.directory", "gcs.service-account.key-file", "local-temp-folder"));
+            configurationBuilder.source(Configurations.values(IntegrationTestProfile.loadApplicationPropertiesFromConsumerSpecificationProfile("gcs",
+                    "data.collector.certs.directory", "gcs.service-account.key-file", "local-temp-folder")));
         }
 
         configurationBuilder
-                .environment("DC_")
-                .systemProperties();
+                .source(Configurations.environment("DC_"))
+                .source(Configurations.systemProperties());
 
-        DynamicConfiguration declared = configurationBuilder.build();
-        EnvironmentOverrides.requireMatched(System.getenv(), declared.asMap().keySet());
-        DynamicConfiguration configuration = Configurations.withoutBlankValues(declared);
+        DynamicConfiguration configuration = configurationBuilder.build();
 
         /*
          * Delegated certificate loader from Google Secret Manager is placed here, because we don't won't a

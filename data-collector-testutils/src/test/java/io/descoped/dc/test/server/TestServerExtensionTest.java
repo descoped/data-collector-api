@@ -63,6 +63,13 @@ class TestServerExtensionTest {
         IntStream.range(0, keyAndValueList.size())
                 .filter(i -> i % 2 == 0)
                 .forEach(n -> assertEquals(keyAndValueList.get(n + 1), testMethodConfiguration.find(keyAndValueList.get(n)).orElse(null)));
-        assertEquals(testServer.getConfiguration(), testMethodConfiguration);
+        // Both include every system property, and the JDK sets some while it runs (sun.nio.ch.bugLevel); compare the rest.
+        assertEquals(withoutSystemProperties(testServer.getConfiguration().asMap()), withoutSystemProperties(testMethodConfiguration.asMap()));
+    }
+
+    private static java.util.Map<String, String> withoutSystemProperties(java.util.Map<String, String> configuration) {
+        java.util.Map<String, String> result = new java.util.TreeMap<>(configuration);
+        result.keySet().removeAll(System.getProperties().stringPropertyNames());
+        return result;
     }
 }

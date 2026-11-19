@@ -517,12 +517,8 @@ public class Worker {
             }
             globalState.put("global.topic", topicName);
 
-            // Without a configured content stream, content goes to rawdata-client's discard provider.
             if (!configurationMap.contains("content.stream.connector")) {
-                configurationMap.put("content.stream.connector", "rawdata");
-                if (!configurationMap.contains("rawdata.client.provider")) {
-                    configurationMap.put("rawdata.client.provider", "discard");
-                }
+                configurationMap.put("content.stream.connector", "discarding");
             }
 
             if (contentStore == null) {

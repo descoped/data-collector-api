@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.descoped.dc</groupId>
+        <artifactId>data-collector-project</artifactId>
+        <version>3.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>data-collector-connector-content-stream-discarding</artifactId>
+    <packaging>jar</packaging>
+
+    <name>Data Collector Connector Content Stream Discarding</name>
+    <description>Content store provider `discarding`: keeps the last published position in memory and drops the content; the engine's default.</description>
+
+    <properties>
+        <!-- Lint and doclint groups this module still breaks (javac -Xlint:all -Werror, Javadoc doclint all with
+             warnings failing); its revision empties both lists. -->
+        <doclint.exclusions>,-missing</doclint.exclusions>
+        <lint.exclusions>,-missing-explicit-ctor,-try</lint.exclusions>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.descoped.dc</groupId>
+            <artifactId>data-collector-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+    </dependencies>
+
+</project>
