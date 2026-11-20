@@ -233,7 +233,7 @@ public class AltinnStagingWorkerTest {
     @Test
     public void writeTargetConsumerSpec() throws IOException {
         Path currentPath = CommonUtils.currentPath().getParent().getParent();
-        Path targetPath = currentPath.resolve("data-collection-consumer-specifications");
+        Path targetPath = currentPath.resolve("examples");
 
         boolean targetProjectExists = targetPath.toFile().exists();
         if (!targetProjectExists) {

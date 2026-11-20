@@ -6,7 +6,7 @@ services:
       - 9990:9990
       - 9992:9992
     environment:
-      - LOGBACK_CONFIGURATION_FILE=/conf/log4j2.xml
+      - JAVA_OPTS=-Dlog4j2.configurationFile=/conf/log4j2.xml
     volumes:
     - $WORKDIR/profile/$PROFILE/conf:/conf
     - $WORKDIR/certs:/certs

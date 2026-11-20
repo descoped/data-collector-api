@@ -23,7 +23,10 @@
       "requestHeaders" : { },
       "bodyPublisher" : {
         "type" : "BodyPublisher",
-        "plainTextData" : "grant_type=password&username=${ENV.'moveIt.server.username'}&password=${ENV.'moveIt.server.password'}"
+        "plainTextData" : {
+          "type" : "StringBodyPublisherProducer",
+          "data" : "grant_type=password&username=${ENV.'moveIt.server.username'}&password=${ENV.'moveIt.server.password'}"
+        }
       },
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",

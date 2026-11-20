@@ -212,12 +212,6 @@ remove-filesystem-dev: ## remove filesystem
 # execute consumer specifications
 #
 
-.PHONY: ping-ske-freg
-ping-ske-freg: ## Ping SKE FREG Playground
-	@ping-ske-freg.sh
-
-#curl --cert $(PWD/certs/ske-test-certs/testauth-public.pem:$(PASSPHRASE) --key `$(PWD/certs/ske-test-certs/testauth-key.pem -kvi -o /dev/null https://folkeregisteret-api-konsument-playground.sits.no/folkeregisteret/offentlig-med-hjemmel/api/v1/hendelser/feed/?seq=1
-
 .PHONY: collect-freg-playground
 collect-freg-playground: ## Collect freg playground
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-freg-playground-spec.json
@@ -237,14 +231,6 @@ collect-sirius-person-utkast: ## Collect sirius person utkast
 .PHONY: collect-sirius-person-fastsatt
 collect-sirius-person-fastsatt: ## Collect sirius person fastsatt
 	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'content-type: application/json' -d @specs/ske-sirius-person-fastsatt-spec.json
-
-.PHONY: collect-sirius-person-utkast-prod
-collect-sirius-person-utkast-prod: ## Collect sirius person utkast prod
-	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'accept: application/xml' -d @specs/ske-sirius-person-utkast-spec-prod.json
-
-.PHONY: collect-sirius-person-fastsatt-prod
-collect-sirius-person-fastsatt-prod: ## Collect sirius person fastsatt prod
-	@curl -X PUT -i localhost:${DC_PORT}/tasks -H 'accept: application/xml' -d @specs/ske-sirius-person-fastsatt-spec-prod.json
 
 .PHONY: collect-tvinn-test
 collect-tvinn-test: ## Collect tvinn Test

@@ -1,8 +1,8 @@
 # Data Collector Samples
 
-![Build Status](https://img.shields.io/github/actions/workflow/status/descoped/data-collector-samples/coverage-and-sonar-analysis.yml)
-![Latest Tag](https://img.shields.io/github/v/tag/descoped/data-collector-samples)
-![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)
+Example specifications for real APIs, run as tests. The ones that need real sources (Maskinporten, business certificates, Skatteetaten, Altinn, Toll) are disabled. This module is not published.
 
-For more information about Data Collector, please refer to
-the [Data Collector documentation](https://github.com/descoped/data-collector-project).
+Not a JPMS module. Part of [Data Collector](../README.md); built with the whole repository.
+
+- [Developer guide](../docs/developer-guide.md)
+- [Examples](../examples/README.md)
