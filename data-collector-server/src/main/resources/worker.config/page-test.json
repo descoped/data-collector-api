@@ -1,13 +1,13 @@
 {
   "type" : "Specification",
-  "id": "TEST",
   "name" : "paging",
   "startFunctionId" : "page-loop",
+  "id" : "TEST",
   "configure" : [ {
     "type" : "SpecificationContext",
     "variables" : {
       "baseURL" : "http://0.0.0.0:PORT",
-      "fromPosition" : "1"
+      "nextPosition" : "${contentStream.lastOrInitialPosition(1)}"
     },
     "globalState" : {
       "global.topic" : "topic"
@@ -39,11 +39,19 @@
       "type" : "Get",
       "id" : "page",
       "url" : "${baseURL}/api/events?position=${fromPosition}&pageSize=10",
-      "positionProducerClass": "io.descoped.dc.server.ServerTest$LongPositionProducer",
+      "requestHeaders" : { },
       "returnVariables" : [ "nextPosition" ],
       "responseValidators" : [ {
         "type" : "HttpStatusValidation",
-        "success" : [ 200, 201, 202, 203, 204, 205, 206 ],
+        "success" : {
+          "200" : [ ],
+          "201" : [ ],
+          "202" : [ ],
+          "203" : [ ],
+          "204" : [ ],
+          "205" : [ ],
+          "206" : [ ]
+        },
         "failed" : [ 300, 301, 302, 303, 304, 305, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 412, 413, 414, 415, 500, 501, 502, 503, 504, 505 ]
       } ],
       "pipes" : [ {
@@ -61,7 +69,7 @@
         "outputs" : {
           "nextPosition" : {
             "type" : "QueryRegEx",
-            "expression" : "(?<=[?&]seq=)[^&]*",
+            "expression" : "(?<=[?&]position=)[^&]*",
             "query" : {
               "type" : "QueryXPath",
               "expression" : "/feed/link[@rel=\"next\"]/@href"
@@ -90,7 +98,7 @@
           "inputVariables" : {
             "eventId" : {
               "type" : "QueryXPath",
-              "expression" : "/entry/event/event-id"
+              "expression" : "/entry/event-id"
             }
           }
         }, {
@@ -103,6 +111,7 @@
       "type" : "Get",
       "id" : "event-doc",
       "url" : "${baseURL}/api/events/${eventId}?type=event",
+      "requestHeaders" : { },
       "pipes" : [ {
         "type" : "AddContent",
         "positionVariableExpression" : "${position}",

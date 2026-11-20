@@ -86,19 +86,6 @@ make TARGET
 | remove-gcs                      | Remove gcs                                       |
 | open-gcs-adminer                | Open a web based DB admin tool in your browser   |
 
-### Kafka Stream Provider
-
-> :warning: The Kafka provider IS NOT a deployment target for MOD Sirius.
-
-| Target                          | Description                                      |
-| :------------------------------ | :----------------------------------------------- |
-| pull-kafka                      | Pull images                                      |
-| start-kafka                     | Start kafka                                      |
-| tail-kafka                      | Tail docker log                                  |
-| stop-kafka                      | Stop kafka                                       |
-| stop-kafka-clean                | Stop kafka and remove anonymous volumes          |
-| remove-kafka                    | Remove kafka                                     |
-
 ### Build Data Collector Dev Image
 
 Dev images requires full checkout of the [data-collector-project](https://github.com/descoped/data-collector-project)
@@ -129,16 +116,6 @@ repo.
 | stop-gcs-dev                    | Stop gcs-dev                                     |
 | stop-gcs-dev-clean              | Stop gcs-dev and remove anonymous volumes        |
 | remove-gcs-dev                  | Remove gcs-dev                                   |
-
-### Kafka Dev Stream Provider
-
-| Target                          | Description                                      |
-| :------------------------------ | :----------------------------------------------- |
-| start-kafka-dev                 | Start kafka-dev                                  |
-| tail-kafka-dev                  | Tail docker log                                  |
-| stop-kafka-dev                  | Stop kafka-dev                                   |
-| stop-kafka-dev-clean            | Stop kafka-dev and remove anonymous volumes      |
-| remove-kafka-dev                | Remove kafka-dev                                 |
 
 ## Rawdata Producer (execute task)
 

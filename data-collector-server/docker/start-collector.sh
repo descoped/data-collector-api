@@ -4,9 +4,10 @@ set -e
 JPMS_SWITCHES="
   --add-opens java.base/java.nio=lmdbjava
   --add-exports java.base/sun.nio.ch=lmdbjava
-  --add-reads no.ssb.dc.core=ALL-UNNAMED
-  --add-opens no.ssb.dc.core/no.ssb.dc.core=ALL-UNNAMED
-  --add-reads no.ssb.dc.content.rawdata=no.ssb.dc.core
+  --add-reads io.descoped.dc.core=ALL-UNNAMED
+  --add-opens io.descoped.dc.core/io.descoped.dc.core=ALL-UNNAMED
+  --add-reads io.descoped.dc.content.rawdata=io.descoped.dc.core
+  --add-modules ALL-MODULE-PATH
 "
 
 if [ -n "$JAVA_OPTS" ]; then
@@ -22,7 +23,7 @@ if [ -n "$PROXY_HTTP_PORT" ]; then
 fi
 
 if [ -n "$PROXY_HTTPS_HOST" ]; then
-  PROXY_OPTS="-Dhttps.proxyHost=$PROXY_HTTPS_HOST"
+  PROXY_OPTS="$PROXY_OPTS -Dhttps.proxyHost=$PROXY_HTTPS_HOST"
 fi
 
 if [ -n "$PROXY_HTTPS_PORT" ]; then
@@ -47,8 +48,8 @@ else
   JMX_REMOTE_OPTS=""
 fi
 
-DEFAULT_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -XX:+UseContainerSupport"
+DEFAULT_OPTS="-XX:+UseContainerSupport"
 
 JAVA_AGENT_OPTS="-XX:+StartAttachListener -javaagent:$(find /opt/dc/lib/ -type f -iname 'byte-buddy-agent*')"
 
-java $JPMS_SWITCHES $JAVA_OPTS $PROXY_OPTS $DEFAULT_OPTS $JMX_REMOTE_OPTS $JAVA_AGENT_OPTS -p /opt/dc/lib -m no.ssb.dc.server/no.ssb.dc.server.Server
+java $JPMS_SWITCHES $JAVA_OPTS $PROXY_OPTS $DEFAULT_OPTS $JMX_REMOTE_OPTS $JAVA_AGENT_OPTS -p /opt/dc/lib -cp '/opt/dc/classpath/*' -m io.descoped.dc.server/io.descoped.dc.server.Server

@@ -10,7 +10,7 @@ the [Data Collector documentation](https://github.com/descoped/data-collector-pr
 
 ```
 cd data-collector-project
-mvn clean install
+./mvnw clean install
 ```
 
 ### Build and release docker-dev image
@@ -21,16 +21,15 @@ mvn clean install
 > :warning: Versioning must follow: https://semver.org
 
 ```
-cd data-collector-server
+cd data-collector-project
+./mvnw -B -pl data-collector-server -am clean verify dependency:copy-dependencies -DskipTests
 
-mvn -B clean install -DskipTests && mvn -B dependency:copy-dependencies
+cd data-collector-server
 
 docker login -u USERNAME
 
-docker build --no-cache -t descoped/data-collector:MAJOR.MINOR.PATCH -f ./Dockerfile-dev .
-docker push descoped/data-collector:MAJOR.MINOR.PATCH
-docker tag descoped/data-collector:MAJOR.MINOR.PATCH descoped/data-collector:latest
-docker push descoped/data-collector:latest
+docker buildx build --no-cache --platform linux/amd64,linux/arm64 -f ./Dockerfile \
+  -t descoped/data-collector:MAJOR.MINOR.PATCH -t descoped/data-collector:latest --push .
 ```
 
 ### Pull and run Data Collector
@@ -87,7 +86,7 @@ data.collector.sslBundle.name=ssb-prod-certs
 data.collector.sslBundle.publicCertificate=secretName
 data.collector.sslBundle.privateCertificate=secretName
 data.collector.sslBundle.archiveCertificate=secretName
-data.collector.sslBundle.passphrase=secretNam
+data.collector.sslBundle.passphrase=secretName
 ```
 
 ### Rawdata Encryption Credentials
@@ -105,4 +104,8 @@ rawdata.encryption.salt = (encryptionSalt | secretName)
 Set environment variable `LOGBACK_CONFIGURATION_FILE=/opt/dc/log4j2-logstash.xml` to enable structured logging using
 Logstash.
 
-.
+### Image
+
+The image (Temurin 17 on Ubuntu) runs on amd64 and arm64, as user `dc` (uid 10001, group root may write its home and `/rawdata`). JMX remote
+(port 9992, no authentication) is off; set `ENABLE_JMX_REMOTE_DEBUGGING=true` to switch it on. The dev image
+(`Dockerfile-dev`, for Visual VM) has it on. `build-and-run.sh` reads the same variable.
