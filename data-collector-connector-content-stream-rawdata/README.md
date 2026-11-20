@@ -1,22 +1,26 @@
-# Data Collector Connector Content Stream Rawdata
+# Data Collector Connector: Rawdata Content Stream
 
-![Build Status](https://img.shields.io/github/actions/workflow/status/descoped/data-collector-connector-content-stream-rawdata/coverage-and-sonar-analysis.yml)
-![Latest Tag](https://img.shields.io/github/v/tag/descoped/data-collector-connector-content-stream-rawdata)
-![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=descoped_data-collector-connector-content-stream-rawdata&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=descoped_data-collector-connector-content-stream-rawdata) [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=descoped_data-collector-connector-content-stream-rawdata&metric=coverage)](https://sonarcloud.io/summary/new_code?id=descoped_data-collector-connector-content-stream-rawdata)
-[![Snyk Security Score](https://snyk.io/test/github/descoped/data-collector-connector-content-stream-rawdata/badge.svg)](https://snyk.io/test/github/descoped/data-collector-connector-content-stream-rawdata)
+Content store provider `rawdata`: dc publishes content to [rawdata-client](https://github.com/descoped/rawdata-client-project)
+topics, optionally encrypted. The rawdata provider dc ships with (`filesystem`, `postgres`, `gcs`, and the built-in `memory` and `discard`) is chosen
+with `rawdata.client.provider`.
 
-## Content Encryption
+JPMS module: `io.descoped.dc.content.rawdata`. Part of [Data Collector](../README.md); built and released with the
+whole repository.
 
-To enable encryption, configure the following properties in `application-*.properties:
+## Content encryption
 
-```
+Content is encrypted when both of these are set:
+
+```properties
 rawdata.encryption.key=PASSPHRASE
 rawdata.encryption.salt=SALT
 ```
 
-This enables AES-128 or AES-256 GCM encryption of rawdata position entries. The consumer must add the
-`io.descoped.encryption:entryption-util:VERSION` and implement the `EncryptionClient`.
+The key is derived with PBKDF2-HMAC-SHA256 (65 536 iterations) and content is encrypted with AES-256 through
+[encryption-util](https://github.com/descoped/encryption-util) 3. A consumer reads it with encryption-util 3 and a key
+derived the same way from the same password and salt (encryption-util 3's own derivation refuses salts shorter than
+16 bytes). The key and salt can also come from Google Secret Manager; see
+[Administration](../docs/administration.md).
 
-For more information about Data Collector, please refer to
-the [Data Collector documentation](https://github.com/descoped/data-collector-project).
+- [Administration](../docs/administration.md)
+- [Architecture](../docs/architecture.md)

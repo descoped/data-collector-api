@@ -5,7 +5,7 @@ Guidance for Claude Code in this repository.
 ## What this is
 
 Data Collector: a specification driven HTTP crawler. A specification is a tree of nodes (get, post, paginate, sequence,
-parallel, queries with JSONPath, jq, XPath and regex, publish) that pages through an API and publishes each entry as a
+parallel, queries with jq, XPath and regex, publish) that pages through an API and publishes each entry as a
 position on a content stream, which the rawdata connector writes to rawdata-client topics. The server runs
 specifications as tasks over HTTP. One Maven reactor, group `io.descoped.dc`, owned by Descoped.
 
@@ -22,8 +22,12 @@ specifications as tasks over HTTP. One Maven reactor, group `io.descoped.dc`, ow
 | `data-collector-testutils` | n/a (class path) | JUnit harness: embedded test server with mock data, test client, configuration profiles |
 | `data-collector-samples` | n/a | example specifications run as tests; not published |
 
-`data-collection-consumer-specifications/` (compose files, example specs) and `data-collector-documentation/`
-(AsciiDoc) are not Maven modules; they are folded into `examples/` and `docs/` later.
+`docs/` holds the documentation (Markdown; diagrams in Mermaid) and `examples/` the compose setups, configuration
+profiles and real-world specifications; neither is a Maven module. `ExampleSpecificationsTest` (data-collector-api)
+reads and builds every `examples/specs/*.json`, so a DSL change that breaks an example fails the build.
+`CHANGELOG.md` (Keep a Changelog) records every user-visible change: a pull request that changes behaviour,
+configuration, the image or the API adds its entry under the unreleased version. Documentation that a change makes
+wrong is updated in the same pull request.
 
 Until 2026-11 every module was a repository of its own; their histories were imported here with `git filter-repo`
 (old tags prefixed with the repository name, e.g. `data-collector-api/2.0.4`). 3.0.0 is the first version built from

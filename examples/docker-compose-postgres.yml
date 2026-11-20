@@ -1,0 +1,54 @@
+services:
+
+  data-collector-postgres:
+    image: $DC_IMAGE
+    ports:
+      - 9990:9990
+      - 9992:9992
+    volumes:
+    - $WORKDIR/profile/$PROFILE/conf:/conf
+    - $WORKDIR/certs:/certs
+    depends_on:
+    - dc-postgres-db
+
+  dc-postgres-db:
+    image: postgres:18.7-alpine
+    ports:
+      - 15432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+    - dc-postgres-test:/var/lib/postgresql
+    - $WORKDIR/profile/$PROFILE/init-db-and-user.sql:/docker-entrypoint-initdb.d/init.sql
+
+  dc-adminer:
+    image: adminer:6.3.0
+    ports:
+    - 8980:8080
+    depends_on:
+    - dc-postgres-db
+
+  grafana:
+    image: grafana/grafana:13.3.1
+    ports:
+    - 3000:3000
+    depends_on:
+    - prom
+
+  prom:
+    image: prom/prometheus:v3.16.0
+    volumes:
+    - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+    ports:
+    - 9090:9090
+    depends_on:
+    - data-collector-postgres
+
+volumes:
+  dc-postgres-test:

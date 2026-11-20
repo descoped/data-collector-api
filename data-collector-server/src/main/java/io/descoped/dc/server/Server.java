@@ -45,7 +45,7 @@ public class Server {
         }
 
         /*
-         * pre-req: refer to data-collection-consumer-specifications-repo and configure gcs
+         * pre-req: refer to examples folder and configure gcs
          */
         if (configurationOverride == ConfigurationOverride.DEBUG_USING_GCS) {
             configurationBuilder.source(Configurations.values(IntegrationTestProfile.loadApplicationPropertiesFromConsumerSpecificationProfile("gcs",

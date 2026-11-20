@@ -8,8 +8,6 @@ import io.descoped.dc.core.executor.Worker;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static io.descoped.dc.api.Builders.addContent;
@@ -161,18 +159,4 @@ public class FregSvalbardWithMaskinportenWorkerTest {
                 .run();
     }
 
-    @Disabled
-    @Test
-    public void writeTargetConsumerSpec() throws IOException {
-        Path currentPath = CommonUtils.currentPath().getParent().getParent();
-        Path targetPath = currentPath.resolve("data-collection-consumer-specifications");
-
-        boolean targetProjectExists = targetPath.toFile().exists();
-        if (!targetProjectExists) {
-            throw new RuntimeException(String.format("Couldn't locate '%s' under currentPath: %s%n", targetPath.toFile().getName(), currentPath.toAbsolutePath().toString()));
-        }
-
-//        Files.writeString(targetPath.resolve("specs").resolve("ske-freg-brsv-konsument-spec.json"), specificationBuilder.serialize());
-        Files.writeString(targetPath.resolve("specs").resolve("ske-freg-brsv-prod-spec.json"), specificationBuilder.serialize());
-    }
 }
