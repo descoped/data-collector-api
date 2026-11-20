@@ -132,11 +132,12 @@
             <artifactId>jansi</artifactId>
             <version>${jansi.version}</version>
         </dependency>
+        <!-- lmdbjava's native bridge at its latest: jnr-ffi brings jffi and jffi's native libraries of one version -->
         <dependency>
             <groupId>com.github.jnr</groupId>
-            <artifactId>jffi</artifactId>
-            <version>${jffi.version}</version>
-            <scope>test</scope>
+            <artifactId>jnr-ffi</artifactId>
+            <version>${jnr-ffi.version}</version>
+            <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>io.descoped.dc</groupId>
@@ -164,6 +165,14 @@
 
     <build>
         <plugins>
+            <!-- dependency:copy-dependencies gathers the image's jars: runtime scope only, no test jars -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <configuration>
+                    <includeScope>runtime</includeScope>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

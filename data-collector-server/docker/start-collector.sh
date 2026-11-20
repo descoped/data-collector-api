@@ -23,7 +23,7 @@ if [ -n "$PROXY_HTTP_PORT" ]; then
 fi
 
 if [ -n "$PROXY_HTTPS_HOST" ]; then
-  PROXY_OPTS="-Dhttps.proxyHost=$PROXY_HTTPS_HOST"
+  PROXY_OPTS="$PROXY_OPTS -Dhttps.proxyHost=$PROXY_HTTPS_HOST"
 fi
 
 if [ -n "$PROXY_HTTPS_PORT" ]; then
@@ -48,8 +48,7 @@ else
   JMX_REMOTE_OPTS=""
 fi
 
-# lmdbjava picks its glibc library on Linux; the image is Alpine (musl)
-DEFAULT_OPTS="-XX:+UnlockExperimentalVMOptions -XX:+EnableJVMCI -XX:+UseContainerSupport -Dlmdbjava.embedded.lib=org/lmdbjava/native/x86_64-linux-musl.so"
+DEFAULT_OPTS="-XX:+UseContainerSupport"
 
 JAVA_AGENT_OPTS="-XX:+StartAttachListener -javaagent:$(find /opt/dc/lib/ -type f -iname 'byte-buddy-agent*')"
 
