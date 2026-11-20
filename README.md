@@ -50,6 +50,7 @@ make stop-filesystem-dev
 | [Developer guide](docs/developer-guide.md) | Building, testing, using dc as a library, writing connectors |
 | [Examples](examples/README.md) | Compose setups, configuration profiles and real-world specifications |
 | [Changelog](CHANGELOG.md) | What changed in each release |
+| [Roadmap](ROADMAP.md) | What comes next in 3.x |
 
 ## Modules
 
