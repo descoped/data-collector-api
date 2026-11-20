@@ -8,7 +8,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -20,13 +19,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  */
 public class ExampleSpecificationsTest {
 
-    private static final Path REPOSITORY = Path.of("..").toAbsolutePath().normalize();
+    private static final Path REPOSITORY = repository();
+
+    /** The repository root: the nearest directory above the working directory that has {@code examples/specs}. */
+    private static Path repository() {
+        for (Path dir = Path.of("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
+            if (Files.isDirectory(dir.resolve("examples").resolve("specs"))) {
+                return dir;
+            }
+        }
+        throw new IllegalStateException("examples/specs not found above " + Path.of("").toAbsolutePath());
+    }
 
     @TestFactory
     Stream<DynamicTest> exampleSpecificationsReadAndBuild() throws IOException {
         List<Path> specifications;
         try (Stream<Path> files = Files.list(REPOSITORY.resolve("examples").resolve("specs"))) {
-            specifications = files.filter(path -> path.toString().endsWith(".json")).sorted().collect(Collectors.toList());
+            specifications = files.filter(path -> path.toString().endsWith(".json")).sorted().toList();
         }
         assertFalse(specifications.isEmpty(), "no specifications in examples/specs");
         Path pageTest = REPOSITORY.resolve("data-collector-server/src/main/resources/worker.config/page-test.json");
