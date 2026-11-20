@@ -1,111 +1,27 @@
 # Data Collector Server
 
-![Renovate](https://img.shields.io/badge/renovate-enabled-brightgreen.svg)
+The server runs specifications as tasks over HTTP (`PUT /tasks`). It also checks topics with an integrity check (LMDB),
+and copies a checked topic to a new one (recovery). This module also builds the Docker image.
 
-For more information about Data Collector, please refer to
-the [Data Collector documentation](https://github.com/descoped/data-collector-project).
+JPMS module: `io.descoped.dc.server`. Part of [Data Collector](../README.md); built and released with the whole
+repository.
 
+## Files
 
-## Build
+| File | Purpose |
+|---|---|
+| `Dockerfile` | The release image: Temurin 17 on Ubuntu, `linux/amd64` and `linux/arm64`, JMX off |
+| `Dockerfile-dev` | The same image with JMX remote on (port 9992), for Visual VM |
+| `docker/start-collector.sh` | The image's launch script |
+| `docker/SplitModulePath.java` | Splits the jars into module path and class path at image build |
+| `build-dev.sh` | Builds the server and the image `data-collector:dev` |
+| `build-and-run.sh` | Builds the server and runs it locally, without Docker |
+| `run-dev.sh` | Runs `data-collector:dev` |
+| `docker-compose.yml`, `init-db-and-user.sql`, `docker-postgres-init-db.bash` | A PostgreSQL 18 database for running the server locally |
 
-```
-cd data-collector-project
-./mvnw clean install
-```
+## Documentation
 
-### Build and release docker-dev image
-
-> :bulb: To determine next version manually, check latest version
-> at [Docker Hub](https://cloud.docker.com/u/descoped/repository/docker/descoped/data-collector/tags)
-
-> :warning: Versioning must follow: https://semver.org
-
-```
-cd data-collector-project
-./mvnw -B -pl data-collector-server -am clean verify dependency:copy-dependencies -DskipTests
-
-cd data-collector-server
-
-docker login -u USERNAME
-
-docker buildx build --no-cache --platform linux/amd64,linux/arm64 -f ./Dockerfile \
-  -t descoped/data-collector:MAJOR.MINOR.PATCH -t descoped/data-collector:latest --push .
-```
-
-### Pull and run Data Collector
-
-```
-docker pull descoped/data-collector:latest
-docker run -it -p 9990:9990 -v $PWD/conf:/conf -v $PWD/certs:/certs -v /tmp/rawdata:/rawdata descoped/data-collector:latest
-```
-
-## Build dev
-
-```
-./build-dev.sh
-
-docker run -it -p 9990:9990 data-collector:dev
-```
-
-## Build dev and Visual VM Profiling
-
-Visual VM can be connected to `io.descoped.dc.server.Server` or using `data-collector:dev` image.
-
-Follow these instructions for setting up profiling.
-
-### Run `Server` from IntelliJ
-
-1. Configure `Server` (see enum inside)
-1. Consult readme in `data-collection-consumer-specifications`-repo regarding GCS configuration
-1. Run `Server` in IntelliJ using Visual VM plugin
-1. `make collect-freg-playground`
-
-### Docker-dev (`data-collection-consumer-specifications`)
-
-> Consult readme in `data-collection-consumer-specifications`-repo regarding GCS configuration.
-
-1. `make build-data-collector-dev-image`
-1. `make start-gcs-dev`
-1. `make tail-gcs-dev`
-1. [Download and open Visual VM](https://visualvm.github.io/) (standard version, not Graal download)
-1. File --> Add Remote Host ("0.0.0.0")
-1. In left pane, right click "0.0.0.0" and Choose "Add JMX Connection"
-1. Set port to 9992
-1. `make collect-freg-playground`
-
-## Configuration
-
-### Google Secret Manager SSL properties
-
-```
-data.collector.sslBundle.provider=google-secret-manager
-data.collector.sslBundle.gcp.projectId=SECRET_MANAGER_PROJECT_ID
-data.collector.sslBundle.gcp.serviceAccountKeyPath=(optional)
-data.collector.sslBundle.type=(pem | p12)
-data.collector.sslBundle.name=ssb-prod-certs
-data.collector.sslBundle.publicCertificate=secretName
-data.collector.sslBundle.privateCertificate=secretName
-data.collector.sslBundle.archiveCertificate=secretName
-data.collector.sslBundle.passphrase=secretName
-```
-
-### Rawdata Encryption Credentials
-
-```
-rawdata.encryption.provider = (dynamic-secret-configuration | google-secret-manager)
-rawdata.encryption.gcp.projectId => google-secret-manager
-rawdata.encryption.gcp.serviceAccountKeyPath => google-secret-manager
-rawdata.encryption.key  = (encryptionKey | secretName)
-rawdata.encryption.salt = (encryptionSalt | secretName)
-```
-
-### Logstash
-
-Set environment variable `LOGBACK_CONFIGURATION_FILE=/opt/dc/log4j2-logstash.xml` to enable structured logging using
-Logstash.
-
-### Image
-
-The image (Temurin 17 on Ubuntu) runs on amd64 and arm64, as user `dc` (uid 10001, group root may write its home and `/rawdata`). JMX remote
-(port 9992, no authentication) is off; set `ENABLE_JMX_REMOTE_DEBUGGING=true` to switch it on. The dev image
-(`Dockerfile-dev`, for Visual VM) has it on. `build-and-run.sh` reads the same variable.
+- [Getting started](../docs/getting-started.md): build the image, start it, run a specification
+- [REST API](../docs/rest-api.md): every endpoint
+- [Administration](../docs/administration.md): configuration, the image, logging, metrics, Visual VM, client certificates,
+  encryption, integrity check and recovery
